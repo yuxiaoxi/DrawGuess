@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/txt_player_room_guess_word"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:background="@drawable/waite_shape"
+        android:layout_centerHorizontal="true"
+        android:text="闭月羞花"
+        android:textColor="@color/white"
+        android:textSize="10sp"/>
+
+    <ImageView
+        android:id="@+id/img_player_room_avatar"
+        android:layout_below="@+id/txt_player_room_guess_word"
+        android:layout_width="47dp"
+        android:layout_height="37dp"
+        android:layout_marginTop="3dp"
+        android:layout_centerHorizontal="true"
+        android:paddingLeft="5dp"
+        android:paddingRight="5dp"
+        android:src="@drawable/default_avatar"/>
+
+    <TextView
+        android:id="@+id/txt_player_room_score"
+        android:layout_width="15dp"
+        android:layout_height="15dp"
+        android:background="@drawable/score_ring_shape"
+        android:layout_alignRight="@+id/img_player_room_avatar"
+        android:layout_alignTop="@+id/img_player_room_avatar"
+        android:layout_marginTop="2dp"
+        android:layout_marginLeft="5dp"
+        android:gravity="center"
+        android:textColor="@color/white"
+        android:text="6"
+        android:textSize="8sp"/>
+
+
+</RelativeLayout>

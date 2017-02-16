@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:android_custom="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical" >
+
+    <com.zhy.graph.widget.RoundProgressBar
+        android:id="@+id/progress"
+        android:layout_width="50dip"
+        android:layout_height="50dip"
+        android_custom:roundColor="#D1D1D1"
+        android_custom:roundProgressColor="@android:color/black"
+        android:layout_centerInParent="true"
+        android_custom:roundWidth="5dip"
+        android_custom:textColor="#FFFFFF"
+        android_custom:textIsDisplayable="true"
+        android_custom:textSize="16sp" />
+
+</RelativeLayout>

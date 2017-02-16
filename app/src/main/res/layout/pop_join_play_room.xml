@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="180dp"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="40dp"
+        android:layout_marginRight="40dp"
+        android:focusable="false"
+        android:focusableInTouchMode="false"
+        android:background="@drawable/white_shape">
+
+        <TextView
+            android:id="@+id/txt_room_id"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="25dp"
+            android:layout_marginTop="25dp"
+            android:gravity="center"
+            android:text="房间号码"
+            android:textColor="#B9B9B9"
+            android:textSize="16sp" />
+
+
+        <TextView
+            android:id="@+id/txt_warn_room_not_exist"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="25dp"
+            android:layout_marginTop="25dp"
+            android:gravity="center"
+            android:text="该房间不存在"
+            android:textColor="@color/red"
+            android:textSize="16sp"
+            android:visibility="gone" />
+
+        <EditText
+            android:id="@+id/edit_input_room_id"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_below="@+id/txt_room_id"
+            android:layout_marginLeft="25dp"
+            android:layout_marginRight="25dp"
+            android:layout_marginTop="10dp"
+            android:background="@null"
+            android:gravity="center"
+            android:inputType="number"
+            android:textSize="24sp" />
+
+        <View
+            android:id="@+id/view_line_seperator"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_below="@+id/edit_input_room_id"
+            android:layout_marginLeft="25dp"
+            android:layout_marginRight="25dp"
+            android:background="#888888" />
+
+        <TextView
+            android:id="@+id/btn_join_play_room"
+            android:layout_width="60dp"
+            android:layout_height="30dp"
+            android:layout_below="@+id/view_line_seperator"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="15dp"
+            android:background="@drawable/fasong_btn"
+            android:gravity="center"
+            android:text="进入"
+            android:textColor="@color/white"></TextView>
+    </RelativeLayout>
+
+</RelativeLayout>

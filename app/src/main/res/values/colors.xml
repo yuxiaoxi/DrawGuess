@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#FF4081</color>
+
+    <!-- 白色 -->
+    <color name="white">#ffffff</color>
+    <!-- 黑色 -->
+    <color name="black">#000000</color>
+    <!-- 蓝色 -->
+    <color name="bule">#0000ff</color>
+    <!-- index 页面 -->
+    <color name="index_bg">#312637</color>
+    <color name="index_text">#524E5D</color>
+    <!-- chat -->
+    <color name="base_bg">#f4f6f6</color>
+
+    <color name="main_bottom">#F8F8F8</color>
+    <color name="index_top_bg">#75C0C5</color>
+
+    <color name="message_record_act_bg">#F6F0E0</color>
+
+    <color name="groups_title_bg">#EAE2CF</color>
+    <color name="main_bottom_gray">#80312637</color>
+    <color name="message_item_time_tbtn_gray_bgxt">#A6A6A6</color>
+    <color name="message_item_content_txt">#7D7D7D</color>
+    <color name="chat_add_bottom_bg">#CECECE</color>
+    <color name="group_act_groupname">#3D4245</color>
+    <color name="red">#FF6A6A</color>
+    <color name="fade_green">#E7F8FF</color>
+    <color name="bg">#E3E3E3</color>
+    <color name="line_bg">#E6E6E6</color>
+    <color name="app_style">#10CECE</color>
+
+    <color name="pink_ring">#FD6E9D</color>
+    <color name="huaban_bg">#FFFDED</color>
+
+    <color name="transparent">#00000000</color>
+    <color name="btn_gray_bg">#656565</color>
+    <color name="btn_ready_gray_bg">#D3D3D3</color>
+
+</resources>

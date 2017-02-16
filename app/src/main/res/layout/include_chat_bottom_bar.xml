@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#F8F8F8"
+    android:orientation="vertical" >
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="0.5dp"
+        android:background="#E6E6E6" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:focusable="true"
+        android:gravity="center_vertical"
+        android:minHeight="50.0dip"
+        android:orientation="horizontal"
+        android:paddingLeft="5dp"
+        android:paddingRight="5dp" >
+
+
+        <com.zhy.graph.widget.EmoticonsEditText
+            android:id="@+id/edit_user_comment"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="3dp"
+            android:layout_marginLeft="6dp"
+            android:layout_marginRight="6dp"
+            android:layout_marginTop="3dp"
+            android:layout_weight="1.0"
+            android:background="@drawable/shurukuang_1"
+            android:imeOptions="flagNoExtractUi"
+            android:maxLines="3"
+            android:minHeight="40dp"
+            android:padding="5dp" />
+
+        <TextView
+            android:id="@+id/btn_chat_send"
+            android:layout_width="60dp"
+            android:layout_height="30dp"
+            android:background="@drawable/fasong_btn"
+            android:gravity="center"
+            android:text="发送"
+            android:textColor="@color/white" >
+        </TextView>
+    </LinearLayout>
+
+
+</LinearLayout>
