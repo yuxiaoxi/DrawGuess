@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:id="@+id/rel_pop_save_draw"
+        android:layout_width="match_parent"
+        android:layout_height="400dp"
+        android:layout_marginLeft="40dp"
+        android:layout_marginRight="40dp"
+        android:focusable="false"
+        android:focusableInTouchMode="false"
+        android:paddingLeft="15dp"
+        android:paddingRight="15dp"
+        android:background="@drawable/titel_shape_green">
+
+        <TextView
+            android:id="@+id/txt_select_word_describe"
+            android:layout_width="wrap_content"
+            android:layout_height="25dp"
+            android:layout_marginLeft="25dp"
+            android:layout_marginTop="20dp"
+            android:layout_centerHorizontal="true"
+            android:gravity="center"
+            android:text="菊花"
+            android:textColor="@color/white"
+            android:textSize="20sp" />
+
+
+        <ImageView
+            android:id="@+id/img_draw_bitmap"
+            android:layout_below="@+id/txt_select_word_describe"
+            android:layout_width="match_parent"
+            android:layout_height="280dp"
+            android:layout_marginTop="10dp"
+            android:background="#FFFAE9"/>
+        <LinearLayout
+            android:layout_below="@+id/img_draw_bitmap"
+            android:layout_width="wrap_content"
+            android:layout_marginTop="25dp"
+            android:layout_height="60dp"
+            android:paddingLeft="30dp"
+            android:paddingRight="20dp"
+            android:orientation="horizontal">
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/save_draw_icon"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center|top"
+                android:layout_gravity="top"
+                android:text="保存"
+                android:layout_marginLeft="6dp"
+                android:textSize="16sp"
+                android:textColor="@color/white"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_below="@+id/img_draw_bitmap"
+            android:layout_width="wrap_content"
+            android:layout_marginTop="25dp"
+            android:layout_height="60dp"
+            android:paddingRight="30dp"
+            android:paddingLeft="20dp"
+            android:layout_alignParentRight="true"
+            android:orientation="horizontal">
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/title_bar_share_icon"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center|top"
+                android:layout_gravity="top"
+                android:text="分享"
+                android:layout_marginLeft="6dp"
+                android:textSize="16sp"
+                android:textColor="@color/white"/>
+        </LinearLayout>
+
+
+    </RelativeLayout>
+
+    <TextView
+        android:layout_below="@+id/rel_pop_save_draw"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_marginTop="20dp"
+        android:layout_alignStart="@+id/rel_pop_save_draw"
+        android:paddingLeft="40dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        android:paddingRight="40dp"
+        android:text="好题"
+        android:layout_marginLeft="6dp"
+        android:textSize="16sp"
+        android:textColor="@color/white"/>
+
+    <TextView
+        android:layout_below="@+id/rel_pop_save_draw"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_marginTop="20dp"
+        android:layout_alignEnd="@+id/rel_pop_save_draw"
+        android:paddingLeft="40dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        android:paddingRight="40dp"
+        android:text="差题"
+        android:layout_marginLeft="6dp"
+        android:textSize="16sp"
+        android:textColor="@color/white"/>
+
+</RelativeLayout>

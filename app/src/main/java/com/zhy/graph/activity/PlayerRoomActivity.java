@@ -8,12 +8,16 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.SubMenu;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.GridView;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -27,6 +31,7 @@ import com.zhy.graph.utils.PtsReceiverUtils;
 import com.zhy.graph.utils.Utils;
 import com.zhy.graph.widget.ChatInputDialog;
 import com.zhy.graph.widget.HuaBanView;
+import com.zhy.graph.widget.PopDialog;
 
 import net.duohuo.dhroid.ioc.annotation.InjectView;
 
@@ -80,6 +85,9 @@ public class PlayerRoomActivity extends BaseAct{
     @InjectView(id = R.id.txt_player_room_answer, click = "onClickCallBack")
     private TextView txt_player_room_answer;
 
+    @InjectView(id = R.id.txt_player_huabi_setting, click = "onClickCallBack")
+    private TextView txt_player_huabi_setting;
+
     @InjectView(id = R.id.txt_player_clear_screen, click = "onClickCallBack")
     private TextView txt_player_clear_screen;
 
@@ -95,6 +103,7 @@ public class PlayerRoomActivity extends BaseAct{
     private Mythread mythread = null;
 
     private boolean destroyed,connectClosed;
+    private PopDialog popDialog = null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -502,13 +511,36 @@ public class PlayerRoomActivity extends BaseAct{
         switch (view.getId()) {
 
             case R.id.txt_player_room_answer:
-                Log.e("nnnnnn","已点击");
-                conn();
+                popDialog = PopDialog.createDialog(PlayerRoomActivity.this, R.layout.pop_save_or_share_draw, Gravity.CENTER, R.style.CustomProgressDialog);
+                Window win = popDialog.getWindow();
+                win.getDecorView().setPadding(0, 0, 0, 0);
+                WindowManager.LayoutParams lp = win.getAttributes();
+                lp.width = WindowManager.LayoutParams.FILL_PARENT;
+                lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
+                win.setAttributes(lp);
+                popDialog.setCanceledOnTouchOutside(false);
+
+                ((ImageView)popDialog.findViewById(R.id.img_draw_bitmap)).setImageBitmap(hbView.getBitmap());
+                if(!popDialog.isShowing()) {
+                    popDialog.show();
+                }
                 break;
 
             case R.id.txt_player_clear_screen:
                 Log.e("mmmm","已点击");
-                hbView.clearScreen();
+//                hbView.clearScreen();
+                hbView.setColor(Color.parseColor("#ff0000"));
+                hbView.setPaintWidth(10);
+                txt_player_clear_screen.setVisibility(View.GONE);
+                txt_player_huabi_setting.setVisibility(View.VISIBLE);
+                break;
+
+            case R.id.txt_player_huabi_setting:
+                hbView.setColor(Color.parseColor("#FFFDED"));
+                hbView.setPaintWidth(20);
+                txt_player_huabi_setting.setVisibility(View.GONE);
+                txt_player_clear_screen.setVisibility(View.VISIBLE);
+
                 break;
 
             case R.id.txt_player_room_send_message:
