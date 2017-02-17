@@ -75,6 +75,7 @@ public class HomeActivity extends BaseAct {
 	private String TAG = "HomeActivity";
 	private Mythread mythread = null;
 	private PopDialog popDialog = null;
+	private boolean roomOwner;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 
@@ -106,8 +107,9 @@ public class HomeActivity extends BaseAct {
 			info.setNickName("haha"+i);
 			info.setReady(i%2==0);
 			info.setYouke(i%2==1);
-			if(i == 1){
+			if(i == 0){
 				info.setMe(true);
+				roomOwner = true;
 			}
 			list.add(info);
 		}
@@ -130,31 +132,47 @@ public class HomeActivity extends BaseAct {
 
 			case R.id.txt_home_ready_ready_btn:
 				daoTimer.cancel();
-				txt_home_ready_time_down.setVisibility(View.GONE);
-				adapter.clickReady();
-				txt_home_ready_ready_btn.setText("已准备");
-				txt_home_ready_ready_btn.setTextColor(Color.parseColor("#ffffff"));
-				txt_home_ready_ready_btn.setBackgroundResource(R.drawable.btn_shape_ready_gray);
-				txt_home_ready_ready_btn.setEnabled(false);
-				break;
-
-			case R.id.txt_home_join_player_room:
-				if(popDialog == null){
-					popDialog = PopDialog.createDialog(HomeActivity.this,R.layout.pop_join_play_room, Gravity.CENTER);
+				if("开始".equals(txt_home_ready_ready_btn.getText().toString())){//是房主
+					popDialog = PopDialog.createDialog(HomeActivity.this, R.layout.pop_select_login_type, Gravity.CENTER, R.style.CustomProgressDialog);
 					Window win = popDialog.getWindow();
-					win.getDecorView().setPadding(0,0,0,0);
+					win.getDecorView().setPadding(0, 0, 0, 0);
 					WindowManager.LayoutParams lp = win.getAttributes();
 					lp.width = WindowManager.LayoutParams.FILL_PARENT;
 					lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
 					win.setAttributes(lp);
-					popDialog.findViewById(R.id.btn_join_play_room).setOnClickListener(new View.OnClickListener() {
-						@Override
-						public void onClick(View v) {
-							popDialog.findViewById(R.id.txt_warn_room_not_exist).setVisibility(View.VISIBLE);
-						}
-					});
+					popDialog.setCanceledOnTouchOutside(false);
 
+					if(!popDialog.isShowing()) {
+						popDialog.show();
+					}
+				}else{
+					txt_home_ready_time_down.setVisibility(View.GONE);
+					adapter.clickReady();
+					txt_home_ready_ready_btn.setText("已准备");
+					txt_home_ready_ready_btn.setTextColor(Color.parseColor("#ffffff"));
+					txt_home_ready_ready_btn.setBackgroundResource(R.drawable.btn_shape_ready_gray);
+					txt_home_ready_ready_btn.setEnabled(false);
 				}
+
+				break;
+
+			case R.id.txt_home_join_player_room:
+
+				popDialog = PopDialog.createDialog(HomeActivity.this, R.layout.pop_join_play_room, Gravity.CENTER,R.style.inputDialog);
+				Window win = popDialog.getWindow();
+				win.getDecorView().setPadding(0, 0, 0, 0);
+				WindowManager.LayoutParams lp = win.getAttributes();
+				lp.width = WindowManager.LayoutParams.FILL_PARENT;
+				lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
+				win.setAttributes(lp);
+				popDialog.findViewById(R.id.btn_join_play_room).setOnClickListener(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						popDialog.findViewById(R.id.txt_warn_room_not_exist).setVisibility(View.VISIBLE);
+					}
+				});
+
+
 				if(!popDialog.isShowing()) {
 					popDialog.show();
 				}
@@ -297,6 +315,10 @@ public class HomeActivity extends BaseAct {
 				}else{
 					txt_home_ready_time_down.setText(msg.arg1+"s");
 				}
+			} else if(msg.what == 0x11){
+				if(roomOwner){
+					txt_home_ready_ready_btn.setText("开始");
+				}
 			}
 		}
 	};
@@ -348,10 +370,7 @@ public class HomeActivity extends BaseAct {
 				public void onNext(StompMessage stompMessage) {
 					Log.e(TAG, "response onNext: " + stompMessage.getPayload()
 					);
-//					Message msg = new Message();
-//					msg.obj = stompMessage.getPayload();
-//					msg.what = 0x13;
-//					changeUI.sendMessage(msg);
+
 				}
 
 			});
@@ -373,6 +392,9 @@ public class HomeActivity extends BaseAct {
 
 						case OPENED:
 							Log.e(TAG, "Stomp connection opened");
+							Message msg = new Message();
+							msg.what = 0x11;
+							changeUI.sendMessage(msg);
 							break;
 
 						case ERROR:

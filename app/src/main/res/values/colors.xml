@@ -40,4 +40,8 @@
     <color name="btn_gray_bg">#656565</color>
     <color name="btn_ready_gray_bg">#D3D3D3</color>
 
+    <color name="btn_login_qq_bg">#F07272</color>
+    <color name="btn_login_weixin_bg">#46BB08</color>
+
+
 </resources>
