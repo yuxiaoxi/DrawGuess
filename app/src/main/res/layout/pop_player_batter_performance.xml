@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="280dp"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="40dp"
+        android:layout_marginRight="40dp"
+        android:focusable="false"
+        android:focusableInTouchMode="false"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        android:background="@drawable/white_shape">
+
+        <TextView
+            android:id="@+id/txt_win"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="40dp"
+            android:layout_marginTop="30dp"
+            android:gravity="center"
+            android:text="获胜"
+            android:textColor="#888888"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/txt_fail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="40dp"
+            android:layout_marginTop="30dp"
+            android:gravity="center"
+            android:text="失败"
+            android:textColor="#888888"
+            android:textSize="16sp" />
+
+
+
+        <ImageView
+            android:id="@+id/img_winer"
+            android:layout_marginTop="20dp"
+            android:layout_below="@+id/txt_win"
+            android:layout_width="40dp"
+            android:layout_height="29dp"
+            android:layout_marginLeft="40dp"
+            android:src="@drawable/winer"/>
+        <ImageView
+            android:id="@+id/img_winer_player_avatar"
+            android:layout_below="@+id/img_winer"
+            android:layout_marginLeft="20dp"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:src="@drawable/default_avatar"/>
+
+        <ImageView
+            android:id="@+id/img_failur_player_avatar"
+            android:layout_below="@+id/txt_fail"
+            android:layout_marginRight="20dp"
+            android:layout_alignParentRight="true"
+            android:layout_marginTop="49dp"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:src="@drawable/default_avatar"/>
+
+        <TextView
+            android:id="@+id/txt_winer_score"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:textColor="@color/red"
+            android:gravity="center"
+            android:text="9"
+            android:layout_below="@+id/img_winer_player_avatar"
+            android:layout_alignStart="@+id/img_winer"
+            android:layout_marginTop="30dp"
+            android:paddingLeft="15dp"/>
+
+        <TextView
+            android:id="@+id/txt_loser_score"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:gravity="center"
+            android:text="9"
+            android:layout_below="@+id/img_failur_player_avatar"
+            android:layout_alignParentRight="true"
+            android:layout_alignStart="@+id/img_failur_player_avatar"
+            android:layout_marginTop="30dp"
+            android:paddingRight="15dp"/>
+
+
+    </RelativeLayout>
+
+</RelativeLayout>

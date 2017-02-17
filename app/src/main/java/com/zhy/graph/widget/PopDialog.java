@@ -4,8 +4,6 @@ package com.zhy.graph.widget;
 import android.app.Dialog;
 import android.content.Context;
 
-import gra.zhy.com.graph.R;
-
 
 public class PopDialog extends Dialog {
 	private Context context = null;
@@ -19,9 +17,9 @@ public class PopDialog extends Dialog {
 		super(context, theme);
 	}
 
-	public static PopDialog createDialog(Context context, int resouces, int location) {
+	public static PopDialog createDialog(Context context, int resouces, int location,int theme) {
 		customProgressDialog = new PopDialog(context,
-				R.style.inputDialog);
+				theme);
 		customProgressDialog.setContentView(resouces);
 		customProgressDialog.getWindow().getAttributes().gravity = location;
 
