@@ -133,7 +133,7 @@ public class HomeActivity extends BaseAct {
 			case R.id.txt_home_ready_ready_btn:
 				daoTimer.cancel();
 				if("开始".equals(txt_home_ready_ready_btn.getText().toString())){//是房主
-					popDialog = PopDialog.createDialog(HomeActivity.this, R.layout.pop_select_login_type, Gravity.CENTER, R.style.CustomProgressDialog);
+					popDialog = PopDialog.createDialog(HomeActivity.this, R.layout.pop_select_guess_word, Gravity.CENTER, R.style.CustomProgressDialog);
 					Window win = popDialog.getWindow();
 					win.getDecorView().setPadding(0, 0, 0, 0);
 					WindowManager.LayoutParams lp = win.getAttributes();
