@@ -66,6 +66,15 @@
 
         </activity>
 
+        <activity
+            android:name="com.zhy.graph.activity.SelfCenterActivity"
+            android:theme="@style/Theme.AppStartLoadTranslucent"
+            android:configChanges="orientation|keyboardHidden"
+            android:exported="true"
+            >
+
+        </activity>
+
     </application>
 
 </manifest>
