@@ -121,7 +121,7 @@ public class HomeActivity extends BaseAct {
 		switch (view.getId()) {
 
 			case R.id.image_title_left:
-				intent.setClass(HomeActivity.this,LoginActivity.class);
+				intent.setClass(HomeActivity.this,SelfCenterActivity.class);
 				startActivity(intent);
 				break;
 
