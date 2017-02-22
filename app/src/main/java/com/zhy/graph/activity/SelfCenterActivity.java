@@ -180,8 +180,10 @@ public class SelfCenterActivity extends BaseAct implements View.OnClickListener{
 
 	@Override
 	public void onClick(View v) {
+		Intent intent = new Intent();
 		if (v.getId() == R.id.item_self_center_invite_friend) {
-
+			intent.setClass(SelfCenterActivity.this, InviteFriendActivity.class);
+			startActivity(intent);
 		} else if (v.getId() == R.id.item_self_center_distribution_question) {
 
 		} else if (v.getId() == R.id.item_self_center_feed_back) {
