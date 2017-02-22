@@ -33,4 +33,15 @@
         android:src="@drawable/title_bar_share_icon"
         android:visibility="gone"/>
 
+    <TextView
+        android:id="@+id/text_title_right"
+        android:layout_width="wrap_content"
+        android:layout_height="24dp"
+        android:layout_alignParentRight="true"
+        android:layout_marginBottom="12dp"
+        android:layout_marginRight="15dp"
+        android:layout_marginTop="12dp"
+        android:gravity="center"
+        android:visibility="gone"/>
+
 </RelativeLayout>

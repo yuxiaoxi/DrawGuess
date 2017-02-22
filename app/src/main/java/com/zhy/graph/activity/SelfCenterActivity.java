@@ -187,7 +187,8 @@ public class SelfCenterActivity extends BaseAct implements View.OnClickListener{
 		} else if (v.getId() == R.id.item_self_center_distribution_question) {
 
 		} else if (v.getId() == R.id.item_self_center_feed_back) {
-
+			intent.setClass(SelfCenterActivity.this, FeedBackActivity.class);
+			startActivity(intent);
 		} else if (v.getId() == R.id.item_self_center_about) {
 
 		}
