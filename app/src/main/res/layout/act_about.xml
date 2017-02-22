@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:yz="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F5F5F5">
+
+    <include
+        android:id="@+id/title_bar_view"
+        layout="@layout/title_bar_layout"
+        ></include>
+
+
+    <ImageView
+        android:id="@+id/img_self_center_avatar"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:layout_marginTop="100dp"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/title_bar_view"
+        android:background="@drawable/ic_launcher"/>
+
+    <TextView
+        android:id="@+id/text_about_version_code"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="版本号v1.0"
+        android:layout_below="@+id/img_self_center_avatar"
+        android:textColor="@color/btn_gray_bg"
+        android:layout_marginTop="15dp"
+        android:textSize="16sp"
+        android:layout_centerHorizontal="true"/>
+
+
+</RelativeLayout>

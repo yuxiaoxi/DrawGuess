@@ -7,15 +7,20 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.zhy.graph.adapter.HomePlayerGridAdapter;
+import com.zhy.graph.app.BaseApplication;
 import com.zhy.graph.bean.PlayerInfo;
 import com.zhy.graph.utils.MyProperUtil;
 import com.zhy.graph.widget.PopDialog;
@@ -159,22 +164,33 @@ public class HomeActivity extends BaseAct {
 			case R.id.txt_home_join_player_room:
 
 				popDialog = PopDialog.createDialog(HomeActivity.this, R.layout.pop_join_play_room, Gravity.CENTER,R.style.inputDialog);
+				((EditText)popDialog.findViewById(R.id.edit_input_room_id)).setOnEditorActionListener(new TextView.OnEditorActionListener() {
+					@Override
+					public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+						if(actionId == EditorInfo.IME_ACTION_SEND){
+							((InputMethodManager) getSystemService(INPUT_METHOD_SERVICE)).toggleSoftInput(0,InputMethodManager.HIDE_NOT_ALWAYS);
+							if(popDialog.isShowing()) {
+								popDialog.dismiss();
+							}
+						}
+						return false;
+					}
+				});
 				Window win = popDialog.getWindow();
 				win.getDecorView().setPadding(0, 0, 0, 0);
 				WindowManager.LayoutParams lp = win.getAttributes();
 				lp.width = WindowManager.LayoutParams.FILL_PARENT;
 				lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
 				win.setAttributes(lp);
-				popDialog.findViewById(R.id.btn_join_play_room).setOnClickListener(new View.OnClickListener() {
-					@Override
-					public void onClick(View v) {
-						popDialog.findViewById(R.id.txt_warn_room_not_exist).setVisibility(View.VISIBLE);
-					}
-				});
-
 
 				if(!popDialog.isShowing()) {
 					popDialog.show();
+				}
+				break;
+
+			case R.id.image_title_right:
+				if(BaseApplication.isLogin){
+
 				}
 				break;
 
