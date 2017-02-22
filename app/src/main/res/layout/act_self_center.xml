@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:yz="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#F5F5F5">
@@ -24,7 +25,7 @@
         android:text="suao"
         android:layout_below="@+id/img_self_center_avatar"
         android:textColor="@color/btn_gray_bg"
-        android:layout_marginTop="15dp"
+        android:layout_marginTop="10dp"
         android:textSize="16sp"
         android:layout_alignStart="@+id/img_self_center_avatar"/>
 
@@ -32,12 +33,42 @@
         android:id="@+id/text_self_center_id"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="suao"
+        android:text="ID:12345"
         android:layout_below="@+id/text_self_center_nickname"
         android:textColor="@color/btn_gray_bg"
         android:layout_marginTop="8dp"
         android:textSize="16sp"
         android:layout_alignStart="@+id/img_self_center_avatar"/>
 
+    <com.zhy.graph.widget.NewBasicSingleItem
+        android:id="@+id/item_self_center_invite_friend"
+        android:layout_below="@+id/text_self_center_id"
+        android:layout_marginTop="30dp"
+        style="@style/BasicSingleItemStyle"
+        yz:item_indicator="@drawable/arrow_normal"
+        yz:item_title="邀请好友" />
+
+    <com.zhy.graph.widget.NewBasicSingleItem
+        android:id="@+id/item_self_center_distribution_question"
+        android:layout_marginTop="1dp"
+        style="@style/BasicSingleItemStyle"
+        android:layout_below="@+id/item_self_center_invite_friend"
+        yz:item_indicator="@drawable/arrow_normal"
+        yz:item_title="贡献题目" />
+    <com.zhy.graph.widget.NewBasicSingleItem
+        android:id="@+id/item_self_center_feed_back"
+        style="@style/BasicSingleItemStyle"
+        android:layout_marginTop="20dp"
+        android:layout_below="@+id/item_self_center_distribution_question"
+        yz:item_indicator="@drawable/arrow_normal"
+        yz:item_title="意见反馈" />
+
+    <com.zhy.graph.widget.NewBasicSingleItem
+        android:id="@+id/item_self_center_about"
+        style="@style/BasicSingleItemStyle"
+        android:layout_marginTop="1dp"
+        android:layout_below="@+id/item_self_center_feed_back"
+        yz:item_indicator="@drawable/arrow_normal"
+        yz:item_title="关于" />
 
 </RelativeLayout>
