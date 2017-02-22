@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="220dp"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="40dp"
+        android:layout_marginRight="40dp"
+        android:focusable="false"
+        android:focusableInTouchMode="false"
+        android:background="@drawable/white_shape">
+
+        <TextView
+            android:id="@+id/txt_distribution_word"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="25dp"
+            android:layout_marginTop="25dp"
+            android:gravity="center"
+            android:text="词语"
+            android:textColor="#B9B9B9"
+            android:textSize="16sp" />
+
+
+        <EditText
+            android:id="@+id/edit_distribution_word_name"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_below="@+id/txt_distribution_word"
+            android:layout_marginLeft="25dp"
+            android:layout_marginRight="25dp"
+            android:layout_marginTop="10dp"
+            android:background="@null"
+            android:gravity="left|center"
+            android:singleLine="true"
+            android:textColor="#383838"
+            android:textSize="18sp" />
+
+        <View
+            android:id="@+id/view_line_seperator"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_below="@+id/edit_distribution_word_name"
+            android:layout_marginLeft="25dp"
+            android:layout_marginRight="25dp"
+            android:background="#888888" />
+
+        <TextView
+            android:id="@+id/txt_distribution_describe_title"
+            android:layout_below="@+id/view_line_seperator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="25dp"
+            android:layout_marginTop="25dp"
+            android:gravity="center"
+            android:text="描述"
+            android:textColor="#B9B9B9"
+            android:textSize="16sp" />
+
+
+        <EditText
+            android:id="@+id/edit_distribution_describe"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_below="@+id/txt_distribution_describe_title"
+            android:layout_marginLeft="25dp"
+            android:layout_marginRight="25dp"
+            android:layout_marginTop="10dp"
+            android:background="@null"
+            android:gravity="left|center"
+            android:singleLine="true"
+            android:textColor="#383838"
+            android:imeOptions="actionSend"
+            android:textSize="18sp" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_below="@+id/edit_distribution_describe"
+            android:layout_marginLeft="25dp"
+            android:layout_marginRight="25dp"
+            android:background="#888888" />
+
+    </RelativeLayout>
+
+</RelativeLayout>

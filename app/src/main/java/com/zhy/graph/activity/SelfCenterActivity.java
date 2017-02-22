@@ -3,7 +3,14 @@ package com.zhy.graph.activity;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -11,6 +18,7 @@ import android.widget.Toast;
 
 import com.zhy.graph.utils.MyProperUtil;
 import com.zhy.graph.widget.NewBasicSingleItem;
+import com.zhy.graph.widget.PopDialog;
 
 import net.duohuo.dhroid.ioc.annotation.InjectView;
 import net.duohuo.dhroid.net.DhNet;
@@ -45,6 +53,8 @@ public class SelfCenterActivity extends BaseAct implements View.OnClickListener{
 
 	@InjectView(id = R.id.item_self_center_about)
 	private NewBasicSingleItem item_self_center_about;
+
+	private PopDialog popDialog = null;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -185,7 +195,33 @@ public class SelfCenterActivity extends BaseAct implements View.OnClickListener{
 			intent.setClass(SelfCenterActivity.this, InviteFriendActivity.class);
 			startActivity(intent);
 		} else if (v.getId() == R.id.item_self_center_distribution_question) {
+			if(popDialog == null){
+				popDialog = PopDialog.createDialog(SelfCenterActivity.this, R.layout.pop_distribution_words, Gravity.CENTER, R.style.inputDialog);
+			}
 
+			((EditText)popDialog.findViewById(R.id.edit_distribution_describe)).setOnEditorActionListener(new TextView.OnEditorActionListener() {
+				@Override
+				public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+					if(actionId == EditorInfo.IME_ACTION_SEND){
+						((InputMethodManager) getSystemService(INPUT_METHOD_SERVICE)).toggleSoftInput(0,InputMethodManager.HIDE_NOT_ALWAYS);
+						if(popDialog.isShowing()) {
+							popDialog.dismiss();
+						}
+					}
+					return false;
+				}
+			});
+			Window win = popDialog.getWindow();
+			win.getDecorView().setPadding(0, 0, 0, 0);
+			WindowManager.LayoutParams lp = win.getAttributes();
+			lp.width = WindowManager.LayoutParams.FILL_PARENT;
+			lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
+			win.setAttributes(lp);
+			popDialog.setCanceledOnTouchOutside(false);
+
+			if(!popDialog.isShowing()) {
+				popDialog.show();
+			}
 		} else if (v.getId() == R.id.item_self_center_feed_back) {
 			intent.setClass(SelfCenterActivity.this, FeedBackActivity.class);
 			startActivity(intent);
