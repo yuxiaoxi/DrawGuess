@@ -183,8 +183,6 @@ public class InviteFriendActivity extends BaseAct implements View.OnClickListene
 
 		} else if (v.getId() == R.id.item_self_center_feed_back) {
 
-		} else if (v.getId() == R.id.item_self_center_about) {
-
 		}
 	}
 }

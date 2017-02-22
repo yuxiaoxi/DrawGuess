@@ -3,6 +3,8 @@ package com.zhy.graph.activity;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -22,7 +24,7 @@ import java.util.Map;
 
 import gra.zhy.com.graph.R;
 
-public class FeedBackActivity extends BaseAct implements View.OnClickListener{
+public class FeedBackActivity extends BaseAct {
 
 
 	@InjectView(id = R.id.title_bar_view)
@@ -63,6 +65,23 @@ public class FeedBackActivity extends BaseAct implements View.OnClickListener{
 		text_title_right.setVisibility(View.VISIBLE);
 		text_title_right.setTextColor(Color.parseColor("#000000"));
 		text_title_right.setText("提交");
+		edit_feed_back_suggest.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+			}
+
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+			}
+
+			@Override
+			public void afterTextChanged(Editable s) {
+				int amount = edit_feed_back_suggest.getText().toString().trim().length();
+				txt_input_count.setText((200-amount)+"");
+			}
+		});
 	}
 
 	public void onClickCallBack(View view) {
@@ -76,7 +95,7 @@ public class FeedBackActivity extends BaseAct implements View.OnClickListener{
 
 
 		case R.id.text_title_right:
-
+			Toast.makeText(FeedBackActivity.this,"提交成功!",Toast.LENGTH_SHORT).show();
 			break;
 
 
@@ -179,16 +198,5 @@ public class FeedBackActivity extends BaseAct implements View.OnClickListener{
 
 	}
 
-	@Override
-	public void onClick(View v) {
-		if (v.getId() == R.id.item_self_center_invite_friend) {
 
-		} else if (v.getId() == R.id.item_self_center_distribution_question) {
-
-		} else if (v.getId() == R.id.item_self_center_feed_back) {
-
-		} else if (v.getId() == R.id.item_self_center_about) {
-
-		}
-	}
 }
