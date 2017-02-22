@@ -14,4 +14,20 @@
             <enum name="FILL" value="1"></enum>
         </attr>
     </declare-styleable>
+
+    <declare-styleable name="BasicSingleItem">
+        <attr format="reference" name="item_icon"/>
+        <attr format="string|reference" name="item_title"/>
+        <attr format="string|reference" name="item_titleHint"/>
+        <attr format="dimension|reference" name="item_titleSize"/>
+        <attr format="reference" name="item_titleColor"/>
+        <attr format="string|reference" name="item_subTitle"/>
+        <attr format="string|reference" name="item_subTitleHint"/>
+        <attr format="dimension|reference" name="item_subTitleSize"/>
+        <attr format="reference" name="item_subTitleColor"/>
+        <attr format="string|reference" name="item_count"/>
+        <attr format="dimension|reference" name="item_countSize"/>
+        <attr format="reference" name="item_countColor"/>
+        <attr format="reference" name="item_indicator"/>
+    </declare-styleable>
 </resources>

@@ -32,4 +32,19 @@
         <item name="android:windowSoftInputMode">stateAlwaysVisible</item><!--显示软件盘-->
     </style>
 
+
+    <style name="BasicSingleItemStyle" >
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">48dp</item>
+        <item name="android:paddingLeft">15dp</item>
+        <item name="android:paddingRight">15dp</item>
+        <item name="android:background">@color/white</item>
+        <item name="item_subTitleColor">@color/text_color_gray</item>
+        <item name="item_subTitleSize">15sp</item>
+        <item name="item_titleColor">@color/text_color_black</item>
+        <item name="item_titleSize">15sp</item>
+        <item name="item_countColor">@color/red</item>
+        <item name="item_countSize">15sp</item>
+    </style>
+
 </resources>

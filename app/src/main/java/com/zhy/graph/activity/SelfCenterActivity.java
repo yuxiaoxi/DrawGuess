@@ -10,6 +10,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.zhy.graph.utils.MyProperUtil;
+import com.zhy.graph.widget.NewBasicSingleItem;
 
 import net.duohuo.dhroid.ioc.annotation.InjectView;
 import net.duohuo.dhroid.net.DhNet;
@@ -21,7 +22,7 @@ import java.util.Map;
 
 import gra.zhy.com.graph.R;
 
-public class SelfCenterActivity extends BaseAct {
+public class SelfCenterActivity extends BaseAct implements View.OnClickListener{
 
 
 	@InjectView(id = R.id.title_bar_view)
@@ -33,6 +34,17 @@ public class SelfCenterActivity extends BaseAct {
 	@InjectView(id = R.id.image_title_left, click = "onClickCallBack")
 	private ImageView backLayout;
 
+	@InjectView(id = R.id.item_self_center_invite_friend)
+	private NewBasicSingleItem item_self_center_invite_friend;
+
+	@InjectView(id = R.id.item_self_center_distribution_question)
+	private NewBasicSingleItem item_self_center_distribution_question;
+
+	@InjectView(id = R.id.item_self_center_feed_back)
+	private NewBasicSingleItem item_self_center_feed_back;
+
+	@InjectView(id = R.id.item_self_center_about)
+	private NewBasicSingleItem item_self_center_about;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +62,10 @@ public class SelfCenterActivity extends BaseAct {
 		txt_title_name.setText("个人中心");
 		txt_title_name.setVisibility(View.VISIBLE);
 		title_bar_view.setBackgroundColor(Color.parseColor("#ffffff"));
+		item_self_center_invite_friend.setOnClickListener(this);
+		item_self_center_distribution_question.setOnClickListener(this);
+		item_self_center_feed_back.setOnClickListener(this);
+		item_self_center_about.setOnClickListener(this);
 	}
 
 	public void onClickCallBack(View view) {
@@ -162,4 +178,19 @@ public class SelfCenterActivity extends BaseAct {
 
 	}
 
+	@Override
+	public void onClick(View v) {
+		Intent intent = new Intent();
+		if (v.getId() == R.id.item_self_center_invite_friend) {
+			intent.setClass(SelfCenterActivity.this, InviteFriendActivity.class);
+			startActivity(intent);
+		} else if (v.getId() == R.id.item_self_center_distribution_question) {
+
+		} else if (v.getId() == R.id.item_self_center_feed_back) {
+			intent.setClass(SelfCenterActivity.this, FeedBackActivity.class);
+			startActivity(intent);
+		} else if (v.getId() == R.id.item_self_center_about) {
+
+		}
+	}
 }
