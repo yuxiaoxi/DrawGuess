@@ -1,2 +1,180 @@
 <?xml version="1.0" encoding="utf-8"?>
-<items version="2" />
+<items version="2" >
+
+    <item
+        jar="/Users/yuzhuo/Desktop/androidresposity/github/DrawGuess/app/libs/ShareSDK-Wechat-Moments-2.8.1.jar"
+        jumboMode="false"
+        revision="24.0.3"
+        sha1="ebed17f12cb04231b5a8a308435810e3d782ba5e">
+        <dex dex="/Users/yuzhuo/Desktop/androidresposity/github/DrawGuess/app/build/intermediates/pre-dexed/debug/ShareSDK-Wechat-Moments-2.8.1_6ca196c6ff92eb44689f33bfae580d7f5814aa3f.jar" />
+    </item>
+    <item
+        jar="/Users/yuzhuo/.gradle/caches/modules-2/files-2.1/org.java-websocket/Java-WebSocket/1.3.0/db2658f013fb163de4a99274c2eb9e17efe535d2/Java-WebSocket-1.3.0.jar"
+        jumboMode="false"
+        revision="24.0.3"
+        sha1="db2658f013fb163de4a99274c2eb9e17efe535d2">
+        <dex dex="/Users/yuzhuo/Desktop/androidresposity/github/DrawGuess/app/build/intermediates/pre-dexed/debug/Java-WebSocket-1.3.0_3ee1f82625d46eeea2d99406488efc701892046f.jar" />
+    </item>
+    <item
+        jar="/Users/yuzhuo/Desktop/androidresposity/github/DrawGuess/app/libs/MobTools-2017.0216.1054.jar"
+        jumboMode="false"
+        revision="24.0.3"
+        sha1="ede8ab947b1cabf937bf36d8ec51fcd9d61eba84">
+        <dex dex="/Users/yuzhuo/Desktop/androidresposity/github/DrawGuess/app/build/intermediates/pre-dexed/debug/MobTools-2017.0216.1054_2b56a488903172008884c8856bdaa394abe2dc29.jar" />
+    </item>
+    <item
+        jar="/Users/yuzhuo/Desktop/androidresposity/github/DrawGuess/app/libs/ShareSDK-Wechat-2.8.1.jar"
+        jumboMode="false"
+        revision="24.0.3"
+        sha1="80ee36c9074e68409cd3db8c3227a6f18bebf983">
+        <dex dex="/Users/yuzhuo/Desktop/androidresposity/github/DrawGuess/app/build/intermediates/pre-dexed/debug/ShareSDK-Wechat-2.8.1_9a56b0cceb8e8219f621c603231b3e1fb7d3d3a8.jar" />
+    </item>
+    <item
+        jar="/Users/yuzhuo/Desktop/androidresposity/github/DrawGuess/app/build/intermediates/exploded-aar/com.android.support/support-v4/23.4.0/jars/libs/internal_impl-23.4.0.jar"
+        jumboMode="false"
+        revision="24.0.3"
+        sha1="ea3c07504d2c8f4b13aa17c45c1b68ed9c1c3674">
+        <dex dex="/Users/yuzhuo/Desktop/androidresposity/github/DrawGuess/app/build/intermediates/pre-dexed/debug/internal_impl-23.4.0_adca83dd4b35aec8b38115f7623e2b3b362d0d9e.jar" />
+    </item>
+    <item
+        jar="/Users/yuzhuo/Desktop/androidresposity/github/DrawGuess/app/libs/MobCommons-2017.0216.1054.jar"
+        jumboMode="false"
+        revision="24.0.3"
+        sha1="4ba1c804706f49009600ff1dd32a46f3af7acc9c">
+        <dex dex="/Users/yuzhuo/Desktop/androidresposity/github/DrawGuess/app/build/intermediates/pre-dexed/debug/MobCommons-2017.0216.1054_b738466307b55dfde8a4ea00dde903214d75617b.jar" />
+    </item>
+    <item
+        jar="/Users/yuzhuo/Desktop/androidresposity/github/DrawGuess/app/build/intermediates/exploded-aar/DrawGuess/dhroid/unspecified/jars/libs/universal-image-loader-1.9.1.jar"
+        jumboMode="false"
+        revision="24.0.3"
+        sha1="53977187b33d23f4c84c8c7688f046cb06e32537">
+        <dex dex="/Users/yuzhuo/Desktop/androidresposity/github/DrawGuess/app/build/intermediates/pre-dexed/debug/universal-image-loader-1.9.1_7f660f071cab4c68c1ae932a21826a3d40cd69d5.jar" />
+    </item>
+    <item
+        jar="/Users/yuzhuo/Desktop/androidresposity/github/DrawGuess/app/build/intermediates/exploded-aar/com.android.support/animated-vector-drawable/23.4.0/jars/classes.jar"
+        jumboMode="false"
+        revision="24.0.3"
+        sha1="de4db3785756bfb0915a9f59a9b3f2fea7407be4">
+        <dex dex="/Users/yuzhuo/Desktop/androidresposity/github/DrawGuess/app/build/intermediates/pre-dexed/debug/com.android.support-animated-vector-drawable-23.4.0_fc7d677b4ba5e40053fcec75e7b3a66a3f007b9a.jar" />
+    </item>
+    <item
+        jar="/Applications/Android Studio.app/Contents/gradle/m2repository/com/google/code/gson/gson/2.2.4/gson-2.2.4.jar"
+        jumboMode="false"
+        revision="24.0.3"
+        sha1="a60a5e993c98c864010053cb901b7eab25306568">
+        <dex dex="/Users/yuzhuo/Desktop/androidresposity/github/DrawGuess/app/build/intermediates/pre-dexed/debug/gson-2.2.4_d0ce76b63ce905fbab3c5d385c8e1b8692010f19.jar" />
+    </item>
+    <item
+        jar="/Users/yuzhuo/.gradle/caches/modules-2/files-2.1/com.squareup.leakcanary/leakcanary-watcher/1.4-beta2/6a920fb0d14e5e3b36e37cf33b1eeef2bcce4c92/leakcanary-watcher-1.4-beta2.jar"
+        jumboMode="false"
+        revision="24.0.3"
+        sha1="6a920fb0d14e5e3b36e37cf33b1eeef2bcce4c92">
+        <dex dex="/Users/yuzhuo/Desktop/androidresposity/github/DrawGuess/app/build/intermediates/pre-dexed/debug/leakcanary-watcher-1.4-beta2_5ff2863bec03df1d4003909cc417a4507b35c99e.jar" />
+    </item>
+    <item
+        jar="/Users/yuzhuo/Desktop/androidresposity/github/DrawGuess/app/build/intermediates/exploded-aar/DrawGuess/dhroid/unspecified/jars/libs/httpmime-4.1.1.jar"
+        jumboMode="false"
+        revision="24.0.3"
+        sha1="8f93ced7162192154a978d2b2855389620f2a1ce">
+        <dex dex="/Users/yuzhuo/Desktop/androidresposity/github/DrawGuess/app/build/intermediates/pre-dexed/debug/httpmime-4.1.1_3772875d66595af0fb983805269ee57bffa9aad5.jar" />
+    </item>
+    <item
+        jar="/Users/yuzhuo/.gradle/caches/modules-2/files-2.1/io.reactivex/rxjava/1.2.0/42bfaf64c94f3848ebf5cf1c2ea4ec9d1b3ac6c8/rxjava-1.2.0.jar"
+        jumboMode="false"
+        revision="24.0.3"
+        sha1="42bfaf64c94f3848ebf5cf1c2ea4ec9d1b3ac6c8">
+        <dex dex="/Users/yuzhuo/Desktop/androidresposity/github/DrawGuess/app/build/intermediates/pre-dexed/debug/rxjava-1.2.0_2a9afd4e933458f006ff695cd02216f7eaa06aa9.jar" />
+    </item>
+    <item
+        jar="/Users/yuzhuo/Desktop/androidresposity/github/DrawGuess/app/build/intermediates/exploded-aar/com.github.NaikSoftware/StompProtocolAndroid/1.1.6/jars/classes.jar"
+        jumboMode="false"
+        revision="24.0.3"
+        sha1="dc8644ecef121a389700bdc4ede1050635fb5b91">
+        <dex dex="/Users/yuzhuo/Desktop/androidresposity/github/DrawGuess/app/build/intermediates/pre-dexed/debug/com.github.NaikSoftware-StompProtocolAndroid-1.1.6_f0c781bb98e9fcc064be5e03a5e579c9cc7210ba.jar" />
+    </item>
+    <item
+        jar="/Users/yuzhuo/Desktop/androidresposity/github/DrawGuess/app/build/intermediates/exploded-aar/com.squareup.leakcanary/leakcanary-android/1.4-beta2/jars/classes.jar"
+        jumboMode="false"
+        revision="24.0.3"
+        sha1="9c8472f8e10502af60d0f63ea11eed68bdf690c2">
+        <dex dex="/Users/yuzhuo/Desktop/androidresposity/github/DrawGuess/app/build/intermediates/pre-dexed/debug/com.squareup.leakcanary-leakcanary-android-1.4-beta2_496fa815f74c300b9c89f92738f9d6e87d13a9d0.jar" />
+    </item>
+    <item
+        jar="/Users/yuzhuo/Downloads/android-sdk-macosx/extras/android/m2repository/com/android/support/support-annotations/23.4.0/support-annotations-23.4.0.jar"
+        jumboMode="false"
+        revision="24.0.3"
+        sha1="ffbe55fdb2bb456b1485831706a9eac3300bb6b8">
+        <dex dex="/Users/yuzhuo/Desktop/androidresposity/github/DrawGuess/app/build/intermediates/pre-dexed/debug/support-annotations-23.4.0_dada7a9afa0b57a9e47367352d84fd2e1b40a79a.jar" />
+    </item>
+    <item
+        jar="/Users/yuzhuo/.gradle/caches/modules-2/files-2.1/com.squareup.haha/haha/2.0.2/fd65b84d12d6adc77ec0e4fcaca623fc391d8679/haha-2.0.2.jar"
+        jumboMode="false"
+        revision="24.0.3"
+        sha1="fd65b84d12d6adc77ec0e4fcaca623fc391d8679">
+        <dex dex="/Users/yuzhuo/Desktop/androidresposity/github/DrawGuess/app/build/intermediates/pre-dexed/debug/haha-2.0.2_cac04c498caf09bdf0f69a341db4471a62bf27a3.jar" />
+    </item>
+    <item
+        jar="/Users/yuzhuo/Desktop/androidresposity/github/DrawGuess/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.4.0/jars/classes.jar"
+        jumboMode="false"
+        revision="24.0.3"
+        sha1="548f06de403a9409f00554b3ee12a9fdea0e236c">
+        <dex dex="/Users/yuzhuo/Desktop/androidresposity/github/DrawGuess/app/build/intermediates/pre-dexed/debug/com.android.support-appcompat-v7-23.4.0_ca38d9b591e6ff8be746878e87aabcec86c3b614.jar" />
+    </item>
+    <item
+        jar="/Users/yuzhuo/Desktop/androidresposity/github/DrawGuess/app/libs/ShareSDK-QQ-2.8.1.jar"
+        jumboMode="false"
+        revision="24.0.3"
+        sha1="15ec01ae7f0c4357f010acb66f76628260786628">
+        <dex dex="/Users/yuzhuo/Desktop/androidresposity/github/DrawGuess/app/build/intermediates/pre-dexed/debug/ShareSDK-QQ-2.8.1_ab48ea9d4f2819ed53855a27e3420dad31f09de2.jar" />
+    </item>
+    <item
+        jar="/Users/yuzhuo/Desktop/androidresposity/github/DrawGuess/app/build/intermediates/exploded-aar/com.android.support/support-vector-drawable/23.4.0/jars/classes.jar"
+        jumboMode="false"
+        revision="24.0.3"
+        sha1="c2c594cace5d83a3227b2b6e658ecbfd586d3ed9">
+        <dex dex="/Users/yuzhuo/Desktop/androidresposity/github/DrawGuess/app/build/intermediates/pre-dexed/debug/com.android.support-support-vector-drawable-23.4.0_f51d852a04aa73b492657248c3fee447c35b2550.jar" />
+    </item>
+    <item
+        jar="/Users/yuzhuo/.gradle/caches/modules-2/files-2.1/com.squareup.leakcanary/leakcanary-analyzer/1.4-beta2/449777cd466ac0a16f7e8d0dc508e70e2cdd13a9/leakcanary-analyzer-1.4-beta2.jar"
+        jumboMode="false"
+        revision="24.0.3"
+        sha1="449777cd466ac0a16f7e8d0dc508e70e2cdd13a9">
+        <dex dex="/Users/yuzhuo/Desktop/androidresposity/github/DrawGuess/app/build/intermediates/pre-dexed/debug/leakcanary-analyzer-1.4-beta2_11379fe426b474f986ed1a82428ebb1a354c24c3.jar" />
+    </item>
+    <item
+        jar="/Users/yuzhuo/Desktop/androidresposity/github/DrawGuess/app/libs/ShareSDK-Core-2.8.1.jar"
+        jumboMode="false"
+        revision="24.0.3"
+        sha1="6b28f6444c88008f7b83cea48a5fbee388717dc6">
+        <dex dex="/Users/yuzhuo/Desktop/androidresposity/github/DrawGuess/app/build/intermediates/pre-dexed/debug/ShareSDK-Core-2.8.1_47db72f66c0811aa6c84a147a1472cfba28d3aba.jar" />
+    </item>
+    <item
+        jar="/Users/yuzhuo/Desktop/androidresposity/github/DrawGuess/app/libs/ShareSDK-Wechat-Core-2.8.1.jar"
+        jumboMode="false"
+        revision="24.0.3"
+        sha1="84bcb90bdb43050335311854dd01d9b1155cde26">
+        <dex dex="/Users/yuzhuo/Desktop/androidresposity/github/DrawGuess/app/build/intermediates/pre-dexed/debug/ShareSDK-Wechat-Core-2.8.1_08da340f200d19d8b2fa9bd432637dbec0f696e6.jar" />
+    </item>
+    <item
+        jar="/Users/yuzhuo/Desktop/androidresposity/github/DrawGuess/app/build/intermediates/exploded-aar/com.android.support/support-v4/23.4.0/jars/classes.jar"
+        jumboMode="false"
+        revision="24.0.3"
+        sha1="67bd36ee9340ec7c254108936ad16b24bed160cc">
+        <dex dex="/Users/yuzhuo/Desktop/androidresposity/github/DrawGuess/app/build/intermediates/pre-dexed/debug/com.android.support-support-v4-23.4.0_6041220ca5c0f0cb562d28180146e6f4863334a6.jar" />
+    </item>
+    <item
+        jar="/Users/yuzhuo/Desktop/androidresposity/github/DrawGuess/app/build/intermediates/exploded-aar/DrawGuess/dhroid/unspecified/jars/classes.jar"
+        jumboMode="false"
+        revision="24.0.3"
+        sha1="30201f9e78e0721b1fd7381e0d57922fb68b0f93">
+        <dex dex="/Users/yuzhuo/Desktop/androidresposity/github/DrawGuess/app/build/intermediates/pre-dexed/debug/DrawGuess-dhroid-unspecified_acf4e5b38ffde895fddc55e50cddbb98d35b1761.jar" />
+    </item>
+    <item
+        jar="/Users/yuzhuo/Desktop/androidresposity/github/DrawGuess/app/build/intermediates/exploded-aar/DrawGuess/dhroid/unspecified/jars/libs/fastjson-1.1.43.android.jar"
+        jumboMode="false"
+        revision="24.0.3"
+        sha1="7f52e69a3f19a1138e5426ec6684642f8e4852ec">
+        <dex dex="/Users/yuzhuo/Desktop/androidresposity/github/DrawGuess/app/build/intermediates/pre-dexed/debug/fastjson-1.1.43.android_242fff239cc51b73f0d1a6fc1495de7d52d6230d.jar" />
+    </item>
+
+</items>
