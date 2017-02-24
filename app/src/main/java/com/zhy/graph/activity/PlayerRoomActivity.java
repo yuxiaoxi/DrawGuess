@@ -18,6 +18,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -85,11 +86,11 @@ public class PlayerRoomActivity extends BaseAct{
     @InjectView(id = R.id.txt_player_room_answer, click = "onClickCallBack")
     private TextView txt_player_room_answer;
 
-    @InjectView(id = R.id.txt_player_huabi_setting, click = "onClickCallBack")
-    private TextView txt_player_huabi_setting;
+    @InjectView(id = R.id.liner_player_huabi_setting, click = "onClickCallBack")
+    private LinearLayout liner_player_huabi_setting;
 
     @InjectView(id = R.id.txt_player_clear_screen, click = "onClickCallBack")
-    private TextView txt_player_clear_screen;
+    private ImageView txt_player_clear_screen;
 
     @InjectView(id = R.id.txt_player_room_send_message, click = "onClickCallBack")
     private TextView txt_player_room_send_message;
@@ -532,13 +533,13 @@ public class PlayerRoomActivity extends BaseAct{
                 hbView.setColor(Color.parseColor("#ff0000"));
                 hbView.setPaintWidth(10);
                 txt_player_clear_screen.setVisibility(View.GONE);
-                txt_player_huabi_setting.setVisibility(View.VISIBLE);
+                liner_player_huabi_setting.setVisibility(View.VISIBLE);
                 break;
 
-            case R.id.txt_player_huabi_setting:
+            case R.id.liner_player_huabi_setting:
                 hbView.setColor(Color.parseColor("#FFFDED"));
                 hbView.setPaintWidth(20);
-                txt_player_huabi_setting.setVisibility(View.GONE);
+                liner_player_huabi_setting.setVisibility(View.GONE);
                 txt_player_clear_screen.setVisibility(View.VISIBLE);
 
                 break;

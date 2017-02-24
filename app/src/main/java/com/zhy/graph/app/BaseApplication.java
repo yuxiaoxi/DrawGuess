@@ -14,6 +14,7 @@ import net.duohuo.dhroid.dialog.IDialog;
 import net.duohuo.dhroid.ioc.Instance.InstanceScope;
 import net.duohuo.dhroid.ioc.IocContainer;
 
+import cn.sharesdk.framework.ShareSDK;
 import gra.zhy.com.graph.R;
 
 /**
@@ -28,10 +29,12 @@ public class BaseApplication extends Application {
 
 	public static DisplayImageOptions defaultOptions;
 
-	public static boolean isLogin = false;
+	public static boolean isLogin = true;
 	@Override
 	public void onCreate() {
 		super.onCreate();
+
+		ShareSDK.initSDK(this);
 		Dhroid.init(this);
 
 		// 对话框对象

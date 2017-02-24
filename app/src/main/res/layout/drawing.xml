@@ -83,7 +83,8 @@
         android:divider="@null"
         android:scrollbars="none"></ListView>
 
-    <TextView
+
+    <ImageView
         android:id="@+id/txt_player_clear_screen"
         android:layout_width="70dp"
         android:layout_height="34dp"
@@ -91,24 +92,61 @@
         android:layout_marginTop="1dp"
         android:layout_alignTop="@+id/huaBanView1"
         android:layout_alignRight="@+id/huaBanView1"
-        android:textColor="@color/white"
+        android:src="@drawable/draw_pencel_icon"
         android:background="@drawable/huabi_bg"
-        android:textSize="16sp"
-        android:text="展开"/>
+        android:visibility="gone"
+        />
 
-    <TextView
-        android:id="@+id/txt_player_huabi_setting"
-        android:layout_width="140dp"
+    <LinearLayout
+        android:id="@+id/liner_player_huabi_setting"
+        android:layout_width="185dp"
         android:layout_height="34dp"
-        android:gravity="center"
+        android:orientation="horizontal"
         android:layout_marginTop="1dp"
         android:layout_alignTop="@+id/huaBanView1"
         android:layout_alignRight="@+id/huaBanView1"
-        android:textColor="@color/white"
         android:background="@drawable/huabi_bg"
-        android:textSize="16sp"
-        android:visibility="gone"
-        android:text="橡皮擦"/>
+        android:visibility="visible">
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="24dp"
+            android:src="@drawable/to_right_icon"/>
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_gravity="center_vertical"
+            android:src="@drawable/black_ring_shape"
+            android:layout_marginLeft="15dp"/>
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_gravity="center_vertical"
+            android:src="@drawable/white_ring_shape_on"
+            android:layout_marginLeft="10dp"/>
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_gravity="center_vertical"
+            android:src="@drawable/red_ring_shape"
+            android:layout_marginLeft="10dp"/>
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_gravity="center_vertical"
+            android:src="@drawable/eraser_icon"
+            android:layout_marginLeft="10dp"/>
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_gravity="center_vertical"
+            android:src="@drawable/clear_sceen_icon"
+            android:layout_marginLeft="10dp"/>
+        </LinearLayout>
 
     <TextView
         android:id="@+id/txt_player_room_answer"
@@ -133,4 +171,59 @@
         android:layout_marginLeft="22dp"
         android:layout_marginBottom="22dp"/>
 
+    <TextView
+        android:id="@+id/txt_player_room_invite_friend"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="300dp"
+        android:layout_centerHorizontal="true"
+        android:text="添加好友"
+        android:textSize="12sp"
+        android:textColor="@color/black"
+        android:gravity="center"
+        android:paddingLeft="30dp"
+        android:visibility="gone"
+        android:background="@drawable/invite_friend_bg_normal">
+
+    </TextView>
+
+
+    <RelativeLayout
+        android:id="@+id/rel_room_owner_select_question"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_marginTop="300dp"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/white_ring_shape_to">
+        <net.duohuo.dhroid.view.megwidget.CircleImageView
+            android:id="@+id/img_room_owner_avatar"
+            android:layout_alignParentLeft="true"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_margin="2dp"
+            android:src="@drawable/default_avatar"/>
+
+        <TextView
+            android:layout_toRightOf="@+id/img_room_owner_avatar"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="正在选题..."
+            android:textSize="12sp"
+            android:textColor="@color/black"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:gravity="center"/>
+    </RelativeLayout>
+
+    <TextView
+        android:layout_below="@+id/rel_room_owner_select_question"
+        android:layout_width="wrap_content"
+        android:layout_height="20dp"
+        android:text="lyn"
+        android:layout_alignStart="@+id/rel_room_owner_select_question"
+        android:textSize="12sp"
+        android:textColor="@color/black"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
+        android:gravity="center"/>
 </RelativeLayout>

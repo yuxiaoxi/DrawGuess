@@ -46,4 +46,5 @@
     <color name="text_color_gray">#878787</color>
     <color name="text_color_black">#323232</color>
 
+    <color name="light_red">#FF0000</color>
 </resources>
