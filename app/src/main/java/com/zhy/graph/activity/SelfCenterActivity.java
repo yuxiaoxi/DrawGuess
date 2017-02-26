@@ -3,6 +3,9 @@ package com.zhy.graph.activity;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler.Callback;
+import android.os.Message;
+import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
@@ -16,6 +19,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.mob.tools.utils.UIHandler;
 import com.zhy.graph.utils.MyProperUtil;
 import com.zhy.graph.widget.NewBasicSingleItem;
 import com.zhy.graph.widget.PopDialog;
@@ -24,14 +28,25 @@ import net.duohuo.dhroid.ioc.annotation.InjectView;
 import net.duohuo.dhroid.net.DhNet;
 import net.duohuo.dhroid.net.NetTask;
 import net.duohuo.dhroid.net.Response;
+import net.duohuo.dhroid.view.megwidget.CircleImageView;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import cn.sharesdk.framework.Platform;
+import cn.sharesdk.framework.PlatformActionListener;
+import cn.sharesdk.tencent.qq.QQ;
+import cn.sharesdk.wechat.friends.Wechat;
 import gra.zhy.com.graph.R;
 
-public class SelfCenterActivity extends BaseAct implements View.OnClickListener{
+public class SelfCenterActivity extends BaseAct implements Callback,
+		View.OnClickListener, PlatformActionListener {
 
+	private static final int MSG_USERID_FOUND = 1;
+	private static final int MSG_LOGIN = 2;
+	private static final int MSG_AUTH_CANCEL = 3;
+	private static final int MSG_AUTH_ERROR= 4;
+	private static final int MSG_AUTH_COMPLETE = 5;
 
 	@InjectView(id = R.id.title_bar_view)
 	private RelativeLayout title_bar_view;
@@ -54,7 +69,12 @@ public class SelfCenterActivity extends BaseAct implements View.OnClickListener{
 	@InjectView(id = R.id.item_self_center_about)
 	private NewBasicSingleItem item_self_center_about;
 
+	@InjectView(id = R.id.img_self_center_avatar)
+	private CircleImageView img_self_center_avatar;
+
 	private PopDialog popDialog = null;
+
+	private PopDialog loginDialog = null;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -76,6 +96,7 @@ public class SelfCenterActivity extends BaseAct implements View.OnClickListener{
 		item_self_center_distribution_question.setOnClickListener(this);
 		item_self_center_feed_back.setOnClickListener(this);
 		item_self_center_about.setOnClickListener(this);
+		img_self_center_avatar.setOnClickListener(this);
 	}
 
 	public void onClickCallBack(View view) {
@@ -137,56 +158,6 @@ public class SelfCenterActivity extends BaseAct implements View.OnClickListener{
 
 	}
 
-	/**
-	 * 
-	 * @Title: isEmpty
-	 * @Description: 判断字符串是否为空
-	 * @param @param str
-	 * @param @return 设定文件
-	 * @return boolean 返回类型
-	 * @throws
-	 */
-	public boolean isEmpty(String str) {
-		if (str == null || "".equals(str)) {
-			return true;
-		}
-		return false;
-	}
-	
-	/**
-	 * 判断帐号是否可用
-	 * 
-	 * @Title: isUserExist
-	 * @Description: TODO(这里用一句话描述这个方法的作用)
-	 * @param @param uid 设定文件
-	 * @return void 返回类型
-	 * @throws
-	 */
-	public void isUserExist(final String userId, final String name, final String avatar,final String type) {
-		
-		Map<String, Object> map = new HashMap<String, Object>();
-		map.put("username", userId);
-		String url = MyProperUtil.getProperties(this,
-				"appConfigDebugHost.properties").getProperty("Host")
-				+ MyProperUtil.getProperties(this, "appConfigDebug.properties")
-						.getProperty("isUserExist");
-		DhNet net = new DhNet(url);
-		net.addParams(map).doPost(new NetTask(this) {
-
-			@Override
-			public void onErray(Response response) {
-
-				super.onErray(response);
-			}
-
-			@Override
-			public void doInUI(Response response, Integer transfer) {
-
-
-			}
-		});
-
-	}
 
 	@Override
 	public void onClick(View v) {
@@ -228,6 +199,129 @@ public class SelfCenterActivity extends BaseAct implements View.OnClickListener{
 		} else if (v.getId() == R.id.item_self_center_about) {
 			intent.setClass(SelfCenterActivity.this, AboutActivity.class);
 			startActivity(intent);
+		} else if(v.getId() == R.id.img_self_center_avatar) {
+			if(loginDialog == null){
+				loginDialog = PopDialog.createDialog(SelfCenterActivity.this, R.layout.pop_select_login_type, Gravity.CENTER, R.style.CustomProgressDialog);
+			}
+
+			loginDialog.findViewById(R.id.btn_login_qq_bg).setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					authorize(new QQ(SelfCenterActivity.this));
+				}
+			});
+
+			loginDialog.findViewById(R.id.btn_login_weixin_bg).setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					authorize(new Wechat(SelfCenterActivity.this));
+				}
+			});
+
+			loginDialog.findViewById(R.id.btn_close).setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					if(loginDialog.isShowing()) {
+						loginDialog.dismiss();
+					}
+				}
+			});
+
+			Window win = loginDialog.getWindow();
+			win.getDecorView().setPadding(0, 0, 0, 0);
+			WindowManager.LayoutParams lp = win.getAttributes();
+			lp.width = WindowManager.LayoutParams.FILL_PARENT;
+			lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
+			win.setAttributes(lp);
+			loginDialog.setCanceledOnTouchOutside(false);
+
+			if(!loginDialog.isShowing()) {
+				loginDialog.show();
+			}
 		}
+	}
+
+
+	private void authorize(Platform plat) {
+		if(plat.isValid()) {
+			String userId = plat.getDb().getUserId();
+			if (!TextUtils.isEmpty(userId)) {
+				UIHandler.sendEmptyMessage(MSG_USERID_FOUND, this);
+				login(plat.getName(), userId, null);
+				return;
+			}
+		}
+		plat.setPlatformActionListener(this);
+		plat.SSOSetting(true);
+		plat.showUser(null);
+	}
+
+	public void onComplete(Platform platform, int action,
+						   HashMap<String, Object> res) {
+		if (action == Platform.ACTION_USER_INFOR) {
+			UIHandler.sendEmptyMessage(MSG_AUTH_COMPLETE, this);
+			login(platform.getName(), platform.getDb().getUserId(), res);
+		}
+		System.out.println(res);
+		System.out.println("------User Name ---------" + platform.getDb().getUserName());
+		System.out.println("------User ID ---------" + platform.getDb().getUserId());
+	}
+
+	public void onError(Platform platform, int action, Throwable t) {
+		if (action == Platform.ACTION_USER_INFOR) {
+			UIHandler.sendEmptyMessage(MSG_AUTH_ERROR, this);
+		}
+		t.printStackTrace();
+	}
+
+	public void onCancel(Platform platform, int action) {
+		if (action == Platform.ACTION_USER_INFOR) {
+			UIHandler.sendEmptyMessage(MSG_AUTH_CANCEL, this);
+		}
+	}
+
+	private void login(String plat, String userId, HashMap<String, Object> userInfo) {
+		Message msg = new Message();
+		msg.what = MSG_LOGIN;
+		msg.obj = plat;
+		UIHandler.sendMessage(msg, this);
+	}
+
+	public boolean handleMessage(Message msg) {
+		switch(msg.what) {
+			case MSG_USERID_FOUND: {
+				Toast.makeText(this, R.string.userid_found, Toast.LENGTH_SHORT).show();
+			}
+			break;
+			case MSG_LOGIN: {
+
+				String text = getString(R.string.logining, msg.obj);
+				Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
+				System.out.println("---------------");
+
+//				Builder builder = new Builder(this);
+//				builder.setTitle(R.string.if_register_needed);
+//				builder.setMessage(R.string.after_auth);
+//				builder.setPositiveButton(R.string.ok, null);
+//				builder.create().show();
+			}
+			break;
+			case MSG_AUTH_CANCEL: {
+				Toast.makeText(this, R.string.auth_cancel, Toast.LENGTH_SHORT).show();
+				System.out.println("-------MSG_AUTH_CANCEL--------");
+			}
+			break;
+			case MSG_AUTH_ERROR: {
+				Toast.makeText(this, R.string.auth_error, Toast.LENGTH_SHORT).show();
+				System.out.println("-------MSG_AUTH_ERROR--------");
+			}
+			break;
+			case MSG_AUTH_COMPLETE: {
+				Toast.makeText(this, R.string.auth_complete, Toast.LENGTH_SHORT).show();
+				System.out.println("--------MSG_AUTH_COMPLETE-------");
+			}
+			break;
+		}
+		return false;
 	}
 }

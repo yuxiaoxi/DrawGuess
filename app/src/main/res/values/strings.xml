@@ -27,4 +27,11 @@
     <string name="toast_text">ScrollView下拉刷新完毕</string>
     <string name="message_ignore">开启"夜间防骚扰模式"，将自动屏蔽23:00~6:00间的任何提醒.</string>
     <string name="goods_unit_hint">请输入，如个、斤、份</string>
+
+    <string name="userid_found">用户信息已存在，正在跳转登录操作…</string>
+    <string name="logining">使用%s帐号登录中…</string>
+
+    <string name="auth_cancel">授权操作已取消</string>
+    <string name="auth_error">授权操作遇到错误，请阅读Logcat输出</string>
+    <string name="auth_complete">授权成功，正在跳转登录操作…</string>
 </resources>

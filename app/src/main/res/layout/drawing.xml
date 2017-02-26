@@ -83,6 +83,14 @@
         android:divider="@null"
         android:scrollbars="none"></ListView>
 
+    <ViewSwitcher
+        android:id="@+id/viewswitch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inAnimation="@anim/slide_in_right"
+        android:layout_alignTop="@+id/huaBanView1"
+        android:layout_alignRight="@+id/huaBanView1"
+        android:persistentDrawingCache="animation">
 
     <ImageView
         android:id="@+id/txt_player_clear_screen"
@@ -90,11 +98,10 @@
         android:layout_height="34dp"
         android:gravity="center"
         android:layout_marginTop="1dp"
-        android:layout_alignTop="@+id/huaBanView1"
-        android:layout_alignRight="@+id/huaBanView1"
+        android:layout_gravity="right"
         android:src="@drawable/draw_pencel_icon"
         android:background="@drawable/huabi_bg"
-        android:visibility="gone"
+        android:visibility="visible"
         />
 
     <LinearLayout
@@ -103,10 +110,8 @@
         android:layout_height="34dp"
         android:orientation="horizontal"
         android:layout_marginTop="1dp"
-        android:layout_alignTop="@+id/huaBanView1"
-        android:layout_alignRight="@+id/huaBanView1"
         android:background="@drawable/huabi_bg"
-        android:visibility="visible">
+        android:visibility="gone">
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="24dp"
@@ -147,6 +152,8 @@
             android:src="@drawable/clear_sceen_icon"
             android:layout_marginLeft="10dp"/>
         </LinearLayout>
+
+    </ViewSwitcher>
 
     <TextView
         android:id="@+id/txt_player_room_answer"

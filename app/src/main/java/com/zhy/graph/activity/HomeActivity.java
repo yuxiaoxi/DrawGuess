@@ -87,7 +87,7 @@ public class HomeActivity extends BaseAct {
 
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.act_home_view);
-
+		handleUserCreateFormUsingPOST(String.valueOf(new Date().getTime()),"123456","");
 		initView();
 
 	}
@@ -206,10 +206,7 @@ public class HomeActivity extends BaseAct {
 	protected void onResume() {
 		// TODO Auto-generated method stub
 		super.onResume();
-		if(mythread == null){
-			mythread = new Mythread();
-			mythread.start();
-		}else{
+		if(mythread != null){
 			mythread.run();
 		}
 
@@ -218,7 +215,9 @@ public class HomeActivity extends BaseAct {
 	@Override
 	protected void onStop() {
 		super.onStop();
-		mStompClient.disconnect();
+		if(mStompClient!=null){
+			mStompClient.disconnect();
+		}
 	}
 
 	/**
@@ -271,26 +270,23 @@ public class HomeActivity extends BaseAct {
 		}
 		return false;
 	}
-	
+
 	/**
-	 * 判断帐号是否可用
-	 * 
-	 * @Title: isUserExist
-	 * @Description: TODO(这里用一句话描述这个方法的作用)
-	 * @param @param uid 设定文件
-	 * @return void 返回类型
-	 * @throws
-	 */
-	public void isUserExist(final String userId, final String name, final String avatar,final String type) {
-		
+	 * 游客创建
+	 * @param userName
+	 * @param password
+	 * @param vcode
+     */
+	public void handleUserCreateFormUsingPOST(final String userName, final String password, final String vcode) {
+
 		Map<String, Object> map = new HashMap<String, Object>();
-		map.put("username", userId);
-		String url = MyProperUtil.getProperties(this,
-				"appConfigDebugHost.properties").getProperty("Host")
-				+ MyProperUtil.getProperties(this, "appConfigDebug.properties")
-						.getProperty("isUserExist");
+		map.put("username", userName);
+		map.put("password",password);
+		map.put("vcode",vcode);
+		System.out.println(map.toString());
+		String url = "http://112.74.174.121:8080/api/v1/create";
 		DhNet net = new DhNet(url);
-		net.addParams(map).doPost(new NetTask(this) {
+		net.addParams(map).doPost(new NetTask(HomeActivity.this) {
 
 			@Override
 			public void onErray(Response response) {
@@ -301,6 +297,16 @@ public class HomeActivity extends BaseAct {
 			@Override
 			public void doInUI(Response response, Integer transfer) {
 
+				Log.e(TAG,response.result);
+				String message = response.getBundle("message");
+				String code = response.getBundle("code");
+				if("1".equals(code)){//创建成功
+
+					mythread = new Mythread(userName);
+					mythread.start();
+				}else if("0".equals(code)){//创建失败
+
+				}
 
 			}
 		});
@@ -342,19 +348,23 @@ public class HomeActivity extends BaseAct {
 		}
 	};
 	public class Mythread extends Thread {
+		private String userName;
+		public Mythread(String username){
+			this.userName = username;
+		}
 		@Override
 		public void run() {
-			conn();
+			conn(userName);
 
 		}
 	}
-	private void conn() {
+	private void conn(String userName) {
 		try {
 
 			if(mStompClient!=null&&mStompClient.isConnected())
 				return;
 			Map<String, String> connectHttpHeaders = new HashMap<>();
-			connectHttpHeaders.put("user-name", new Date().toString());
+			connectHttpHeaders.put("user-name", userName);
 			mStompClient = Stomp.over(WebSocket.class, "ws://112.74.174.121:8080/ws/websocket", connectHttpHeaders);
 			mStompClient.topic("/topic/user.login").subscribe(new Subscriber<StompMessage>() {
 				@Override

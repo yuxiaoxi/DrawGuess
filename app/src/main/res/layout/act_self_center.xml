@@ -22,23 +22,24 @@
         android:id="@+id/text_self_center_nickname"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="suao"
+        android:text="未登录"
         android:layout_below="@+id/img_self_center_avatar"
         android:textColor="@color/btn_gray_bg"
         android:layout_marginTop="10dp"
+        android:gravity="center"
         android:textSize="16sp"
-        android:layout_alignStart="@+id/img_self_center_avatar"/>
+        android:layout_centerHorizontal="true"/>
 
     <TextView
         android:id="@+id/text_self_center_id"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="ID:12345"
+        android:text=""
         android:layout_below="@+id/text_self_center_nickname"
         android:textColor="@color/btn_gray_bg"
         android:layout_marginTop="8dp"
         android:textSize="16sp"
-        android:layout_alignStart="@+id/img_self_center_avatar"/>
+        android:layout_centerHorizontal="true"/>
 
     <com.zhy.graph.widget.NewBasicSingleItem
         android:id="@+id/item_self_center_invite_friend"

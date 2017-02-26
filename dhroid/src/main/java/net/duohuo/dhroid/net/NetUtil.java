@@ -1,16 +1,5 @@
 package net.duohuo.dhroid.net;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
-
-import net.duohuo.dhroid.ioc.IocContainer;
-
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -20,7 +9,13 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.message.BasicNameValuePair;
 
-import android.util.Log;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Scanner;
 /**
  * 网络访问
  * @author duohuo-jinghao
@@ -77,12 +72,6 @@ public class NetUtil {
 			UrlEncodedFormEntity entity = new UrlEncodedFormEntity(formparams,
 					"UTF-8");
 			httppost.setEntity(entity);
-			httppost.addHeader("BBG-AppKey", "test-bbg");
-			// 签名数据为URI路径，签名密码为test-bbg-secret
-			String signature = SignatureUtil.hmac_sha1("/bbg/test",
-					"test-bbg-secret");
-			Log.e("signature--->", signature);
-			httppost.addHeader("BBG-Signature", signature);
 			response =HttpManager.execute(httppost);
 			Header[] headers=response.getHeaders("Set-Cookie");
 			System.out.println(headers);
