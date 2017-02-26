@@ -22,6 +22,7 @@ import android.widget.Toast;
 import com.zhy.graph.adapter.HomePlayerGridAdapter;
 import com.zhy.graph.app.BaseApplication;
 import com.zhy.graph.bean.PlayerInfo;
+import com.zhy.graph.bean.ResultBean;
 import com.zhy.graph.utils.MyProperUtil;
 import com.zhy.graph.widget.PopDialog;
 
@@ -298,13 +299,13 @@ public class HomeActivity extends BaseAct {
 			public void doInUI(Response response, Integer transfer) {
 
 				Log.e(TAG,response.result);
-				String message = response.getBundle("message");
-				String code = response.getBundle("code");
-				if("1".equals(code)){//创建成功
+				ResultBean result = response.model(ResultBean.class);
+
+				if("1".equals(result.getCode())){//创建成功
 
 					mythread = new Mythread(userName);
 					mythread.start();
-				}else if("0".equals(code)){//创建失败
+				}else if("0".equals(result.getCode())){//创建失败
 
 				}
 
