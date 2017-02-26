@@ -30,6 +30,9 @@ public class BaseApplication extends Application {
 	public static DisplayImageOptions defaultOptions;
 
 	public static boolean isLogin = true;
+
+	public static  String username;
+
 	@Override
 	public void onCreate() {
 		super.onCreate();

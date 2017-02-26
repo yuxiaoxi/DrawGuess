@@ -134,8 +134,7 @@ public class HomeActivity extends BaseAct {
 				break;
 
 			case R.id.txt_home_create_player_room:
-				intent.setClass(HomeActivity.this,PlayerRoomActivity.class);
-				startActivity(intent);
+				createRoomUsingGET(BaseApplication.username);
 				break;
 
 			case R.id.txt_home_ready_ready_btn:
@@ -246,6 +245,44 @@ public class HomeActivity extends BaseAct {
 				if("1".equals(response.code)) {//获取成功
 					RoomInfoBean roomInfo = response.modelFromData(RoomInfoBean.class);
 					Log.e(TAG,roomInfo.getNowUserNum());
+
+					mythread = new Mythread(username,roomInfo.getRoomId());
+					mythread.start();
+				}
+			}
+		});
+
+	}
+
+	/**
+	 * createRoomUsingGET
+	 * @param username
+     */
+	void createRoomUsingGET(final String username) {
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("username", username);
+		String url = DomainUtils.SERVER_HOST+"/api/v1/room/create";
+		DhNet net = new DhNet(url);
+		net.addParams(map).doGet(new NetTask(HomeActivity.this) {
+
+			@Override
+			public void onErray(Response response) {
+
+				super.onErray(response);
+				Toast.makeText(HomeActivity.this,"数据请求错误！请您重新再试！",
+						Toast.LENGTH_SHORT).show();
+			}
+
+			@Override
+			public void doInUI(Response response, Integer transfer) {
+				if("1".equals(response.code)) {//获取成功
+					RoomInfoBean roomInfo = response.modelFromData(RoomInfoBean.class);
+					Log.e(TAG,roomInfo.getNowUserNum());
+					Intent intent = new Intent();
+					intent.setClass(HomeActivity.this,PlayerRoomActivity.class);
+					intent.putExtra("data",roomInfo);
+					startActivity(intent);
+
 				}
 			}
 		});
@@ -298,9 +335,9 @@ public class HomeActivity extends BaseAct {
 				ResultBean result = response.model(ResultBean.class);
 
 				if("1".equals(result.getCode())){//创建成功
+					BaseApplication.username = userName;
 					getRandomRoomUsingGET(userName);
-//					mythread = new Mythread(userName);
-//					mythread.start();
+//
 				}else if("0".equals(result.getCode())){//创建失败
 
 				}

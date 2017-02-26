@@ -29,6 +29,7 @@ import com.zhy.graph.adapter.PlayerRoomGridAdapter;
 import com.zhy.graph.bean.ChatInfo;
 import com.zhy.graph.bean.CoordinateBean;
 import com.zhy.graph.bean.PlayerRoomInfo;
+import com.zhy.graph.bean.RoomInfoBean;
 import com.zhy.graph.utils.PtsReceiverUtils;
 import com.zhy.graph.utils.Utils;
 import com.zhy.graph.widget.ChatInputDialog;
@@ -109,10 +110,14 @@ public class PlayerRoomActivity extends BaseAct{
 
     private boolean destroyed,connectClosed;
     private PopDialog popDialog = null;
+
+    private RoomInfoBean roomInfoBean = null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.drawing);
+        roomInfoBean = (RoomInfoBean) getIntent().getSerializableExtra("data");
+        Log.e(TAG,roomInfoBean.getRoomId());
         initView();
         mythread = new Mythread();
         mythread.start();
