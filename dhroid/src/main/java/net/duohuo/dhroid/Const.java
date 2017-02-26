@@ -37,8 +37,8 @@ public class Const {
 	
 	//网络访问返回数据的格式定义	
 	public static String response_success = "success";
-	public static String response_msg = "msg";
-	public static String response_data = "data";
+	public static String response_msg = "message";
+	public static String response_data = "content";
 	public static String response_code = "code";
 	public static int net_pool_size=10;
 	

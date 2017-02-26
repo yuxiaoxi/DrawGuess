@@ -22,6 +22,7 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.ViewSwitcher;
 
 import com.zhy.graph.adapter.ChatListAdapter;
 import com.zhy.graph.adapter.PlayerRoomGridAdapter;
@@ -95,6 +96,9 @@ public class PlayerRoomActivity extends BaseAct{
     @InjectView(id = R.id.txt_player_room_send_message, click = "onClickCallBack")
     private TextView txt_player_room_send_message;
 
+
+    @InjectView(id = R.id.viewswitch)
+    private ViewSwitcher viewswitch;
 
     @InjectView(id = R.id.lv_player_room_chat)
     private ListView lv_player_room_chat;
@@ -532,15 +536,17 @@ public class PlayerRoomActivity extends BaseAct{
 //                hbView.clearScreen();
                 hbView.setColor(Color.parseColor("#ff0000"));
                 hbView.setPaintWidth(10);
-                txt_player_clear_screen.setVisibility(View.GONE);
-                liner_player_huabi_setting.setVisibility(View.VISIBLE);
+                viewswitch.setDisplayedChild(1);
+//                txt_player_clear_screen.setVisibility(View.GONE);
+//                liner_player_huabi_setting.setVisibility(View.VISIBLE);
                 break;
 
             case R.id.liner_player_huabi_setting:
                 hbView.setColor(Color.parseColor("#FFFDED"));
                 hbView.setPaintWidth(20);
-                liner_player_huabi_setting.setVisibility(View.GONE);
-                txt_player_clear_screen.setVisibility(View.VISIBLE);
+                viewswitch.setDisplayedChild(0);
+//                liner_player_huabi_setting.setVisibility(View.GONE);
+//                txt_player_clear_screen.setVisibility(View.VISIBLE);
 
                 break;
 
