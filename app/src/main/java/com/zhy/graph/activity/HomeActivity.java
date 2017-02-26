@@ -23,7 +23,8 @@ import com.zhy.graph.adapter.HomePlayerGridAdapter;
 import com.zhy.graph.app.BaseApplication;
 import com.zhy.graph.bean.PlayerInfo;
 import com.zhy.graph.bean.ResultBean;
-import com.zhy.graph.utils.MyProperUtil;
+import com.zhy.graph.bean.RoomInfoBean;
+import com.zhy.graph.utils.DomainUtils;
 import com.zhy.graph.widget.PopDialog;
 
 import net.duohuo.dhroid.ioc.annotation.InjectView;
@@ -222,23 +223,15 @@ public class HomeActivity extends BaseAct {
 	}
 
 	/**
-	 * 
-	 * @Title: doLogin
-	 * @Description: 登录
-	 * @param @param uid
-	 * @return void 返回类型
-	 * @throws
-	 */
-	void doLogin(final String uid, final String password) {
+	 * 用户进入随机房间接口
+	 * @param username
+     */
+	void getRandomRoomUsingGET(final String username) {
 		Map<String, Object> map = new HashMap<String, Object>();
-		map.put("username", uid);
-		map.put("passwd", password);
-		String url = MyProperUtil.getProperties(this,
-				"appConfigDebugHost.properties").getProperty("Host")
-				+ MyProperUtil.getProperties(this, "appConfigDebug.properties")
-						.getProperty("login");
+		map.put("username", username);
+		String url = DomainUtils.SERVER_HOST+"/api/v1/room/into";
 		DhNet net = new DhNet(url);
-		net.addParams(map).doPost(new NetTask(this) {
+		net.addParams(map).doGet(new NetTask(HomeActivity.this) {
 
 			@Override
 			public void onErray(Response response) {
@@ -250,7 +243,10 @@ public class HomeActivity extends BaseAct {
 
 			@Override
 			public void doInUI(Response response, Integer transfer) {
-
+				if("1".equals(response.code)) {//获取成功
+					RoomInfoBean roomInfo = response.modelFromData(RoomInfoBean.class);
+					Log.e(TAG,roomInfo.getNowUserNum());
+				}
 			}
 		});
 
@@ -285,7 +281,7 @@ public class HomeActivity extends BaseAct {
 		map.put("password",password);
 		map.put("vcode",vcode);
 		System.out.println(map.toString());
-		String url = "http://112.74.174.121:8080/api/v1/create";
+		String url = DomainUtils.SERVER_HOST+"/api/v1/create";
 		DhNet net = new DhNet(url);
 		net.addParams(map).doPost(new NetTask(HomeActivity.this) {
 
@@ -302,9 +298,9 @@ public class HomeActivity extends BaseAct {
 				ResultBean result = response.model(ResultBean.class);
 
 				if("1".equals(result.getCode())){//创建成功
-
-					mythread = new Mythread(userName);
-					mythread.start();
+					getRandomRoomUsingGET(userName);
+//					mythread = new Mythread(userName);
+//					mythread.start();
 				}else if("0".equals(result.getCode())){//创建失败
 
 				}
@@ -350,16 +346,18 @@ public class HomeActivity extends BaseAct {
 	};
 	public class Mythread extends Thread {
 		private String userName;
-		public Mythread(String username){
+		private String roomId;
+		public Mythread(String username,String roomId){
 			this.userName = username;
+			this.roomId = roomId;
 		}
 		@Override
 		public void run() {
-			conn(userName);
+			conn(userName,roomId);
 
 		}
 	}
-	private void conn(String userName) {
+	private void conn(String userName,String roomId) {
 		try {
 
 			if(mStompClient!=null&&mStompClient.isConnected())
@@ -367,7 +365,8 @@ public class HomeActivity extends BaseAct {
 			Map<String, String> connectHttpHeaders = new HashMap<>();
 			connectHttpHeaders.put("user-name", userName);
 			mStompClient = Stomp.over(WebSocket.class, "ws://112.74.174.121:8080/ws/websocket", connectHttpHeaders);
-			mStompClient.topic("/topic/user.login").subscribe(new Subscriber<StompMessage>() {
+
+			mStompClient.topic("/topic/room."+roomId+"/out").subscribe(new Subscriber<StompMessage>() {
 				@Override
 				public void onCompleted() {
 					Log.e(TAG, "/topic/user.login/ onCompleted: ");
@@ -385,25 +384,6 @@ public class HomeActivity extends BaseAct {
 
 			});
 
-			mStompClient.topic("/topic/draw/pts").subscribe(new Subscriber<StompMessage>() {
-				@Override
-				public void onCompleted() {
-					Log.i(TAG, "/topic/pts/ onCompleted: ");
-				}
-
-				@Override
-				public void onError(Throwable e) {
-					Log.i(TAG, "/topic/pts/ onError: " + e.getMessage());
-				}
-
-				@Override
-				public void onNext(StompMessage stompMessage) {
-					Log.e(TAG, "response onNext: " + stompMessage.getPayload()
-					);
-
-				}
-
-			});
 
 			mStompClient.lifecycle().subscribe(new Observer<LifecycleEvent>() {
 				@Override
