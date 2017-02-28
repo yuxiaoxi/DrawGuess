@@ -108,7 +108,6 @@ public class HomeActivity extends BaseAct {
 		for (int i = 0; i<roomInfoBean.getAddedUserList().size(); i++){
 			PlayerInfo info = new PlayerInfo();
 			info.setNickName(roomInfoBean.getAddedUserList().get(i).getNickname());
-			info.setReady(false);
 			info.setYouke(true);
 			info.setId(roomInfoBean.getAddedUserList().get(i).getId());
 			info.setUsername(roomInfoBean.getAddedUserList().get(i).getUsername());
@@ -116,6 +115,11 @@ public class HomeActivity extends BaseAct {
 				info.setMe(true);
 			if(i==0&&Integer.parseInt(roomInfoBean.getNowUserNum())==1){
 				roomOwner = true;
+			}
+			if("Ready".equals(roomInfoBean.getAddedUserList().get(i).getStatus())){
+				info.setReady(true);
+			}else if("Empty".equals(roomInfoBean.getAddedUserList().get(i).getStatus())){
+				info.setReady(false);
 			}
 			dataList.add(info);
 		}
@@ -131,7 +135,11 @@ public class HomeActivity extends BaseAct {
 			return;
 		PlayerInfo info = new PlayerInfo();
 		info.setNickName(playerBean.getNickname());
-		info.setReady(false);
+		if("Ready".equals(playerBean.getStatus())){
+			info.setReady(true);
+		}else if("Empty".equals(playerBean.getStatus())){
+			info.setReady(false);
+		}
 		info.setYouke(true);
 		info.setMe(false);
 		info.setId(playerBean.getId());
@@ -172,8 +180,9 @@ public class HomeActivity extends BaseAct {
 		switch (view.getId()) {
 
 			case R.id.image_title_left:
-				intent.setClass(HomeActivity.this,SelfCenterActivity.class);
-				startActivity(intent);
+				daoTimer.cancel();
+				netUitl.leaveRoomUsingGET(BaseApplication.username,3,null);
+
 				break;
 
 			case R.id.txt_home_create_player_room:
@@ -259,7 +268,8 @@ public class HomeActivity extends BaseAct {
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
 
-		if(requestCode == 1 && resultCode == 1){
+		if(requestCode == 1){
+			onStop = false;
 			netUitl.getRandomRoomUsingGET(BaseApplication.username);
 		}
 	}
@@ -342,7 +352,9 @@ public class HomeActivity extends BaseAct {
 				}
 			} else if(msg.what == 0x11){
 				if(!onStop){//非退出app,倒计时到了自动退出房间
-					mStompClient.disconnect();
+					if(mStompClient!=null){
+						mStompClient.disconnect();
+					}
 					netUitl.getRandomRoomUsingGET(BaseApplication.username);
 				}
 			} else if(msg.what == 0x12){
@@ -364,6 +376,10 @@ public class HomeActivity extends BaseAct {
 				Intent intent = new Intent();
 				intent.setClass(HomeActivity.this,PlayerRoomActivity.class);
 				intent.putExtra("data",(RoomInfoBean)msg.obj);
+				startActivityForResult(intent,1);
+			} else if(msg.what == 0x16){
+				Intent intent = new Intent();
+				intent.setClass(HomeActivity.this,SelfCenterActivity.class);
 				startActivityForResult(intent,1);
 			}
 		}

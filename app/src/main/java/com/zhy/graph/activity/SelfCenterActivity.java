@@ -104,6 +104,7 @@ public class SelfCenterActivity extends BaseAct implements Callback,
 		switch (view.getId()) {
 
 		case R.id.image_title_left:
+			setResult(2);
 			finish();
 			break;
 
