@@ -97,6 +97,9 @@ public class PlayerRoomActivity extends BaseAct{
     @InjectView(id = R.id.txt_player_room_send_message, click = "onClickCallBack")
     private TextView txt_player_room_send_message;
 
+    @InjectView(id = R.id.img_close_game, click = "onClickCallBack")
+    private ImageView img_close_game;
+
 
     @InjectView(id = R.id.viewswitch)
     private ViewSwitcher viewswitch;
@@ -559,6 +562,11 @@ public class PlayerRoomActivity extends BaseAct{
                 if(chatDialog!=null&&!chatDialog.isShowing()){
                     chatDialog.show();
                 }
+                break;
+
+            case R.id.img_close_game:
+                setResult(1);
+                finish();
                 break;
 
             default:
