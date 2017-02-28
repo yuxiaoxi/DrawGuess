@@ -16,6 +16,10 @@ public class PlayerInfo {
     //是否本人
     private boolean me;
 
+    private String id;
+
+    private String username;
+
     public String getAvater() {
         return avater;
     }
@@ -54,5 +58,21 @@ public class PlayerInfo {
 
     public void setMe(boolean me) {
         this.me = me;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 }

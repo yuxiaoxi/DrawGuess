@@ -21,6 +21,7 @@ import android.widget.Toast;
 
 import com.zhy.graph.adapter.HomePlayerGridAdapter;
 import com.zhy.graph.app.BaseApplication;
+import com.zhy.graph.bean.PlayerBean;
 import com.zhy.graph.bean.PlayerInfo;
 import com.zhy.graph.bean.ResultBean;
 import com.zhy.graph.bean.RoomInfoBean;
@@ -83,7 +84,8 @@ public class HomeActivity extends BaseAct {
 	private String TAG = "HomeActivity";
 	private Mythread mythread = null;
 	private PopDialog popDialog = null;
-	private boolean roomOwner;
+	private boolean roomOwner,onStop;
+	private List<PlayerInfo> dataList;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 
@@ -95,33 +97,71 @@ public class HomeActivity extends BaseAct {
 	}
 
 	public void initView(){
+		dataList = new ArrayList<>();
 		left_image.setVisibility(View.VISIBLE);
 		left_image.setImageResource(R.drawable.title_bar_self_center_icon);
 		right_image.setVisibility(View.VISIBLE);
 		right_image.setImageResource(R.drawable.title_bar_share_icon);
 		titleTextView.setVisibility(View.VISIBLE);
-		titleTextView.setText("房间666");
 
-		adapter = new HomePlayerGridAdapter(HomeActivity.this,getData());
+
+		adapter = new HomePlayerGridAdapter(HomeActivity.this,dataList);
 		grid_home.setAdapter(adapter);
-		countDown(18);
+
 	}
 
 
-	public List<PlayerInfo> getData(){
-		List<PlayerInfo> list = new ArrayList<>();
-		for (int i = 0; i<6; i++){
+	public void initData(RoomInfoBean roomInfoBean){
+		dataList.clear();
+		titleTextView.setText("房间"+roomInfoBean.getRoomId());
+		if(roomInfoBean.getAddedUserList()==null)
+			return;
+		for (int i = 0; i<roomInfoBean.getAddedUserList().size(); i++){
 			PlayerInfo info = new PlayerInfo();
-			info.setNickName("haha"+i);
-			info.setReady(i%2==0);
-			info.setYouke(i%2==1);
-			if(i == 0){
+			info.setNickName(roomInfoBean.getAddedUserList().get(i).getNickname());
+			info.setReady(false);
+			info.setYouke(true);
+			info.setId(roomInfoBean.getAddedUserList().get(i).getId());
+			info.setUsername(roomInfoBean.getAddedUserList().get(i).getUsername());
+			if((i+1) == Integer.parseInt(roomInfoBean.getNowUserNum()))
 				info.setMe(true);
+			if(i==0&&Integer.parseInt(roomInfoBean.getNowUserNum())==1){
 				roomOwner = true;
 			}
-			list.add(info);
+			dataList.add(info);
 		}
-		return list;
+		adapter.notifyDataSetChanged();
+		if(!roomOwner){
+			countDown(18);
+		}
+
+	}
+
+	public void updateData(PlayerBean playerBean){
+		if(playerBean==null)
+			return;
+		PlayerInfo info = new PlayerInfo();
+		info.setNickName(playerBean.getNickname());
+		info.setReady(false);
+		info.setYouke(true);
+		info.setMe(false);
+		info.setId(playerBean.getId());
+		info.setUsername(playerBean.getUsername());
+		dataList.add(info);
+		adapter.notifyDataSetChanged();
+	}
+
+	public void logout(PlayerBean playerBean){
+		if(playerBean==null)
+			return;
+		for (PlayerInfo info: dataList
+			 ) {
+			if(info.getId().equals(playerBean.getId())){
+				dataList.remove(info);
+				break;
+			}
+		}
+		adapter.notifyDataSetChanged();
 	}
 
 	public void onClickCallBack(View view) {
@@ -216,6 +256,8 @@ public class HomeActivity extends BaseAct {
 	@Override
 	protected void onStop() {
 		super.onStop();
+		onStop = true;
+		leaveRoomUsingGET(BaseApplication.username);
 		if(mStompClient!=null){
 			mStompClient.disconnect();
 		}
@@ -245,9 +287,44 @@ public class HomeActivity extends BaseAct {
 				if("1".equals(response.code)) {//获取成功
 					RoomInfoBean roomInfo = response.modelFromData(RoomInfoBean.class);
 					Log.e(TAG,roomInfo.getNowUserNum());
+					initData(roomInfo);
+					if(mythread == null){
+						mythread = new Mythread(username,roomInfo.getRoomId());
+						mythread.start();
+					}else{
+						mythread.setRoomId(roomInfo.getRoomId());
+						mythread.run();
+					}
 
-					mythread = new Mythread(username,roomInfo.getRoomId());
-					mythread.start();
+				}
+			}
+		});
+
+	}
+
+	public void leaveRoomUsingGET(final String username) {
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("username", username);
+		String url = DomainUtils.SERVER_HOST+"/api/v1/room/leave";
+		DhNet net = new DhNet(url);
+		net.addParams(map).doGet(new NetTask(HomeActivity.this) {
+
+			@Override
+			public void onErray(Response response) {
+
+				super.onErray(response);
+				Toast.makeText(HomeActivity.this,"数据请求错误！请您重新再试！",
+						Toast.LENGTH_SHORT).show();
+			}
+
+			@Override
+			public void doInUI(Response response, Integer transfer) {
+				if("1".equals(response.code)) {//获取成功
+					if(!onStop){//非退出app,倒计时到了自动退出房间
+						mStompClient.disconnect();
+						getRandomRoomUsingGET(BaseApplication.username);
+					}
+
 				}
 			}
 		});
@@ -358,6 +435,7 @@ public class HomeActivity extends BaseAct {
 				msg.arg1 = Integer.parseInt(txt_home_ready_time_down.getText().toString().split("s")[0])-1;
 				if(msg.arg1 == 0){
 					daoTimer.cancel();
+					leaveRoomUsingGET(BaseApplication.username);
 				}
 				changeUI.sendMessage(msg);
 			}
@@ -378,6 +456,10 @@ public class HomeActivity extends BaseAct {
 				if(roomOwner){
 					txt_home_ready_ready_btn.setText("开始");
 				}
+			} else if(msg.what == 0x12){
+				updateData((PlayerBean) msg.obj);
+			} else if(msg.what == 0x13){
+				logout((PlayerBean) msg.obj);
 			}
 		}
 	};
@@ -388,6 +470,10 @@ public class HomeActivity extends BaseAct {
 			this.userName = username;
 			this.roomId = roomId;
 		}
+		public void setRoomId(String roomId) {
+			this.roomId = roomId;
+		}
+
 		@Override
 		public void run() {
 			conn(userName,roomId);
@@ -403,6 +489,29 @@ public class HomeActivity extends BaseAct {
 			connectHttpHeaders.put("user-name", userName);
 			mStompClient = Stomp.over(WebSocket.class, "ws://112.74.174.121:8080/ws/websocket", connectHttpHeaders);
 
+			mStompClient.topic("/topic/room."+roomId+"/in").subscribe(new Subscriber<StompMessage>() {
+				@Override
+				public void onCompleted() {
+					Log.e(TAG, "/topic/roomin/ onCompleted: ");
+				}
+
+				@Override
+				public void onError(Throwable e) {
+					Log.e(TAG, "/topic/roomin/ onError: " + e.getMessage());
+				}
+
+				@Override
+				public void onNext(StompMessage stompMessage) {
+					Response response = new Response(stompMessage.getPayload());
+					Message msg = new Message();
+					msg.obj = response.model(PlayerBean.class);
+					msg.what = 0x12;
+					changeUI.sendMessage(msg);
+					Log.e(TAG, "login onNext: " + stompMessage.getPayload());
+				}
+
+			});
+
 			mStompClient.topic("/topic/room."+roomId+"/out").subscribe(new Subscriber<StompMessage>() {
 				@Override
 				public void onCompleted() {
@@ -416,10 +525,16 @@ public class HomeActivity extends BaseAct {
 
 				@Override
 				public void onNext(StompMessage stompMessage) {
+					Response response = new Response(stompMessage.getPayload());
+					Message msg = new Message();
+					msg.obj = response.model(PlayerBean.class);
+					msg.what = 0x13;
+					changeUI.sendMessage(msg);
 					Log.e(TAG, "login onNext: " + stompMessage.getPayload());
 				}
 
 			});
+
 
 
 			mStompClient.lifecycle().subscribe(new Observer<LifecycleEvent>() {

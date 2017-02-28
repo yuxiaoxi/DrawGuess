@@ -13,7 +13,7 @@ public class RoomInfoBean implements Serializable{
     private String roomOwnerName;
     private String nowUserNum;
     private String questionNum;
-    private List<PlayerBean> addedList;
+    private List<PlayerBean> addedUserList;
     private List<String> questions;
     private String currentQuestion;
     private String version;
@@ -68,12 +68,12 @@ public class RoomInfoBean implements Serializable{
         this.questionNum = questionNum;
     }
 
-    public List<PlayerBean> getAddedList() {
-        return addedList;
+    public List<PlayerBean> getAddedUserList() {
+        return addedUserList;
     }
 
-    public void setAddedList(List<PlayerBean> addedList) {
-        this.addedList = addedList;
+    public void setAddedUserList(List<PlayerBean> addedUserList) {
+        this.addedUserList = addedUserList;
     }
 
     public List<String> getQuestions() {
