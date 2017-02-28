@@ -99,6 +99,9 @@ public class NetRequestUtil {
                         createRoomUsingGET(username);
                     }else if(type == 2){
                         intoRoomUsingGET(username,roomId);
+                    }else if(type == 3){
+                        msg.what = 0x16;
+                        mHandler.sendMessage(msg);
                     }
 
 
