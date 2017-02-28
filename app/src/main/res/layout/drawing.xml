@@ -49,6 +49,7 @@
         android:textColor="@color/white"/>
 
     <ImageView
+        android:id="@+id/img_close_game"
         android:layout_alignParentRight="true"
 
         android:layout_width="50dp"

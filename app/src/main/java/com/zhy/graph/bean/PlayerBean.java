@@ -1,9 +1,11 @@
 package com.zhy.graph.bean;
 
+import java.io.Serializable;
+
 /**
  * Created by yuzhuo on 2017/2/26.
  */
-public class PlayerBean {
+public class PlayerBean implements Serializable{
     private String id;
     private String username;
     private String nickname;
