@@ -5,7 +5,6 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
@@ -17,39 +16,27 @@ import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.zhy.graph.adapter.HomePlayerGridAdapter;
 import com.zhy.graph.app.BaseApplication;
+import com.zhy.graph.bean.PlayerBean;
 import com.zhy.graph.bean.PlayerInfo;
-import com.zhy.graph.bean.ResultBean;
 import com.zhy.graph.bean.RoomInfoBean;
-import com.zhy.graph.utils.DomainUtils;
+import com.zhy.graph.network.MessageObserveUtil;
+import com.zhy.graph.network.NetRequestUtil;
 import com.zhy.graph.widget.PopDialog;
 
 import net.duohuo.dhroid.ioc.annotation.InjectView;
-import net.duohuo.dhroid.net.DhNet;
-import net.duohuo.dhroid.net.NetTask;
-import net.duohuo.dhroid.net.Response;
-
-import org.java_websocket.WebSocket;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import cn.sharesdk.onekeyshare.OnekeyShare;
 import gra.zhy.com.graph.R;
-import rx.Observer;
-import rx.Subscriber;
-import ua.naiksoftware.stomp.LifecycleEvent;
-import ua.naiksoftware.stomp.Stomp;
 import ua.naiksoftware.stomp.client.StompClient;
-import ua.naiksoftware.stomp.client.StompMessage;
 
 public class HomeActivity extends BaseAct {
 
@@ -81,48 +68,104 @@ public class HomeActivity extends BaseAct {
 	private HomePlayerGridAdapter adapter;
 	private StompClient mStompClient;
 	private String TAG = "HomeActivity";
-	private Mythread mythread = null;
+	private MessageObserveUtil obserUitl = null;
 	private PopDialog popDialog = null;
-	private boolean roomOwner;
+	private boolean roomOwner,onStop;
+	private List<PlayerInfo> dataList;
+	private String roomId;
+	private NetRequestUtil netUitl = null;
+	private TimerTask task = null;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.act_home_view);
-		handleUserCreateFormUsingPOST(String.valueOf(new Date().getTime()),"123456","");
 		initView();
+		netUitl.handleUserCreateFormUsingPOST(String.valueOf(new Date().getTime()),"123456","");
 
 	}
 
 	public void initView(){
+		dataList = new ArrayList<>();
 		left_image.setVisibility(View.VISIBLE);
 		left_image.setImageResource(R.drawable.title_bar_self_center_icon);
 		right_image.setVisibility(View.VISIBLE);
 		right_image.setImageResource(R.drawable.title_bar_share_icon);
 		titleTextView.setVisibility(View.VISIBLE);
-		titleTextView.setText("房间666");
 
-		adapter = new HomePlayerGridAdapter(HomeActivity.this,getData());
+
+		adapter = new HomePlayerGridAdapter(HomeActivity.this,dataList);
 		grid_home.setAdapter(adapter);
-		countDown(18);
+		netUitl = new NetRequestUtil(HomeActivity.this,netRequest);
 	}
 
 
-	public List<PlayerInfo> getData(){
-		List<PlayerInfo> list = new ArrayList<>();
-		for (int i = 0; i<6; i++){
+	public void initData(RoomInfoBean roomInfoBean){
+		dataList.clear();
+		titleTextView.setText("房间"+roomInfoBean.getRoomId());
+		if(roomInfoBean.getAddedUserList()==null)
+			return;
+		for (int i = 0; i<roomInfoBean.getAddedUserList().size(); i++){
 			PlayerInfo info = new PlayerInfo();
-			info.setNickName("haha"+i);
-			info.setReady(i%2==0);
-			info.setYouke(i%2==1);
-			if(i == 0){
+			info.setNickName(roomInfoBean.getAddedUserList().get(i).getNickname());
+			info.setReady(false);
+			info.setYouke(true);
+			info.setId(roomInfoBean.getAddedUserList().get(i).getId());
+			info.setUsername(roomInfoBean.getAddedUserList().get(i).getUsername());
+			if((i+1) == Integer.parseInt(roomInfoBean.getNowUserNum()))
 				info.setMe(true);
+			if(i==0&&Integer.parseInt(roomInfoBean.getNowUserNum())==1){
 				roomOwner = true;
 			}
-			list.add(info);
+			dataList.add(info);
 		}
-		return list;
+		adapter.notifyDataSetChanged();
+		if(!roomOwner){
+			countDown(18);
+		}
+
 	}
+
+	public void updateData(PlayerBean playerBean){
+		if(playerBean==null)
+			return;
+		PlayerInfo info = new PlayerInfo();
+		info.setNickName(playerBean.getNickname());
+		info.setReady(false);
+		info.setYouke(true);
+		info.setMe(false);
+		info.setId(playerBean.getId());
+		info.setUsername(playerBean.getUsername());
+		dataList.add(info);
+		adapter.notifyDataSetChanged();
+	}
+
+	public void logout(PlayerBean playerBean){
+		if(playerBean==null)
+			return;
+		for (PlayerInfo info: dataList
+			 ) {
+			if(info.getId().equals(playerBean.getId())){
+				dataList.remove(info);
+				break;
+			}
+		}
+		adapter.notifyDataSetChanged();
+	}
+
+	public void toReady(PlayerBean playerBean,boolean ready){
+		if(playerBean==null)
+			return;
+		for (PlayerInfo info: dataList
+				) {
+			if(info.getId().equals(playerBean.getId())){
+				info.setReady(ready);
+				break;
+			}
+		}
+		adapter.notifyDataSetChanged();
+	}
+
 
 	public void onClickCallBack(View view) {
 		Intent intent = new Intent();
@@ -134,12 +177,14 @@ public class HomeActivity extends BaseAct {
 				break;
 
 			case R.id.txt_home_create_player_room:
-				createRoomUsingGET(BaseApplication.username);
+				daoTimer.cancel();
+				netUitl.leaveRoomUsingGET(BaseApplication.username,1,null);
 				break;
 
 			case R.id.txt_home_ready_ready_btn:
 				daoTimer.cancel();
 				if("开始".equals(txt_home_ready_ready_btn.getText().toString())){//是房主
+
 					popDialog = PopDialog.createDialog(HomeActivity.this, R.layout.pop_select_guess_word, Gravity.CENTER, R.style.CustomProgressDialog);
 					Window win = popDialog.getWindow();
 					win.getDecorView().setPadding(0, 0, 0, 0);
@@ -152,19 +197,15 @@ public class HomeActivity extends BaseAct {
 					if(!popDialog.isShowing()) {
 						popDialog.show();
 					}
-				}else{
-					txt_home_ready_time_down.setVisibility(View.GONE);
-					adapter.clickReady();
-					txt_home_ready_ready_btn.setText("已准备");
-					txt_home_ready_ready_btn.setTextColor(Color.parseColor("#ffffff"));
-					txt_home_ready_ready_btn.setBackgroundResource(R.drawable.btn_shape_ready_gray);
-					txt_home_ready_ready_btn.setEnabled(false);
+				}else if("准备".equals(txt_home_ready_ready_btn.getText().toString())){
+					netUitl.userReadyUsingGET(BaseApplication.username,roomId);
+				}else if("已准备".equals(txt_home_ready_ready_btn.getText().toString())){
+					netUitl.userReadyCancelUsingGET(BaseApplication.username,roomId);
 				}
 
 				break;
 
 			case R.id.txt_home_join_player_room:
-
 				popDialog = PopDialog.createDialog(HomeActivity.this, R.layout.pop_join_play_room, Gravity.CENTER,R.style.inputDialog);
 				((EditText)popDialog.findViewById(R.id.edit_input_room_id)).setOnEditorActionListener(new TextView.OnEditorActionListener() {
 					@Override
@@ -174,6 +215,9 @@ public class HomeActivity extends BaseAct {
 							if(popDialog.isShowing()) {
 								popDialog.dismiss();
 							}
+							daoTimer.cancel();
+							String roomId = ((EditText)popDialog.findViewById(R.id.edit_input_room_id)).getText().toString().trim();
+							netUitl.leaveRoomUsingGET(BaseApplication.username,2,roomId);
 						}
 						return false;
 					}
@@ -207,151 +251,39 @@ public class HomeActivity extends BaseAct {
 	protected void onResume() {
 		// TODO Auto-generated method stub
 		super.onResume();
-		if(mythread != null){
-			mythread.run();
-		}
+		onStop = false;
 
+	}
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+
+		if(requestCode == 1 && resultCode == 1){
+			netUitl.getRandomRoomUsingGET(BaseApplication.username);
+		}
 	}
 
 	@Override
 	protected void onStop() {
 		super.onStop();
+		onStop = true;
+		netUitl.leaveRoomUsingGET(BaseApplication.username,0,null);
 		if(mStompClient!=null){
 			mStompClient.disconnect();
 		}
-	}
-
-	/**
-	 * 用户进入随机房间接口
-	 * @param username
-     */
-	void getRandomRoomUsingGET(final String username) {
-		Map<String, Object> map = new HashMap<String, Object>();
-		map.put("username", username);
-		String url = DomainUtils.SERVER_HOST+"/api/v1/room/into";
-		DhNet net = new DhNet(url);
-		net.addParams(map).doGet(new NetTask(HomeActivity.this) {
-
-			@Override
-			public void onErray(Response response) {
-
-				super.onErray(response);
-				Toast.makeText(HomeActivity.this,"数据请求错误！请您重新再试！",
-						Toast.LENGTH_SHORT).show();
-			}
-
-			@Override
-			public void doInUI(Response response, Integer transfer) {
-				if("1".equals(response.code)) {//获取成功
-					RoomInfoBean roomInfo = response.modelFromData(RoomInfoBean.class);
-					Log.e(TAG,roomInfo.getNowUserNum());
-
-					mythread = new Mythread(username,roomInfo.getRoomId());
-					mythread.start();
-				}
-			}
-		});
-
-	}
-
-	/**
-	 * createRoomUsingGET
-	 * @param username
-     */
-	void createRoomUsingGET(final String username) {
-		Map<String, Object> map = new HashMap<String, Object>();
-		map.put("username", username);
-		String url = DomainUtils.SERVER_HOST+"/api/v1/room/create";
-		DhNet net = new DhNet(url);
-		net.addParams(map).doGet(new NetTask(HomeActivity.this) {
-
-			@Override
-			public void onErray(Response response) {
-
-				super.onErray(response);
-				Toast.makeText(HomeActivity.this,"数据请求错误！请您重新再试！",
-						Toast.LENGTH_SHORT).show();
-			}
-
-			@Override
-			public void doInUI(Response response, Integer transfer) {
-				if("1".equals(response.code)) {//获取成功
-					RoomInfoBean roomInfo = response.modelFromData(RoomInfoBean.class);
-					Log.e(TAG,roomInfo.getNowUserNum());
-					Intent intent = new Intent();
-					intent.setClass(HomeActivity.this,PlayerRoomActivity.class);
-					intent.putExtra("data",roomInfo);
-					startActivity(intent);
-
-				}
-			}
-		});
-
-	}
-
-	/**
-	 * 
-	 * @Title: isEmpty
-	 * @Description: 判断字符串是否为空
-	 * @param @param str
-	 * @param @return 设定文件
-	 * @return boolean 返回类型
-	 * @throws
-	 */
-	public boolean isEmpty(String str) {
-		if (str == null || "".equals(str)) {
-			return true;
+		if(daoTimer != null){
+			daoTimer.cancel();
 		}
-		return false;
-	}
-
-	/**
-	 * 游客创建
-	 * @param userName
-	 * @param password
-	 * @param vcode
-     */
-	public void handleUserCreateFormUsingPOST(final String userName, final String password, final String vcode) {
-
-		Map<String, Object> map = new HashMap<String, Object>();
-		map.put("username", userName);
-		map.put("password",password);
-		map.put("vcode",vcode);
-		System.out.println(map.toString());
-		String url = DomainUtils.SERVER_HOST+"/api/v1/create";
-		DhNet net = new DhNet(url);
-		net.addParams(map).doPost(new NetTask(HomeActivity.this) {
-
-			@Override
-			public void onErray(Response response) {
-
-				super.onErray(response);
-			}
-
-			@Override
-			public void doInUI(Response response, Integer transfer) {
-
-				Log.e(TAG,response.result);
-				ResultBean result = response.model(ResultBean.class);
-
-				if("1".equals(result.getCode())){//创建成功
-					BaseApplication.username = userName;
-					getRandomRoomUsingGET(userName);
-//
-				}else if("0".equals(result.getCode())){//创建失败
-
-				}
-
-			}
-		});
 
 	}
+
 
 	private void countDown(int countTime){
 		txt_home_ready_time_down.setVisibility(View.VISIBLE);
 		txt_home_ready_time_down.setText(countTime+"s");
 		daoTimer = new Timer();
-		TimerTask task = new TimerTask() {
+		task = new TimerTask() {
 			public void run() {
 				Message msg = new Message();
 				msg.what = 0x10;
@@ -370,100 +302,72 @@ public class HomeActivity extends BaseAct {
 		public void handleMessage(Message msg) {
 			if(msg.what == 0x10){
 				if(msg.arg1 == 0){
+					txt_home_ready_time_down.setText("0");
 					txt_home_ready_time_down.setVisibility(View.GONE);
+					netUitl.leaveRoomUsingGET(BaseApplication.username,0,null);
 				}else{
 					txt_home_ready_time_down.setText(msg.arg1+"s");
 				}
 			} else if(msg.what == 0x11){
 				if(roomOwner){
 					txt_home_ready_ready_btn.setText("开始");
+				}else{
+					txt_home_ready_ready_btn.setText("准备");
 				}
+			} else if(msg.what == 0x12){
+				updateData((PlayerBean) msg.obj);
+			} else if(msg.what == 0x13){
+				logout((PlayerBean) msg.obj);
+			} else if(msg.what == 0x14){
+				toReady((PlayerBean) msg.obj,true);
+			} else if(msg.what == 0x16){
+				toReady((PlayerBean) msg.obj,false);
 			}
 		}
 	};
-	public class Mythread extends Thread {
-		private String userName;
-		private String roomId;
-		public Mythread(String username,String roomId){
-			this.userName = username;
-			this.roomId = roomId;
-		}
+
+	private Handler netRequest = new Handler() {
 		@Override
-		public void run() {
-			conn(userName,roomId);
-
+		public void handleMessage(Message msg) {
+			if(msg.what == 0x10){
+				RoomInfoBean roomInfo = (RoomInfoBean) msg.obj;
+				roomId = roomInfo.getRoomId();
+				initData(roomInfo);
+				if(obserUitl == null){
+					obserUitl = new MessageObserveUtil(BaseApplication.username,roomInfo.getRoomId(),mStompClient,changeUI);
+					obserUitl.start();
+				}else{
+					obserUitl.setRoomId(roomInfo.getRoomId());
+					obserUitl.run();
+				}
+			} else if(msg.what == 0x11){
+				if(!onStop){//非退出app,倒计时到了自动退出房间
+					mStompClient.disconnect();
+					netUitl.getRandomRoomUsingGET(BaseApplication.username);
+				}
+			} else if(msg.what == 0x12){
+				txt_home_ready_time_down.setVisibility(View.GONE);
+//					adapter.clickReady();
+				txt_home_ready_ready_btn.setText("已准备");
+				txt_home_ready_ready_btn.setTextColor(Color.parseColor("#ffffff"));
+				txt_home_ready_ready_btn.setBackgroundResource(R.drawable.btn_shape_ready_gray);
+				daoTimer.cancel();
+			} else if(msg.what == 0x13){
+				txt_home_ready_time_down.setVisibility(View.VISIBLE);
+				txt_home_ready_time_down.setText("");
+//					adapter.cancelReady();
+				txt_home_ready_ready_btn.setText("准备");
+				txt_home_ready_ready_btn.setTextColor(Color.parseColor("#ffffff"));
+				txt_home_ready_ready_btn.setBackgroundResource(R.drawable.pink_ring_shape);
+				countDown(18);
+			} else if(msg.what == 0x15){
+				Intent intent = new Intent();
+				intent.setClass(HomeActivity.this,PlayerRoomActivity.class);
+				intent.putExtra("data",(RoomInfoBean)msg.obj);
+				startActivityForResult(intent,1);
+			}
 		}
-	}
-	private void conn(String userName,String roomId) {
-		try {
-
-			if(mStompClient!=null&&mStompClient.isConnected())
-				return;
-			Map<String, String> connectHttpHeaders = new HashMap<>();
-			connectHttpHeaders.put("user-name", userName);
-			mStompClient = Stomp.over(WebSocket.class, "ws://112.74.174.121:8080/ws/websocket", connectHttpHeaders);
-
-			mStompClient.topic("/topic/room."+roomId+"/out").subscribe(new Subscriber<StompMessage>() {
-				@Override
-				public void onCompleted() {
-					Log.e(TAG, "/topic/user.login/ onCompleted: ");
-				}
-
-				@Override
-				public void onError(Throwable e) {
-					Log.e(TAG, "/topic/user.login/ onError: " + e.getMessage());
-				}
-
-				@Override
-				public void onNext(StompMessage stompMessage) {
-					Log.e(TAG, "login onNext: " + stompMessage.getPayload());
-				}
-
-			});
-
-
-			mStompClient.lifecycle().subscribe(new Observer<LifecycleEvent>() {
-				@Override
-				public void onCompleted() {
-					Log.e(TAG, "lifecycle onCompleted: ");
-				}
-
-				@Override
-				public void onError(Throwable e) {
-					Log.e(TAG, "lifecycle onError: ");
-				}
-
-				@Override
-				public void onNext(LifecycleEvent lifecycleEvent) {
-					switch (lifecycleEvent.getType()) {
-
-						case OPENED:
-							Log.e(TAG, "Stomp connection opened");
-							Message msg = new Message();
-							msg.what = 0x11;
-							changeUI.sendMessage(msg);
-							break;
-
-						case ERROR:
-							Log.e(TAG, "Error", lifecycleEvent.getException());
-							break;
-
-						case CLOSED:
-							Log.e(TAG, "Stomp connection closed");
-							break;
-					}
-				}
-			});
-
-			mStompClient.connect();
-			Log.i(TAG, "end of program,mStompClient status:" + mStompClient.isConnected());
-
-		} catch (Exception e) {
-			e.printStackTrace();
-			Log.i("IOException", "IOException");
-		}
-	}
-
+	};
 
 	private void showShare() {
 		OnekeyShare oks = new OnekeyShare();

@@ -103,6 +103,18 @@ public class HomePlayerGridAdapter extends BaseAdapter{
         notifyDataSetChanged();
     }
 
+    public void cancelReady(){
+        if(this.dataList == null)
+            return;
+        for (int i = 0; i < this.dataList.size(); i++) {
+            if(this.dataList.get(i).isMe()){
+                this.dataList.get(i).setReady(false);
+                break;
+            }
+        }
+        notifyDataSetChanged();
+    }
+
     public static class ViewHolder{
         private ImageView avatarImageView;
         private TextView nickNameTextView;
