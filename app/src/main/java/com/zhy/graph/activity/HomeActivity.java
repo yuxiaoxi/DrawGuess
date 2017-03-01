@@ -1,5 +1,6 @@
 package com.zhy.graph.activity;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -12,18 +13,22 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.zhy.graph.adapter.HomePlayerGridAdapter;
+import com.zhy.graph.adapter.QuestionsSelectListAdapter;
 import com.zhy.graph.app.BaseApplication;
 import com.zhy.graph.bean.PlayerBean;
 import com.zhy.graph.bean.PlayerInfo;
+import com.zhy.graph.bean.QuestionInfo;
 import com.zhy.graph.bean.RoomInfoBean;
-import com.zhy.graph.network.MessageObserveUtil;
-import com.zhy.graph.network.NetRequestUtil;
+import com.zhy.graph.network.HomeNetHelper;
+import com.zhy.graph.network.HomeObserverHepler;
 import com.zhy.graph.widget.PopDialog;
 
 import net.duohuo.dhroid.ioc.annotation.InjectView;
@@ -68,13 +73,16 @@ public class HomeActivity extends BaseAct {
 	private HomePlayerGridAdapter adapter;
 	private StompClient mStompClient;
 	private String TAG = "HomeActivity";
-	private MessageObserveUtil obserUitl = null;
+	private HomeObserverHepler obserUitl = null;
 	private PopDialog popDialog = null;
-	private boolean roomOwner,onStop;
+	private PopDialog questionDialog = null;
+	private boolean roomOwner,onStop,popDismiss;
 	private List<PlayerInfo> dataList;
 	private String roomId;
-	private NetRequestUtil netUitl = null;
+	private HomeNetHelper netUitl = null;
 	private TimerTask task = null;
+	private QuestionsSelectListAdapter questionsAdapter = null;
+	private ListView questionListView;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 
@@ -96,7 +104,7 @@ public class HomeActivity extends BaseAct {
 
 		adapter = new HomePlayerGridAdapter(HomeActivity.this,dataList);
 		grid_home.setAdapter(adapter);
-		netUitl = new NetRequestUtil(HomeActivity.this,netRequest);
+		netUitl = new HomeNetHelper(HomeActivity.this,netRequest);
 	}
 
 
@@ -191,44 +199,40 @@ public class HomeActivity extends BaseAct {
 				break;
 
 			case R.id.txt_home_ready_ready_btn:
-				daoTimer.cancel();
+
 				if("开始".equals(txt_home_ready_ready_btn.getText().toString())){//是房主
-
-					popDialog = PopDialog.createDialog(HomeActivity.this, R.layout.pop_select_guess_word, Gravity.CENTER, R.style.CustomProgressDialog);
-					Window win = popDialog.getWindow();
-					win.getDecorView().setPadding(0, 0, 0, 0);
-					WindowManager.LayoutParams lp = win.getAttributes();
-					lp.width = WindowManager.LayoutParams.FILL_PARENT;
-					lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
-					win.setAttributes(lp);
-					popDialog.setCanceledOnTouchOutside(false);
-
-					if(!popDialog.isShowing()) {
-						popDialog.show();
-					}
+					netUitl.gameStartUsingGET(BaseApplication.username,roomId);
 				}else if("准备".equals(txt_home_ready_ready_btn.getText().toString())){
+					daoTimer.cancel();
 					netUitl.userReadyUsingGET(BaseApplication.username,roomId);
 				}else if("已准备".equals(txt_home_ready_ready_btn.getText().toString())){
+					daoTimer.cancel();
 					netUitl.userReadyCancelUsingGET(BaseApplication.username,roomId);
 				}
 
 				break;
 
 			case R.id.txt_home_join_player_room:
+				daoTimer.cancel();
 				popDialog = PopDialog.createDialog(HomeActivity.this, R.layout.pop_join_play_room, Gravity.CENTER,R.style.inputDialog);
 				((EditText)popDialog.findViewById(R.id.edit_input_room_id)).setOnEditorActionListener(new TextView.OnEditorActionListener() {
 					@Override
 					public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
 						if(actionId == EditorInfo.IME_ACTION_SEND){
-							((InputMethodManager) getSystemService(INPUT_METHOD_SERVICE)).toggleSoftInput(0,InputMethodManager.HIDE_NOT_ALWAYS);
-							if(popDialog.isShowing()) {
-								popDialog.dismiss();
-							}
-							daoTimer.cancel();
+
 							String roomId = ((EditText)popDialog.findViewById(R.id.edit_input_room_id)).getText().toString().trim();
 							netUitl.leaveRoomUsingGET(BaseApplication.username,2,roomId);
 						}
 						return false;
+					}
+				});
+				popDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+					@Override
+					public void onDismiss(DialogInterface dialog) {
+						if(!popDismiss){
+							netUitl.getRandomRoomUsingGET(BaseApplication.username);
+						}
+
 					}
 				});
 				Window win = popDialog.getWindow();
@@ -261,7 +265,7 @@ public class HomeActivity extends BaseAct {
 		// TODO Auto-generated method stub
 		super.onResume();
 		onStop = false;
-
+		popDismiss = false;
 	}
 
 	@Override
@@ -344,7 +348,7 @@ public class HomeActivity extends BaseAct {
 				roomId = roomInfo.getRoomId();
 				initData(roomInfo);
 				if(obserUitl == null){
-					obserUitl = new MessageObserveUtil(BaseApplication.username,roomInfo.getRoomId(),mStompClient,changeUI);
+					obserUitl = new HomeObserverHepler(BaseApplication.username,roomInfo.getRoomId(),mStompClient,changeUI);
 					obserUitl.start();
 				}else{
 					obserUitl.setRoomId(roomInfo.getRoomId());
@@ -372,6 +376,16 @@ public class HomeActivity extends BaseAct {
 				txt_home_ready_ready_btn.setTextColor(Color.parseColor("#ffffff"));
 				txt_home_ready_ready_btn.setBackgroundResource(R.drawable.pink_ring_shape);
 				countDown(18);
+			} else if(msg.what == 0x14){
+				((InputMethodManager) getSystemService(INPUT_METHOD_SERVICE)).toggleSoftInput(0,InputMethodManager.HIDE_NOT_ALWAYS);
+				if(popDialog!=null&&popDialog.isShowing()) {
+					popDialog.dismiss();
+				}
+				popDismiss = true;
+				Intent intent = new Intent();
+				intent.setClass(HomeActivity.this,PlayerRoomActivity.class);
+				intent.putExtra("data",(RoomInfoBean)msg.obj);
+				startActivityForResult(intent,1);
 			} else if(msg.what == 0x15){
 				Intent intent = new Intent();
 				intent.setClass(HomeActivity.this,PlayerRoomActivity.class);
@@ -381,6 +395,35 @@ public class HomeActivity extends BaseAct {
 				Intent intent = new Intent();
 				intent.setClass(HomeActivity.this,SelfCenterActivity.class);
 				startActivityForResult(intent,1);
+			} else if(msg.what == 0x17){
+				(popDialog.findViewById(R.id.txt_warn_room_not_exist)).setVisibility(View.VISIBLE);
+			} else if(msg.what == 0x18){
+				final List<QuestionInfo> questionList = (List<QuestionInfo>)msg.obj;
+				questionsAdapter = new QuestionsSelectListAdapter(HomeActivity.this,questionList);
+				questionDialog = PopDialog.createDialog(HomeActivity.this, R.layout.pop_select_guess_word, Gravity.CENTER, R.style.CustomProgressDialog);
+				Window win = questionDialog.getWindow();
+				win.getDecorView().setPadding(0, 0, 0, 0);
+				WindowManager.LayoutParams lp = win.getAttributes();
+				lp.width = WindowManager.LayoutParams.FILL_PARENT;
+				lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
+				win.setAttributes(lp);
+				questionDialog.setCanceledOnTouchOutside(false);
+				questionListView = (ListView)questionDialog.findViewById(R.id.list_guess_word_pop);
+				questionListView.setAdapter(questionsAdapter);
+				questionListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+					@Override
+					public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+						netUitl.questionOkUsingGE(roomId,questionList.get(position).getId());
+					}
+				});
+				if(!questionDialog.isShowing()) {
+					questionDialog.show();
+				}
+			} else if(msg.what == 0x19){
+				Intent intent = new Intent();
+				intent.setClass(HomeActivity.this,PlayerRoomActivity.class);
+				intent.putExtra("data",(QuestionInfo)msg.obj);
+				startActivity(intent);
 			}
 		}
 	};

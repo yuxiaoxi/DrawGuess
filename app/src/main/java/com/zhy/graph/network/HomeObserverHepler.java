@@ -23,14 +23,14 @@ import ua.naiksoftware.stomp.client.StompMessage;
 /**
  * Created by yuzhuo on 2017/2/28.
  */
-public class MessageObserveUtil extends Thread{
+public class HomeObserverHepler extends Thread{
 
-    private final String TAG = "MessageObserveUtil";
+    private final String TAG = "HomeObserverHepler";
     private String userName;
     private String roomId;
     private StompClient mStompClient;
     private Handler changeUI;
-    public MessageObserveUtil(String username,String roomId, StompClient stompClient, Handler handler){
+    public HomeObserverHepler(String username, String roomId, StompClient stompClient, Handler handler){
         this.userName = username;
         this.roomId = roomId;
         this.mStompClient = stompClient;
@@ -212,6 +212,52 @@ public class MessageObserveUtil extends Thread{
                     msg.what = 0x18;
                     changeUI.sendMessage(msg);
                     Log.e(TAG, "start.game onNext: " + stompMessage.getPayload());
+                }
+
+            });
+
+            mStompClient.topic("/topic/room."+roomId+"/questions").subscribe(new Subscriber<StompMessage>() {
+                @Override
+                public void onCompleted() {
+                    Log.e(TAG, "/topic/questions/ onCompleted: ");
+                }
+
+                @Override
+                public void onError(Throwable e) {
+                    Log.e(TAG, "/topic/questions/ onError: " + e.getMessage());
+                }
+
+                @Override
+                public void onNext(StompMessage stompMessage) {
+                    Response response = new Response(stompMessage.getPayload());
+                    Message msg = new Message();
+//					msg.obj = response.model(PlayerBean.class);
+                    msg.what = 0x18;
+                    changeUI.sendMessage(msg);
+                    Log.e(TAG, "questionsList -----> onNext: " + stompMessage.getPayload());
+                }
+
+            });
+
+            mStompClient.topic("/topic/room."+roomId+"/question/ok").subscribe(new Subscriber<StompMessage>() {
+                @Override
+                public void onCompleted() {
+                    Log.e(TAG, "/topic/question/ok/ onCompleted: ");
+                }
+
+                @Override
+                public void onError(Throwable e) {
+                    Log.e(TAG, "/topic/question/ok/ onError: " + e.getMessage());
+                }
+
+                @Override
+                public void onNext(StompMessage stompMessage) {
+                    Response response = new Response(stompMessage.getPayload());
+                    Message msg = new Message();
+//					msg.obj = response.model(PlayerBean.class);
+                    msg.what = 0x18;
+                    changeUI.sendMessage(msg);
+                    Log.e(TAG, "/question/ok -----> onNext: " + stompMessage.getPayload());
                 }
 
             });
