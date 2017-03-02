@@ -8,7 +8,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.zhy.graph.bean.PlayerRoomInfo;
+import com.zhy.graph.bean.PlayerBean;
 
 import java.util.List;
 
@@ -20,10 +20,10 @@ import gra.zhy.com.graph.R;
 public class PlayerRoomGridAdapter extends BaseAdapter{
 
     private Context mContext;
-    private List<PlayerRoomInfo> dataList;
+    private List<PlayerBean> dataList;
     private LayoutInflater mInflater;
 
-    public PlayerRoomGridAdapter(Context context, List<PlayerRoomInfo> data){
+    public PlayerRoomGridAdapter(Context context, List<PlayerBean> data){
         this.mContext = context;
         this.dataList = data;
         if(context != null){
@@ -32,7 +32,7 @@ public class PlayerRoomGridAdapter extends BaseAdapter{
     }
 
     @Override
-    public PlayerRoomInfo getItem(int position) {
+    public PlayerBean getItem(int position) {
         return dataList.get(position);
     }
 
@@ -61,8 +61,8 @@ public class PlayerRoomGridAdapter extends BaseAdapter{
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        viewHolder.guessWordsTextView.setText(dataList.get(position).getGuessWords());
-        viewHolder.scoreTextView.setText(dataList.get(position).getScore());
+        viewHolder.guessWordsTextView.setText(dataList.get(position).getStatus());
+        viewHolder.scoreTextView.setText(dataList.get(position).getCurrentScore());
 
         return convertView;
     }

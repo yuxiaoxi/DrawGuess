@@ -88,7 +88,6 @@
         android:id="@+id/viewswitch"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:inAnimation="@anim/slide_in_right"
         android:layout_alignTop="@+id/huaBanView1"
         android:layout_alignRight="@+id/huaBanView1"
         android:persistentDrawingCache="animation">

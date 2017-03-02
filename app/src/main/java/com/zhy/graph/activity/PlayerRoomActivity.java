@@ -1,18 +1,13 @@
 package com.zhy.graph.activity;
 
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.view.Gravity;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.MotionEvent;
-import android.view.SubMenu;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -20,41 +15,30 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.ViewSwitcher;
 
 import com.zhy.graph.adapter.ChatListAdapter;
 import com.zhy.graph.adapter.PlayerRoomGridAdapter;
+import com.zhy.graph.app.BaseApplication;
 import com.zhy.graph.bean.ChatInfo;
 import com.zhy.graph.bean.CoordinateBean;
-import com.zhy.graph.bean.PlayerRoomInfo;
+import com.zhy.graph.bean.PlayerBean;
 import com.zhy.graph.bean.RoomInfoBean;
+import com.zhy.graph.network.PlayerRoomObserverHepler;
 import com.zhy.graph.utils.PtsReceiverUtils;
-import com.zhy.graph.utils.Utils;
 import com.zhy.graph.widget.ChatInputDialog;
 import com.zhy.graph.widget.HuaBanView;
 import com.zhy.graph.widget.PopDialog;
 
 import net.duohuo.dhroid.ioc.annotation.InjectView;
 
-import org.java_websocket.WebSocket;
-
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import gra.zhy.com.graph.R;
-import rx.Observer;
-import rx.Subscriber;
-import ua.naiksoftware.stomp.LifecycleEvent;
-import ua.naiksoftware.stomp.Stomp;
-import ua.naiksoftware.stomp.client.StompClient;
-import ua.naiksoftware.stomp.client.StompMessage;
 
 /**
  * Created by yuzhuo on 2017/2/10.
@@ -62,20 +46,14 @@ import ua.naiksoftware.stomp.client.StompMessage;
 public class PlayerRoomActivity extends BaseAct{
 
     private float startX, startY, stopX, stopY;
-    // private int RandomID = new Random().nextInt(10);
     private HuaBanView hbView;
     private GridView playerroomGrid;
 
-    private AlertDialog dialog;
-    private View dialogView;
-    private TextView shouWidth;
-    private SeekBar widthSb;
     private int paintWidth;
 
     private int currentTime;
     private Timer timer,coTimer;
 
-    private StompClient mStompClient;
     private String TAG = "PlayRoomActivity";
 
     private PlayerRoomGridAdapter adapter;
@@ -109,21 +87,27 @@ public class PlayerRoomActivity extends BaseAct{
 
     private List<CoordinateBean> paintList;
 
-    private Mythread mythread = null;
+    private PlayerRoomObserverHepler obserUitl = null;
 
     private boolean destroyed,connectClosed;
     private PopDialog popDialog = null;
 
     private RoomInfoBean roomInfoBean = null;
+
+    private List<PlayerBean> dataList;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.drawing);
-        roomInfoBean = (RoomInfoBean) getIntent().getSerializableExtra("data");
-        Log.e(TAG,roomInfoBean.getRoomId());
-        initView();
-        mythread = new Mythread();
-        mythread.start();
+        roomInfoBean = (RoomInfoBean) getIntent().getSerializableExtra("roomInfoData");
+        if(roomInfoBean!=null){
+            initView();
+            obserUitl = new PlayerRoomObserverHepler(BaseApplication.username,roomInfoBean.getRoomId(),changeUI);
+            obserUitl.start();
+
+        }
+
+
     }
 
 
@@ -134,7 +118,7 @@ public class PlayerRoomActivity extends BaseAct{
     }
 
     public void initView() {
-
+        dataList = new ArrayList<>();
         chatDialog = ChatInputDialog.createDialog(PlayerRoomActivity.this,changeUI);
         paintList = new ArrayList<>();
 
@@ -177,44 +161,13 @@ public class PlayerRoomActivity extends BaseAct{
                         break;
                 }
                 hbView.invalidate();
-                mStompClient.send("/app/draw/paint", ptsReceiverUtils.sendPaintData(paintList)).subscribe();
+                obserUitl.getmStompClient().send("/topic/room."+roomInfoBean.getRoomId()+"/"+BaseApplication.username+"/draw/paint", ptsReceiverUtils.sendPaintData(paintList)).subscribe();
                 return true;
             }
         });
-        dialogView = getLayoutInflater().inflate(R.layout.dialog_width_set, null);
-        shouWidth = (TextView) dialogView.findViewById(R.id.textView1);
-        widthSb = (SeekBar) dialogView.findViewById(R.id.seekBar1);
-        widthSb.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                shouWidth.setText("��ǰѡ�п�ȣ�" + (progress + 1));
-                paintWidth = progress + 1;
-            }
-        });
-        dialog = new AlertDialog.Builder(this).setIcon(android.R.drawable.ic_dialog_info).setTitle("���û��ʿ��")
-                .setView(dialogView) //
-                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
-
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        hbView.setPaintWidth(paintWidth);
-                    }
-                }).setNegativeButton("取消", null).create();
-
         playerroomGrid = (GridView) findViewById(R.id.grid_play_room_player);
 
-        adapter = new PlayerRoomGridAdapter(PlayerRoomActivity.this,getData());
+        adapter = new PlayerRoomGridAdapter(PlayerRoomActivity.this,roomInfoBean.getAddedUserList());
 
         playerroomGrid.setAdapter(adapter);
 
@@ -222,21 +175,6 @@ public class PlayerRoomActivity extends BaseAct{
 
         chatAdapter = new ChatListAdapter(PlayerRoomActivity.this,getChatList());
         lv_player_room_chat.setAdapter(chatAdapter);
-    }
-
-    public List<PlayerRoomInfo> getData(){
-        List<PlayerRoomInfo> list = new ArrayList<>();
-
-        for (int i = 0 ;i<6;i++){
-            PlayerRoomInfo bean = new PlayerRoomInfo();
-            bean.setGuessWords("逗逼咯1"+i);
-            bean.setScore(i*2+"");
-
-            list.add(bean);
-        }
-
-        return list;
-
     }
 
     public List<ChatInfo> getChatList(){
@@ -267,11 +205,13 @@ public class PlayerRoomActivity extends BaseAct{
                 String result = (String)msg.obj;
                 ptsReceiverUtils.updateView(result);
             } else if (msg.what == 0x14) {
-                mythread.run();
+                obserUitl.run();
             } else if (msg.what == 0x15) {
                 ChatInfo info = (ChatInfo) msg.obj;
                 chatAdapter.update(info);
                 lv_player_room_chat.setSelection(chatAdapter.getDataList().size()-1);
+            }else if (msg.what == 0x16) {
+                connectClosed = true;
             }
         }
     };
@@ -296,108 +236,6 @@ public class PlayerRoomActivity extends BaseAct{
 
     }
 
-
-
-    public class Mythread extends Thread {
-        @Override
-        public void run() {
-            conn();
-
-        }
-    }
-
-
-    private void conn() {
-        try {
-
-            if(mStompClient!=null&&mStompClient.isConnected())
-                return;
-                Map<String, String> connectHttpHeaders = new HashMap<>();
-                connectHttpHeaders.put("user-name", new Date().toString());
-                mStompClient = Stomp.over(WebSocket.class, "ws://112.74.174.121:8080/ws/websocket", connectHttpHeaders);
-                mStompClient.topic("/topic/user.login").subscribe(new Subscriber<StompMessage>() {
-                    @Override
-                    public void onCompleted() {
-                        Log.e(TAG, "/topic/user.login/ onCompleted: ");
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        Log.e(TAG, "/topic/user.login/ onError: " + e.getMessage());
-                    }
-
-                    @Override
-                    public void onNext(StompMessage stompMessage) {
-                        Log.e(TAG, "login onNext: " + stompMessage.getPayload());
-                    }
-
-                });
-
-                mStompClient.topic("/topic/draw/pts").subscribe(new Subscriber<StompMessage>() {
-                    @Override
-                    public void onCompleted() {
-                        Log.i(TAG, "/topic/pts/ onCompleted: ");
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        Log.i(TAG, "/topic/pts/ onError: " + e.getMessage());
-                    }
-
-                    @Override
-                    public void onNext(StompMessage stompMessage) {
-                        Log.e(TAG, "response onNext: " + stompMessage.getPayload()
-                        );
-                        Message msg = new Message();
-                        msg.obj = stompMessage.getPayload();
-                        msg.what = 0x13;
-                        changeUI.sendMessage(msg);
-                    }
-
-                });
-
-                mStompClient.lifecycle().subscribe(new Observer<LifecycleEvent>() {
-                    @Override
-                    public void onCompleted() {
-                        Log.e(TAG, "lifecycle onCompleted: ");
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        Log.e(TAG, "lifecycle onError: ");
-                    }
-
-                    @Override
-                    public void onNext(LifecycleEvent lifecycleEvent) {
-                        switch (lifecycleEvent.getType()) {
-
-                            case OPENED:
-                                Log.e(TAG, "Stomp connection opened");
-                                break;
-
-                            case ERROR:
-                                Log.e(TAG, "Error", lifecycleEvent.getException());
-                                break;
-
-                            case CLOSED:
-                                connectClosed = true;
-                                Log.e(TAG, "Stomp connection closed");
-                                break;
-                        }
-                    }
-                });
-
-                mStompClient.connect();
-                Log.i(TAG, "end of program,mStompClient status:" + mStompClient.isConnected());
-
-//            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            Log.i("IOException", "IOException");
-        }
-    }
-
     @Override
     protected void onStop() {
         super.onStop();
@@ -407,81 +245,10 @@ public class PlayerRoomActivity extends BaseAct{
     protected void onDestroy() {
         super.onDestroy();
         destroyed = true;
-        mStompClient.disconnect();
-        coTimer.cancel();
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        SubMenu colorSm = menu.addSubMenu(1, 1, 1, "ѡ�񻭱���ɫ");
-        colorSm.add(2, 200, 200, "��ɫ");
-        colorSm.add(2, 210, 210, "��ɫ");
-        colorSm.add(2, 220, 220, "��ɫ");
-        colorSm.add(2, 230, 230, "��ɫ");
-        colorSm.add(2, 240, 240, "��ɫ");
-        colorSm.add(2, 250, 250, "��ɫ");
-        menu.add(1, 2, 2, "���û��ʴ�ϸ");
-        SubMenu widthSm = menu.addSubMenu(1, 3, 3, "���û�����ʽ");
-        widthSm.add(3, 300, 300, "��״����");
-        widthSm.add(3, 301, 301, "��仭��");
-        // menu.add(1, 4, 4, "��ջ���");
-        menu.add(1, 5, 5, "���滭��");
-        menu.add(1, 6, 6, "�˳�Ӧ��");
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int index = item.getItemId();
-        switch (index) {
-            case 200:
-                hbView.setColor(Color.RED);
-                break;
-            case 210:
-                hbView.setColor(Color.GREEN);
-                break;
-            case 220:
-                hbView.setColor(Color.BLUE);
-                break;
-            case 230:
-                hbView.setColor(Color.MAGENTA);
-                break;
-            case 240:
-                hbView.setColor(Color.YELLOW);
-                break;
-            case 250:
-                hbView.setColor(Color.BLACK);
-                break;
-            case 2:
-                dialog.show();
-                break;
-            case 300:
-                hbView.setStyle(HuaBanView.PEN);
-                break;
-            case 301:
-                hbView.setStyle(HuaBanView.PAIL);
-                break;
-            case 4:
-                hbView.clearScreen();
-                break;
-            case 5: { //
-                Utils.saveBitmap(null, hbView.getBitmap(), "test");
-
-                Message msg = new Message();
-                msg.what = 0x13;
-                changeUI.sendMessage(msg);
-            }
-            break;
-            case 6:
-                finish();
-                break;
+        if(obserUitl!= null&&obserUitl.getmStompClient() != null){
+            obserUitl.getmStompClient().disconnect();
         }
-        return true;
-    }
-
-    @Override
-    public void openOptionsMenu() {
-        super.openOptionsMenu();
+//        coTimer.cancel();
     }
 
     private void changeTime() {

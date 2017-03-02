@@ -83,6 +83,7 @@ public class HomeActivity extends BaseAct {
 	private TimerTask task = null;
 	private QuestionsSelectListAdapter questionsAdapter = null;
 	private ListView questionListView;
+	private RoomInfoBean playerInfo;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 
@@ -336,6 +337,13 @@ public class HomeActivity extends BaseAct {
 				toReady((PlayerBean) msg.obj,true);
 			} else if(msg.what == 0x16){
 				toReady((PlayerBean) msg.obj,false);
+			} else if(msg.what == 0x18){
+				if(roomOwner)
+					return;
+				Intent intent = new Intent();
+				intent.setClass(HomeActivity.this,PlayerRoomActivity.class);
+				intent.putExtra("roomInfoData",(RoomInfoBean)msg.obj);
+				startActivityForResult(intent,1);
 			}
 		}
 	};
@@ -384,12 +392,12 @@ public class HomeActivity extends BaseAct {
 				popDismiss = true;
 				Intent intent = new Intent();
 				intent.setClass(HomeActivity.this,PlayerRoomActivity.class);
-				intent.putExtra("data",(RoomInfoBean)msg.obj);
+				intent.putExtra("roomInfoData",(RoomInfoBean)msg.obj);
 				startActivityForResult(intent,1);
 			} else if(msg.what == 0x15){
 				Intent intent = new Intent();
 				intent.setClass(HomeActivity.this,PlayerRoomActivity.class);
-				intent.putExtra("data",(RoomInfoBean)msg.obj);
+				intent.putExtra("roomInfoData",(RoomInfoBean)msg.obj);
 				startActivityForResult(intent,1);
 			} else if(msg.what == 0x16){
 				Intent intent = new Intent();
@@ -399,6 +407,7 @@ public class HomeActivity extends BaseAct {
 				(popDialog.findViewById(R.id.txt_warn_room_not_exist)).setVisibility(View.VISIBLE);
 			} else if(msg.what == 0x18){
 				final List<QuestionInfo> questionList = (List<QuestionInfo>)msg.obj;
+				playerInfo = (RoomInfoBean) msg.getData().get("data");
 				questionsAdapter = new QuestionsSelectListAdapter(HomeActivity.this,questionList);
 				questionDialog = PopDialog.createDialog(HomeActivity.this, R.layout.pop_select_guess_word, Gravity.CENTER, R.style.CustomProgressDialog);
 				Window win = questionDialog.getWindow();
@@ -420,9 +429,13 @@ public class HomeActivity extends BaseAct {
 					questionDialog.show();
 				}
 			} else if(msg.what == 0x19){
+				if(!questionDialog.isShowing()) {
+					questionDialog.show();
+				}
 				Intent intent = new Intent();
 				intent.setClass(HomeActivity.this,PlayerRoomActivity.class);
-				intent.putExtra("data",(QuestionInfo)msg.obj);
+				intent.putExtra("roomInfoData",playerInfo);
+				intent.putExtra("questionData",(QuestionInfo)msg.obj);
 				startActivity(intent);
 			}
 		}
