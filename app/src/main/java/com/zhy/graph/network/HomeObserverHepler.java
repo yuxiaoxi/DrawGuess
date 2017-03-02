@@ -5,6 +5,7 @@ import android.os.Message;
 import android.util.Log;
 
 import com.zhy.graph.bean.PlayerBean;
+import com.zhy.graph.bean.RoomInfoBean;
 
 import net.duohuo.dhroid.net.Response;
 
@@ -208,7 +209,7 @@ public class HomeObserverHepler extends Thread{
                 public void onNext(StompMessage stompMessage) {
                     Response response = new Response(stompMessage.getPayload());
                     Message msg = new Message();
-//					msg.obj = response.model(PlayerBean.class);
+					msg.obj = response.model(RoomInfoBean.class);
                     msg.what = 0x18;
                     changeUI.sendMessage(msg);
                     Log.e(TAG, "start.game onNext: " + stompMessage.getPayload());
@@ -232,7 +233,7 @@ public class HomeObserverHepler extends Thread{
                     Response response = new Response(stompMessage.getPayload());
                     Message msg = new Message();
 //					msg.obj = response.model(PlayerBean.class);
-                    msg.what = 0x18;
+                    msg.what = 0x19;
                     changeUI.sendMessage(msg);
                     Log.e(TAG, "questionsList -----> onNext: " + stompMessage.getPayload());
                 }
@@ -255,7 +256,7 @@ public class HomeObserverHepler extends Thread{
                     Response response = new Response(stompMessage.getPayload());
                     Message msg = new Message();
 //					msg.obj = response.model(PlayerBean.class);
-                    msg.what = 0x18;
+                    msg.what = 0x20;
                     changeUI.sendMessage(msg);
                     Log.e(TAG, "/question/ok -----> onNext: " + stompMessage.getPayload());
                 }

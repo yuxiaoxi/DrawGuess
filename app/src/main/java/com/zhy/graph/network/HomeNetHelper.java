@@ -1,6 +1,7 @@
 package com.zhy.graph.network;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
@@ -278,7 +279,7 @@ public class HomeNetHelper {
                 if("1".equals(response.code)) {//获取成功
 
                     RoomInfoBean roomInfo = response.modelFromData(RoomInfoBean.class);
-                    questionListUsingGET(roomInfo.getRoomId(),4);
+                    questionListUsingGET(roomInfo,4);
                     Log.e(TAG,roomInfo.getNowUserNum());
                 }
             }
@@ -288,14 +289,14 @@ public class HomeNetHelper {
 
     /**
      * 请求题目列表
-     * @param roomId
+     * @param roomInfo
      * @param size
      */
-    public void questionListUsingGET(final String roomId, final int size) {
+    public void questionListUsingGET(final RoomInfoBean roomInfo, final int size) {
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("size", size);
-        map.put("roomId", roomId);
-        String url = DomainUtils.SERVER_HOST+"/api/v1/room/"+roomId+"/question/list";
+        map.put("roomId", roomInfo.getRoomId());
+        String url = DomainUtils.SERVER_HOST+"/api/v1/room/"+roomInfo.getRoomId()+"/question/list";
         DhNet net = new DhNet(url);
         net.addParams(map).doGet(new NetTask(mContext) {
 
@@ -314,6 +315,9 @@ public class HomeNetHelper {
                     List<QuestionInfo> questionList = response.listFromData(QuestionInfo.class);
                     Message msg = new Message();
                     msg.obj = questionList;
+                    Bundle bundle = new Bundle();
+                    bundle.putSerializable("data",roomInfo);
+                    msg.setData(bundle);
                     msg.what = 0x18;
                     mHandler.sendMessage(msg);
                     Log.e(TAG,response.result);
