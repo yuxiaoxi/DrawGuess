@@ -31,16 +31,22 @@ public class HomeObserverHepler extends Thread{
     private String roomId;
     private StompClient mStompClient;
     private Handler changeUI;
-    public HomeObserverHepler(String username, String roomId, StompClient stompClient, Handler handler){
+    public HomeObserverHepler(String username, String roomId, Handler handler){
         this.userName = username;
         this.roomId = roomId;
-        this.mStompClient = stompClient;
         this.changeUI = handler;
     }
     public void setRoomId(String roomId) {
         this.roomId = roomId;
     }
 
+    public void setChangeUI(Handler changeUI) {
+        this.changeUI = changeUI;
+    }
+
+    public StompClient getmStompClient() {
+        return mStompClient;
+    }
     @Override
     public void run() {
         conn();
@@ -259,6 +265,103 @@ public class HomeObserverHepler extends Thread{
                     msg.what = 0x20;
                     changeUI.sendMessage(msg);
                     Log.e(TAG, "/question/ok -----> onNext: " + stompMessage.getPayload());
+                }
+
+            });
+
+
+
+
+            //******************************下方为playerroom****************监听队列
+
+            mStompClient.topic("/topic/room."+roomId+"/game.talk").subscribe(new Subscriber<StompMessage>() {
+                @Override
+                public void onCompleted() {
+                    Log.e(TAG, "/game.talk onCompleted: ");
+                }
+
+                @Override
+                public void onError(Throwable e) {
+                    Log.e(TAG, "/game.talk onError: " + e.getMessage());
+                }
+
+                @Override
+                public void onNext(StompMessage stompMessage) {
+                    Response response = new Response(stompMessage.getPayload());
+                    Message msg = new Message();
+                    msg.obj = response.model(PlayerBean.class);
+//                    msg.what = 0x13;
+                    changeUI.sendMessage(msg);
+                    Log.e(TAG, "/game.talk onNext: " + stompMessage.getPayload());
+                }
+
+            });
+
+            mStompClient.topic("/topic/room."+roomId+"/draw/answer/correct").subscribe(new Subscriber<StompMessage>() {
+                @Override
+                public void onCompleted() {
+                    Log.e(TAG, "draw/answer/correct onCompleted: ");
+                }
+
+                @Override
+                public void onError(Throwable e) {
+                    Log.e(TAG, "/draw/answer/correct onError: " + e.getMessage());
+                }
+
+                @Override
+                public void onNext(StompMessage stompMessage) {
+                    Response response = new Response(stompMessage.getPayload());
+                    Message msg = new Message();
+                    msg.obj = response.model(PlayerBean.class);
+//                    msg.what = 0x13;
+                    changeUI.sendMessage(msg);
+                    Log.e(TAG, "draw/answer/correct onNext: " + stompMessage.getPayload());
+                }
+
+            });
+
+            mStompClient.topic("/topic/room."+roomId+"/draw/answer/incorrect").subscribe(new Subscriber<StompMessage>() {
+                @Override
+                public void onCompleted() {
+                    Log.e(TAG, "draw/answer/incorrect onCompleted: ");
+                }
+
+                @Override
+                public void onError(Throwable e) {
+                    Log.e(TAG, "/draw/answer/incorrect onError: " + e.getMessage());
+                }
+
+                @Override
+                public void onNext(StompMessage stompMessage) {
+                    Response response = new Response(stompMessage.getPayload());
+                    Message msg = new Message();
+                    msg.obj = response.model(PlayerBean.class);
+//                    msg.what = 0x13;
+                    changeUI.sendMessage(msg);
+                    Log.e(TAG, "draw/answer/incorrect onNext: " + stompMessage.getPayload());
+                }
+
+            });
+
+            mStompClient.topic("/topic/room."+roomId+"/draw/pts").subscribe(new Subscriber<StompMessage>() {
+                @Override
+                public void onCompleted() {
+                    Log.i(TAG, "/topic/pts/ onCompleted: ");
+                }
+
+                @Override
+                public void onError(Throwable e) {
+                    Log.i(TAG, "/topic/pts/ onError: " + e.getMessage());
+                }
+
+                @Override
+                public void onNext(StompMessage stompMessage) {
+                    Log.e(TAG, "response onNext: " + stompMessage.getPayload()
+                    );
+                    Message msg = new Message();
+                    msg.obj = stompMessage.getPayload();
+                    msg.what = 0x23;
+                    changeUI.sendMessage(msg);
                 }
 
             });

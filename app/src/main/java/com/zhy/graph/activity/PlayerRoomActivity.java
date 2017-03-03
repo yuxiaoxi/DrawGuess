@@ -1,12 +1,14 @@
 package com.zhy.graph.activity;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
@@ -19,13 +21,13 @@ import android.widget.TextView;
 import android.widget.ViewSwitcher;
 
 import com.zhy.graph.adapter.ChatListAdapter;
+import com.zhy.graph.adapter.HomePlayerGridAdapter;
 import com.zhy.graph.adapter.PlayerRoomGridAdapter;
 import com.zhy.graph.app.BaseApplication;
 import com.zhy.graph.bean.ChatInfo;
 import com.zhy.graph.bean.CoordinateBean;
 import com.zhy.graph.bean.PlayerBean;
 import com.zhy.graph.bean.RoomInfoBean;
-import com.zhy.graph.network.PlayerRoomObserverHepler;
 import com.zhy.graph.utils.PtsReceiverUtils;
 import com.zhy.graph.widget.ChatInputDialog;
 import com.zhy.graph.widget.HuaBanView;
@@ -87,8 +89,6 @@ public class PlayerRoomActivity extends BaseAct{
 
     private List<CoordinateBean> paintList;
 
-    private PlayerRoomObserverHepler obserUitl = null;
-
     private boolean destroyed,connectClosed;
     private PopDialog popDialog = null;
 
@@ -102,9 +102,10 @@ public class PlayerRoomActivity extends BaseAct{
         roomInfoBean = (RoomInfoBean) getIntent().getSerializableExtra("roomInfoData");
         if(roomInfoBean!=null){
             initView();
-            obserUitl = new PlayerRoomObserverHepler(BaseApplication.username,roomInfoBean.getRoomId(),changeUI);
-            obserUitl.start();
-
+            BaseApplication.obserUitl.setRoomId(roomInfoBean.getRoomId());
+            BaseApplication.obserUitl.setChangeUI(changeUI);
+            BaseApplication.obserUitl.getmStompClient().disconnect();
+            BaseApplication.obserUitl.run();
         }
 
 
@@ -161,7 +162,8 @@ public class PlayerRoomActivity extends BaseAct{
                         break;
                 }
                 hbView.invalidate();
-                obserUitl.getmStompClient().send("/topic/room."+roomInfoBean.getRoomId()+"/"+BaseApplication.username+"/draw/paint", ptsReceiverUtils.sendPaintData(paintList)).subscribe();
+                Log.e(TAG,"/app/room."+roomInfoBean.getRoomId()+"/draw/paint");
+                BaseApplication.obserUitl.getmStompClient().send("/app/room."+roomInfoBean.getRoomId()+"/draw/paint", ptsReceiverUtils.sendPaintData(paintList)).subscribe();
                 return true;
             }
         });
@@ -197,15 +199,13 @@ public class PlayerRoomActivity extends BaseAct{
         public void handleMessage(Message msg) {
 
             if (msg.what == 0x11) {
-                handleDraws(msg);
-            } else if (msg.what == 0x12) {
                 // dialog.show();
-                openOptionsMenu();
-            } else if (msg.what == 0x13) {
+                Log.e(TAG, "Stomp reconnection opened");
+            } else if (msg.what == 0x23) {
                 String result = (String)msg.obj;
                 ptsReceiverUtils.updateView(result);
             } else if (msg.what == 0x14) {
-                obserUitl.run();
+                BaseApplication.obserUitl.run();
             } else if (msg.what == 0x15) {
                 ChatInfo info = (ChatInfo) msg.obj;
                 chatAdapter.update(info);
@@ -245,10 +245,21 @@ public class PlayerRoomActivity extends BaseAct{
     protected void onDestroy() {
         super.onDestroy();
         destroyed = true;
-        if(obserUitl!= null&&obserUitl.getmStompClient() != null){
-            obserUitl.getmStompClient().disconnect();
+        coTimer.cancel();
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if ((keyCode == KeyEvent.KEYCODE_BACK)) {
+            Intent intent = new Intent(PlayerRoomActivity.this, HomePlayerGridAdapter.class);
+            intent.putExtra("roomId",roomInfoBean.getRoomId());
+            setResult(1,intent);
+            finish();
+            return false;
+        }else {
+            return super.onKeyDown(keyCode, event);
         }
-//        coTimer.cancel();
+
     }
 
     private void changeTime() {
@@ -275,15 +286,19 @@ public class PlayerRoomActivity extends BaseAct{
         coTimer = new Timer();
         TimerTask task = new TimerTask() {
             public void run() {
+                if(BaseApplication.obserUitl.getmStompClient().isConnected()){
+                    Log.e(TAG,"every 5s later heart beat to test is connected....");
+                }else{
+                    Log.e(TAG,"every 5s later heart beat to test isn't connected....");
+                }
 
-                Log.e(TAG,"every 5s later heart beat to test is connected....");
 
                 if(!destroyed&&connectClosed){
                     changeUI.sendEmptyMessage(0x14);
                 }
             }
         };
-        coTimer.schedule(task, 0, 5000);
+        coTimer.schedule(task, 0, 10000);
     }
 
 
@@ -332,7 +347,9 @@ public class PlayerRoomActivity extends BaseAct{
                 break;
 
             case R.id.img_close_game:
-                setResult(1);
+                Intent intent = new Intent(PlayerRoomActivity.this, HomePlayerGridAdapter.class);
+                intent.putExtra("roomId",roomInfoBean.getRoomId());
+                setResult(1,intent);
                 finish();
                 break;
 

@@ -75,7 +75,7 @@ public class HomePlayerGridAdapter extends BaseAdapter{
             viewHolder.avatarImageView.setImageResource(R.drawable.default_avatar);
         }
 
-        if(dataList.get(position).isReady()){
+        if(dataList.get(position).isReady()&&position>0){
             viewHolder.isReadyTextView.setVisibility(View.VISIBLE);
         }else{
             viewHolder.isReadyTextView.setVisibility(View.GONE);
