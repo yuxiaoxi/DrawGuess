@@ -7,6 +7,7 @@ import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.ImageScaleType;
+import com.zhy.graph.network.HomeObserverHepler;
 
 import net.duohuo.dhroid.Dhroid;
 import net.duohuo.dhroid.dialog.DialogImpl;
@@ -32,6 +33,8 @@ public class BaseApplication extends Application {
 	public static boolean isLogin = true;
 
 	public static  String username;
+
+	public static HomeObserverHepler obserUitl = null;
 
 	@Override
 	public void onCreate() {

@@ -3,15 +3,13 @@ package com.zhy.graph.widget;
 
 import android.app.Dialog;
 import android.content.Context;
-import android.os.Handler;
-import android.os.Message;
 import android.view.Gravity;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.EditText;
 
-import com.zhy.graph.bean.ChatInfo;
+import com.zhy.graph.app.BaseApplication;
 
 import gra.zhy.com.graph.R;
 
@@ -28,7 +26,7 @@ public class ChatInputDialog extends Dialog {
 		super(context, theme);
 	}
 
-	public static ChatInputDialog createDialog(Context context, final Handler handler) {
+	public static ChatInputDialog createDialog(Context context, final String  roomId) {
 		customProgressDialog = new ChatInputDialog(context,
 				R.style.inputDialog);
 		customProgressDialog.setContentView(R.layout.include_chat_bottom_bar);
@@ -39,13 +37,9 @@ public class ChatInputDialog extends Dialog {
 				String content = ((EditText)customProgressDialog.findViewById(R.id.edit_user_comment)).getText().toString().trim();
 				if(content == null ||content.length() ==0)
 					return;
-				ChatInfo info = new ChatInfo();
-				info.setContent(content);
-				info.setNickName("二二");
-				Message msg = new Message();
-				msg.what = 0x15;
-				msg.obj = info;
-				handler.sendMessage(msg);
+
+				BaseApplication.obserUitl.getmStompClient().send("/app/room."+roomId+"/talk",content).subscribe();
+
 				((EditText)customProgressDialog.findViewById(R.id.edit_user_comment)).setText("");
 			}
 		});

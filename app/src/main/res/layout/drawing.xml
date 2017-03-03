@@ -44,7 +44,6 @@
         android:layout_height="25dp"
         android:layout_marginTop="5dp"
         android:layout_marginLeft="15dp"
-        android:text="两个字"
         android:textSize="20sp"
         android:textColor="@color/white"/>
 
@@ -81,6 +80,7 @@
         android:layout_width="250dp"
         android:layout_height="100dp"
         android:background="@android:color/transparent"
+        android:listSelector="@android:color/transparent"
         android:divider="@null"
         android:scrollbars="none"></ListView>
 
@@ -163,7 +163,6 @@
         android:gravity="center"
         android:textColor="@color/white"
         android:textSize="18sp"
-        android:text="抢答"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
         android:layout_margin="30dp"/>
@@ -201,6 +200,7 @@
         android:layout_height="40dp"
         android:layout_marginTop="300dp"
         android:layout_centerHorizontal="true"
+        android:visibility="gone"
         android:background="@drawable/white_ring_shape_to">
         <net.duohuo.dhroid.view.megwidget.CircleImageView
             android:id="@+id/img_room_owner_avatar"
@@ -223,6 +223,7 @@
     </RelativeLayout>
 
     <TextView
+        android:id="@+id/txt_room_owner_select_question_name"
         android:layout_below="@+id/rel_room_owner_select_question"
         android:layout_width="wrap_content"
         android:layout_height="20dp"
@@ -232,5 +233,6 @@
         android:textColor="@color/black"
         android:paddingLeft="8dp"
         android:paddingRight="8dp"
+        android:visibility="gone"
         android:gravity="center"/>
 </RelativeLayout>

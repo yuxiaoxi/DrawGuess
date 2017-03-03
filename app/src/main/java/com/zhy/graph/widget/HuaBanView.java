@@ -27,7 +27,7 @@ public class HuaBanView extends View {
 	
 	private int paintColor = Color.BLACK;
 	private static Paint.Style paintStyle = Paint.Style.STROKE;
-	private static int paintWidth = 10;
+	private static int paintWidth = 5;
 	
 	private Canvas canvas;
 	

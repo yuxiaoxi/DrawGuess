@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
@@ -41,7 +42,6 @@ import java.util.TimerTask;
 
 import cn.sharesdk.onekeyshare.OnekeyShare;
 import gra.zhy.com.graph.R;
-import ua.naiksoftware.stomp.client.StompClient;
 
 public class HomeActivity extends BaseAct {
 
@@ -71,9 +71,7 @@ public class HomeActivity extends BaseAct {
 
 	private Timer daoTimer;
 	private HomePlayerGridAdapter adapter;
-	private StompClient mStompClient;
 	private String TAG = "HomeActivity";
-	private HomeObserverHepler obserUitl = null;
 	private PopDialog popDialog = null;
 	private PopDialog questionDialog = null;
 	private boolean roomOwner,onStop,popDismiss;
@@ -112,6 +110,7 @@ public class HomeActivity extends BaseAct {
 	public void initData(RoomInfoBean roomInfoBean){
 		dataList.clear();
 		titleTextView.setText("房间"+roomInfoBean.getRoomId());
+
 		if(roomInfoBean.getAddedUserList()==null)
 			return;
 		for (int i = 0; i<roomInfoBean.getAddedUserList().size(); i++){
@@ -124,6 +123,8 @@ public class HomeActivity extends BaseAct {
 				info.setMe(true);
 			if(i==0&&Integer.parseInt(roomInfoBean.getNowUserNum())==1){
 				roomOwner = true;
+			}else{
+				roomOwner = false;
 			}
 			if("Ready".equals(roomInfoBean.getAddedUserList().get(i).getStatus())){
 				info.setReady(true);
@@ -133,9 +134,21 @@ public class HomeActivity extends BaseAct {
 			dataList.add(info);
 		}
 		adapter.notifyDataSetChanged();
+		txt_home_ready_ready_btn.setVisibility(View.VISIBLE);
+		txt_home_ready_ready_btn.setTextColor(Color.parseColor("#ffffff"));
+		txt_home_ready_ready_btn.setBackgroundResource(R.drawable.pink_ring_shape);
 		if(!roomOwner){
+			txt_home_ready_ready_btn.setText("准备");
 			countDown(18);
+		}else{
+			txt_home_ready_time_down.setVisibility(View.VISIBLE);
+			txt_home_ready_time_down.setText("--");
+			txt_home_ready_ready_btn.setText("开始");
 		}
+
+
+
+
 
 	}
 
@@ -167,6 +180,17 @@ public class HomeActivity extends BaseAct {
 				break;
 			}
 		}
+		if(dataList.size()==1){
+			roomOwner = true;
+			dataList.get(0).setReady(false);
+			dataList.get(0).setMe(true);
+			txt_home_ready_ready_btn.setVisibility(View.VISIBLE);
+			txt_home_ready_ready_btn.setTextColor(Color.parseColor("#ffffff"));
+			txt_home_ready_ready_btn.setBackgroundResource(R.drawable.pink_ring_shape);
+			txt_home_ready_time_down.setVisibility(View.VISIBLE);
+			txt_home_ready_time_down.setText("--");
+			txt_home_ready_ready_btn.setText("开始");
+		}
 		adapter.notifyDataSetChanged();
 	}
 
@@ -189,13 +213,17 @@ public class HomeActivity extends BaseAct {
 		switch (view.getId()) {
 
 			case R.id.image_title_left:
-				daoTimer.cancel();
+				if(!roomOwner&&daoTimer!=null){
+					daoTimer.cancel();
+				}
 				netUitl.leaveRoomUsingGET(BaseApplication.username,3,null);
 
 				break;
 
 			case R.id.txt_home_create_player_room:
-				daoTimer.cancel();
+				if(!roomOwner&&daoTimer!=null){
+					daoTimer.cancel();
+				}
 				netUitl.leaveRoomUsingGET(BaseApplication.username,1,null);
 				break;
 
@@ -214,7 +242,9 @@ public class HomeActivity extends BaseAct {
 				break;
 
 			case R.id.txt_home_join_player_room:
-				daoTimer.cancel();
+				if(!roomOwner&&daoTimer!=null){
+					daoTimer.cancel();
+				}
 				popDialog = PopDialog.createDialog(HomeActivity.this, R.layout.pop_join_play_room, Gravity.CENTER,R.style.inputDialog);
 				((EditText)popDialog.findViewById(R.id.edit_input_room_id)).setOnEditorActionListener(new TextView.OnEditorActionListener() {
 					@Override
@@ -276,6 +306,11 @@ public class HomeActivity extends BaseAct {
 		if(requestCode == 1){
 			onStop = false;
 			netUitl.getRandomRoomUsingGET(BaseApplication.username);
+		}else if(requestCode == 2){//游戏退出来后回调
+			if(data!=null){
+				netUitl.leaveRoomUsingGET(BaseApplication.username,0,data.getStringExtra("roomId"));
+			}
+
 		}
 	}
 
@@ -283,16 +318,34 @@ public class HomeActivity extends BaseAct {
 	protected void onStop() {
 		super.onStop();
 		onStop = true;
-		netUitl.leaveRoomUsingGET(BaseApplication.username,0,null);
-		if(mStompClient!=null){
-			mStompClient.disconnect();
-		}
 		if(daoTimer != null){
 			daoTimer.cancel();
 		}
 
 	}
 
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+
+
+	}
+
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		if ((keyCode == KeyEvent.KEYCODE_BACK)) {
+			onStop = true;
+			netUitl.leaveRoomUsingGET(BaseApplication.username,0,null);
+			if(BaseApplication.obserUitl!=null&&BaseApplication.obserUitl.getmStompClient()!=null){
+				BaseApplication.obserUitl.getmStompClient().disconnect();
+			}
+			finish();
+			return false;
+		}else {
+			return super.onKeyDown(keyCode, event);
+		}
+
+	}
 
 	private void countDown(int countTime){
 		txt_home_ready_time_down.setVisibility(View.VISIBLE);
@@ -324,11 +377,7 @@ public class HomeActivity extends BaseAct {
 					txt_home_ready_time_down.setText(msg.arg1+"s");
 				}
 			} else if(msg.what == 0x11){
-				if(roomOwner){
-					txt_home_ready_ready_btn.setText("开始");
-				}else{
-					txt_home_ready_ready_btn.setText("准备");
-				}
+				Log.e(TAG, "Stomp reconnection opened");
 			} else if(msg.what == 0x12){
 				updateData((PlayerBean) msg.obj);
 			} else if(msg.what == 0x13){
@@ -343,7 +392,8 @@ public class HomeActivity extends BaseAct {
 				Intent intent = new Intent();
 				intent.setClass(HomeActivity.this,PlayerRoomActivity.class);
 				intent.putExtra("roomInfoData",(RoomInfoBean)msg.obj);
-				startActivityForResult(intent,1);
+				intent.putExtra("roomOwner",roomOwner);
+				startActivityForResult(intent,2);
 			}
 		}
 	};
@@ -355,18 +405,17 @@ public class HomeActivity extends BaseAct {
 				RoomInfoBean roomInfo = (RoomInfoBean) msg.obj;
 				roomId = roomInfo.getRoomId();
 				initData(roomInfo);
-				if(obserUitl == null){
-					obserUitl = new HomeObserverHepler(BaseApplication.username,roomInfo.getRoomId(),mStompClient,changeUI);
-					obserUitl.start();
+				if(BaseApplication.obserUitl == null){
+					BaseApplication.obserUitl = new HomeObserverHepler(BaseApplication.username,roomInfo.getRoomId(),changeUI);
+					BaseApplication.obserUitl.start();
 				}else{
-					obserUitl.setRoomId(roomInfo.getRoomId());
-					obserUitl.run();
+					BaseApplication.obserUitl.setChangeUI(changeUI);
+					BaseApplication.obserUitl.setRoomId(roomInfo.getRoomId());
+					BaseApplication.obserUitl.getmStompClient().disconnect();
+					BaseApplication.obserUitl.run();
 				}
 			} else if(msg.what == 0x11){
 				if(!onStop){//非退出app,倒计时到了自动退出房间
-					if(mStompClient!=null){
-						mStompClient.disconnect();
-					}
 					netUitl.getRandomRoomUsingGET(BaseApplication.username);
 				}
 			} else if(msg.what == 0x12){
@@ -378,7 +427,6 @@ public class HomeActivity extends BaseAct {
 				daoTimer.cancel();
 			} else if(msg.what == 0x13){
 				txt_home_ready_time_down.setVisibility(View.VISIBLE);
-				txt_home_ready_time_down.setText("");
 //					adapter.cancelReady();
 				txt_home_ready_ready_btn.setText("准备");
 				txt_home_ready_ready_btn.setTextColor(Color.parseColor("#ffffff"));
@@ -429,14 +477,15 @@ public class HomeActivity extends BaseAct {
 					questionDialog.show();
 				}
 			} else if(msg.what == 0x19){
-				if(!questionDialog.isShowing()) {
-					questionDialog.show();
+				if(questionDialog.isShowing()) {
+					questionDialog.dismiss();
 				}
 				Intent intent = new Intent();
 				intent.setClass(HomeActivity.this,PlayerRoomActivity.class);
 				intent.putExtra("roomInfoData",playerInfo);
 				intent.putExtra("questionData",(QuestionInfo)msg.obj);
-				startActivity(intent);
+				intent.putExtra("roomOwner",roomOwner);
+				startActivityForResult(intent,2);
 			}
 		}
 	};
