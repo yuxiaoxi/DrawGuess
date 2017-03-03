@@ -4,7 +4,9 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
+import com.zhy.graph.bean.ChatInfo;
 import com.zhy.graph.bean.PlayerBean;
+import com.zhy.graph.bean.QuestionInfo;
 import com.zhy.graph.bean.RoomInfoBean;
 
 import net.duohuo.dhroid.net.Response;
@@ -238,7 +240,6 @@ public class HomeObserverHepler extends Thread{
                 public void onNext(StompMessage stompMessage) {
                     Response response = new Response(stompMessage.getPayload());
                     Message msg = new Message();
-//					msg.obj = response.model(PlayerBean.class);
                     msg.what = 0x19;
                     changeUI.sendMessage(msg);
                     Log.e(TAG, "questionsList -----> onNext: " + stompMessage.getPayload());
@@ -261,7 +262,7 @@ public class HomeObserverHepler extends Thread{
                 public void onNext(StompMessage stompMessage) {
                     Response response = new Response(stompMessage.getPayload());
                     Message msg = new Message();
-//					msg.obj = response.model(PlayerBean.class);
+					msg.obj = response.model(QuestionInfo.class);
                     msg.what = 0x20;
                     changeUI.sendMessage(msg);
                     Log.e(TAG, "/question/ok -----> onNext: " + stompMessage.getPayload());
@@ -288,9 +289,12 @@ public class HomeObserverHepler extends Thread{
                 @Override
                 public void onNext(StompMessage stompMessage) {
                     Response response = new Response(stompMessage.getPayload());
+                    ChatInfo info = new ChatInfo();
+                    info.setContent(response.result);
+                    info.setNickName("二二");
                     Message msg = new Message();
-                    msg.obj = response.model(PlayerBean.class);
-//                    msg.what = 0x13;
+                    msg.what = 0x15;
+                    msg.obj = info;
                     changeUI.sendMessage(msg);
                     Log.e(TAG, "/game.talk onNext: " + stompMessage.getPayload());
                 }

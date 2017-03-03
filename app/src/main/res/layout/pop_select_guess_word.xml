@@ -34,6 +34,8 @@
             android:layout_height="match_parent"
             android:layout_below="@+id/txt_select_word_describe"
             android:scrollbars="none"
+            android:divider="@null"
+            android:listSelector="@android:color/transparent"
             android:layout_marginBottom="20dp"/>
 
     </RelativeLayout>

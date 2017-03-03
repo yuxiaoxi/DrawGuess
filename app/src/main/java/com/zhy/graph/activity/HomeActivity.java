@@ -392,6 +392,7 @@ public class HomeActivity extends BaseAct {
 				Intent intent = new Intent();
 				intent.setClass(HomeActivity.this,PlayerRoomActivity.class);
 				intent.putExtra("roomInfoData",(RoomInfoBean)msg.obj);
+				intent.putExtra("roomOwner",roomOwner);
 				startActivityForResult(intent,2);
 			}
 		}
@@ -483,6 +484,7 @@ public class HomeActivity extends BaseAct {
 				intent.setClass(HomeActivity.this,PlayerRoomActivity.class);
 				intent.putExtra("roomInfoData",playerInfo);
 				intent.putExtra("questionData",(QuestionInfo)msg.obj);
+				intent.putExtra("roomOwner",roomOwner);
 				startActivityForResult(intent,2);
 			}
 		}

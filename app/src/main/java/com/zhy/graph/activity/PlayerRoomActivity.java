@@ -17,7 +17,9 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ViewSwitcher;
 
 import com.zhy.graph.adapter.ChatListAdapter;
@@ -27,6 +29,7 @@ import com.zhy.graph.app.BaseApplication;
 import com.zhy.graph.bean.ChatInfo;
 import com.zhy.graph.bean.CoordinateBean;
 import com.zhy.graph.bean.PlayerBean;
+import com.zhy.graph.bean.QuestionInfo;
 import com.zhy.graph.bean.RoomInfoBean;
 import com.zhy.graph.utils.PtsReceiverUtils;
 import com.zhy.graph.widget.ChatInputDialog;
@@ -81,11 +84,24 @@ public class PlayerRoomActivity extends BaseAct{
     private ImageView img_close_game;
 
 
+    @InjectView(id = R.id.rel_room_owner_select_question)
+    private RelativeLayout rel_room_owner_select_question;
+
+    @InjectView(id = R.id.txt_room_owner_select_question_name)
+    private TextView txt_room_owner_select_question_name;
+
+
     @InjectView(id = R.id.viewswitch)
     private ViewSwitcher viewswitch;
 
     @InjectView(id = R.id.lv_player_room_chat)
     private ListView lv_player_room_chat;
+
+    private ListView pop_player_room_chat;
+
+    @InjectView(id = R.id.txt_play_room_warn_describe)
+    private TextView txt_play_room_warn_describe;
+
 
     private List<CoordinateBean> paintList;
 
@@ -95,11 +111,18 @@ public class PlayerRoomActivity extends BaseAct{
     private RoomInfoBean roomInfoBean = null;
 
     private List<PlayerBean> dataList;
+
+    private List<ChatInfo> chatList;
+
+    private boolean roomOwner;
+    private QuestionInfo questionData = null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.drawing);
         roomInfoBean = (RoomInfoBean) getIntent().getSerializableExtra("roomInfoData");
+        roomOwner = getIntent().getBooleanExtra("roomOwner",false);
+        questionData = (QuestionInfo) getIntent().getSerializableExtra("questionData");
         if(roomInfoBean!=null){
             initView();
             BaseApplication.obserUitl.setRoomId(roomInfoBean.getRoomId());
@@ -107,7 +130,9 @@ public class PlayerRoomActivity extends BaseAct{
             BaseApplication.obserUitl.getmStompClient().disconnect();
             BaseApplication.obserUitl.run();
         }
-
+        if(questionData!=null){
+            txt_play_room_warn_describe.setText(questionData.getKeyword1());
+        }
 
     }
 
@@ -120,53 +145,67 @@ public class PlayerRoomActivity extends BaseAct{
 
     public void initView() {
         dataList = new ArrayList<>();
-        chatDialog = ChatInputDialog.createDialog(PlayerRoomActivity.this,changeUI);
+        chatList = new ArrayList<>();
+        chatDialog = ChatInputDialog.createDialog(PlayerRoomActivity.this,roomInfoBean.getRoomId());
+        pop_player_room_chat = (ListView)chatDialog.findViewById(R.id.chat_bottom_player_room_chat);
         paintList = new ArrayList<>();
 
         hbView = (HuaBanView) findViewById(R.id.huaBanView1);
+        if(roomOwner) {
+            txt_player_room_answer.setText("开始");
+            viewswitch.setVisibility(View.VISIBLE);
+            hbView.setOnTouchListener(new View.OnTouchListener() {
 
-        hbView.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
 
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
+                    int action = event.getAction();
+                    switch (action) {
+                        case MotionEvent.ACTION_DOWN:
+                            paintList.clear();
+                            changeTime();
+                            hbView.path.moveTo(event.getX(), event.getY());
+                            hbView.pX = event.getX();
+                            hbView.pY = event.getY();
+                            CoordinateBean startBean = new CoordinateBean();
+                            startBean.setX(event.getX());
+                            startBean.setY(event.getY());
+                            paintList.add(startBean);
+                            break;
+                        case MotionEvent.ACTION_MOVE:
+                            timer.cancel();
+                            hbView.path.moveTo(hbView.pX, hbView.pY);
 
-                int action = event.getAction();
-                switch (action) {
-                    case MotionEvent.ACTION_DOWN:
-                        paintList.clear();
-                        changeTime();
-                        hbView.path.moveTo(event.getX(), event.getY());
-                        hbView.pX = event.getX();
-                        hbView.pY = event.getY();
-                        CoordinateBean startBean = new CoordinateBean();
-                        startBean.setX(event.getX());
-                        startBean.setY(event.getY());
-                        paintList.add(startBean);
-                        break;
-                    case MotionEvent.ACTION_MOVE:
-                        timer.cancel();
-                        hbView.path.moveTo(hbView.pX, hbView.pY);
-
-                        hbView.path.quadTo(hbView.pX, hbView.pY, event.getX(), event.getY());
-                        hbView.pX = event.getX();
-                        hbView.pY = event.getY();
-                        CoordinateBean moveBean = new CoordinateBean();
-                        moveBean.setX(event.getX());
-                        moveBean.setY(event.getY());
-                        paintList.add(moveBean);
-                        break;
-                    case MotionEvent.ACTION_UP:
-                        timer.cancel();
-                        hbView.cacheCanvas.drawPath(hbView.path, hbView.paint);
-                        hbView.path.reset();
-                        break;
+                            hbView.path.quadTo(hbView.pX, hbView.pY, event.getX(), event.getY());
+                            hbView.pX = event.getX();
+                            hbView.pY = event.getY();
+                            CoordinateBean moveBean = new CoordinateBean();
+                            moveBean.setX(event.getX());
+                            moveBean.setY(event.getY());
+                            paintList.add(moveBean);
+                            break;
+                        case MotionEvent.ACTION_UP:
+                            timer.cancel();
+                            hbView.cacheCanvas.drawPath(hbView.path, hbView.paint);
+                            hbView.path.reset();
+                            break;
+                    }
+                    hbView.invalidate();
+                    Log.e(TAG, "/app/room." + roomInfoBean.getRoomId() + "/draw/paint");
+                    BaseApplication.obserUitl.getmStompClient().send("/app/room." + roomInfoBean.getRoomId() + "/draw/paint", ptsReceiverUtils.sendPaintData(paintList)).subscribe();
+                    return true;
                 }
-                hbView.invalidate();
-                Log.e(TAG,"/app/room."+roomInfoBean.getRoomId()+"/draw/paint");
-                BaseApplication.obserUitl.getmStompClient().send("/app/room."+roomInfoBean.getRoomId()+"/draw/paint", ptsReceiverUtils.sendPaintData(paintList)).subscribe();
-                return true;
-            }
-        });
+            });
+        }else{
+            txt_player_room_answer.setText("抢答");
+            viewswitch.setVisibility(View.GONE);
+            hbView.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    return true;
+                }
+            });
+        }
         playerroomGrid = (GridView) findViewById(R.id.grid_play_room_player);
 
         adapter = new PlayerRoomGridAdapter(PlayerRoomActivity.this,roomInfoBean.getAddedUserList());
@@ -175,8 +214,10 @@ public class PlayerRoomActivity extends BaseAct{
 
         ptsReceiverUtils = new PtsReceiverUtils(PlayerRoomActivity.this,hbView);
 
-        chatAdapter = new ChatListAdapter(PlayerRoomActivity.this,getChatList());
+        chatAdapter = new ChatListAdapter(PlayerRoomActivity.this,chatList);
         lv_player_room_chat.setAdapter(chatAdapter);
+
+        pop_player_room_chat.setAdapter(chatAdapter);
     }
 
     public List<ChatInfo> getChatList(){
@@ -198,20 +239,33 @@ public class PlayerRoomActivity extends BaseAct{
         @Override
         public void handleMessage(Message msg) {
 
-            if (msg.what == 0x11) {
+            if (msg.what == 0x11) {//连接后发出handler告诉activity
                 // dialog.show();
                 Log.e(TAG, "Stomp reconnection opened");
             } else if (msg.what == 0x23) {
                 String result = (String)msg.obj;
                 ptsReceiverUtils.updateView(result);
-            } else if (msg.what == 0x14) {
+            } else if (msg.what == 0x14) {//重新连接stomp
                 BaseApplication.obserUitl.run();
-            } else if (msg.what == 0x15) {
+            } else if (msg.what == 0x15) {//聊天
                 ChatInfo info = (ChatInfo) msg.obj;
                 chatAdapter.update(info);
                 lv_player_room_chat.setSelection(chatAdapter.getDataList().size()-1);
-            }else if (msg.what == 0x16) {
+                pop_player_room_chat.setSelection(chatAdapter.getDataList().size()-1);
+            }else if (msg.what == 0x16) {//连接断开
                 connectClosed = true;
+            }else if (msg.what == 0x19) {//收到房主选题广播
+                rel_room_owner_select_question.setVisibility(View.VISIBLE);
+                txt_room_owner_select_question_name.setVisibility(View.VISIBLE);
+                txt_room_owner_select_question_name.setText(roomInfoBean.getRoomOwnerName());
+            }else if (msg.what == 0x20) {
+                questionData = (QuestionInfo) msg.obj;
+                if(questionData!=null){
+                    txt_play_room_warn_describe.setText(questionData.getKeyword1());
+                }
+                rel_room_owner_select_question.setVisibility(View.GONE);
+                txt_room_owner_select_question_name.setVisibility(View.GONE);
+                Toast.makeText(PlayerRoomActivity.this,"房主题目选择完成!",Toast.LENGTH_SHORT).show();
             }
         }
     };
