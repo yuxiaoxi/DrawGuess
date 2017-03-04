@@ -316,8 +316,8 @@ public class HomeObserverHepler extends Thread{
                 public void onNext(StompMessage stompMessage) {
                     Response response = new Response(stompMessage.getPayload());
                     Message msg = new Message();
-                    msg.obj = response.model(PlayerBean.class);
-//                    msg.what = 0x13;
+                    msg.obj = response.result;
+                    msg.what = 0x24;
                     changeUI.sendMessage(msg);
                     Log.e(TAG, "draw/answer/correct onNext: " + stompMessage.getPayload());
                 }
@@ -339,8 +339,8 @@ public class HomeObserverHepler extends Thread{
                 public void onNext(StompMessage stompMessage) {
                     Response response = new Response(stompMessage.getPayload());
                     Message msg = new Message();
-                    msg.obj = response.model(PlayerBean.class);
-//                    msg.what = 0x13;
+                    msg.obj = response.result;
+                    msg.what = 0x25;
                     changeUI.sendMessage(msg);
                     Log.e(TAG, "draw/answer/incorrect onNext: " + stompMessage.getPayload());
                 }

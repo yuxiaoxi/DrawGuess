@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="150dp"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="40dp"
+        android:layout_marginRight="40dp"
+        android:focusable="false"
+        android:focusableInTouchMode="false"
+        android:background="@drawable/white_shape">
+
+        <TextView
+            android:id="@+id/txt_room_id"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="25dp"
+            android:layout_marginRight="25dp"
+            android:layout_marginTop="25dp"
+            android:gravity="center"
+            android:text="你的答案"
+            android:textColor="#B9B9B9"
+            android:textSize="16sp" />
+
+
+
+        <EditText
+            android:id="@+id/edit_input_answer"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_below="@+id/txt_room_id"
+            android:layout_marginLeft="25dp"
+            android:layout_marginRight="25dp"
+            android:layout_marginTop="10dp"
+            android:background="@null"
+            android:gravity="center"
+            android:singleLine="true"
+            android:imeOptions="actionSend"
+            android:textSize="24sp" />
+
+        <View
+            android:id="@+id/view_line_seperator"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_below="@+id/edit_input_answer"
+            android:layout_marginLeft="25dp"
+            android:layout_marginRight="25dp"
+            android:background="#888888" />
+
+    </RelativeLayout>
+
+</RelativeLayout>

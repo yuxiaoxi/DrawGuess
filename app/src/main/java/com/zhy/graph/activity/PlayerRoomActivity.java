@@ -13,6 +13,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.inputmethod.EditorInfo;
+import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -106,7 +108,11 @@ public class PlayerRoomActivity extends BaseAct{
     private List<CoordinateBean> paintList;
 
     private boolean destroyed,connectClosed;
+
     private PopDialog popDialog = null;
+
+    //抢答框
+    private PopDialog answerDialog = null;
 
     private RoomInfoBean roomInfoBean = null;
 
@@ -116,6 +122,8 @@ public class PlayerRoomActivity extends BaseAct{
 
     private boolean roomOwner;
     private QuestionInfo questionData = null;
+
+    private int roomType ;//区分游客房间和玩家创建的房间 0为游客,1为玩家创建
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -123,11 +131,11 @@ public class PlayerRoomActivity extends BaseAct{
         roomInfoBean = (RoomInfoBean) getIntent().getSerializableExtra("roomInfoData");
         roomOwner = getIntent().getBooleanExtra("roomOwner",false);
         questionData = (QuestionInfo) getIntent().getSerializableExtra("questionData");
+        roomType = getIntent().getIntExtra("roomType",0);
         if(roomInfoBean!=null){
             initView();
             BaseApplication.obserUitl.setRoomId(roomInfoBean.getRoomId());
             BaseApplication.obserUitl.setChangeUI(changeUI);
-            BaseApplication.obserUitl.getmStompClient().disconnect();
             BaseApplication.obserUitl.run();
         }
         if(questionData!=null){
@@ -151,7 +159,8 @@ public class PlayerRoomActivity extends BaseAct{
         paintList = new ArrayList<>();
 
         hbView = (HuaBanView) findViewById(R.id.huaBanView1);
-        if(roomOwner) {
+        if(roomOwner&&roomType == 0) {
+            txt_player_room_answer.setVisibility(View.GONE);
             txt_player_room_answer.setText("开始");
             viewswitch.setVisibility(View.VISIBLE);
             hbView.setOnTouchListener(new View.OnTouchListener() {
@@ -355,24 +364,56 @@ public class PlayerRoomActivity extends BaseAct{
         coTimer.schedule(task, 0, 10000);
     }
 
+    public void answer(){
+        answerDialog = PopDialog.createDialog(PlayerRoomActivity.this, R.layout.pop_ask_answer, Gravity.BOTTOM, R.style.inputDialog);
+        Window win = answerDialog.getWindow();
+        win.getDecorView().setPadding(0, 0, 0, 0);
+        WindowManager.LayoutParams lp = win.getAttributes();
+        lp.width = WindowManager.LayoutParams.FILL_PARENT;
+        lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
+        win.setAttributes(lp);
+
+        ((EditText)answerDialog.findViewById(R.id.edit_input_answer)).setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if(actionId == EditorInfo.IME_ACTION_SEND){
+                    String answer = ((EditText)answerDialog.findViewById(R.id.edit_input_answer)).getText().toString().trim();
+                    BaseApplication.obserUitl.getmStompClient().send("/app/room." + roomInfoBean.getRoomId() + "/draw/answer", answer).subscribe();
+                    if(answerDialog.isShowing()) {
+                        answerDialog.dismiss();
+                    }
+                }
+                return false;
+            }
+        });
+
+        if(!answerDialog.isShowing()) {
+            answerDialog.show();
+        }
+    }
+
+    public void saveDraw(){
+        popDialog = PopDialog.createDialog(PlayerRoomActivity.this, R.layout.pop_save_or_share_draw, Gravity.CENTER, R.style.CustomProgressDialog);
+        Window win = popDialog.getWindow();
+        win.getDecorView().setPadding(0, 0, 0, 0);
+        WindowManager.LayoutParams lp = win.getAttributes();
+        lp.width = WindowManager.LayoutParams.FILL_PARENT;
+        lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
+        win.setAttributes(lp);
+        popDialog.setCanceledOnTouchOutside(false);
+
+        ((ImageView)popDialog.findViewById(R.id.img_draw_bitmap)).setImageBitmap(hbView.getBitmap());
+        if(!popDialog.isShowing()) {
+            popDialog.show();
+        }
+    }
+
 
     public void onClickCallBack(View view) {
         switch (view.getId()) {
 
             case R.id.txt_player_room_answer:
-                popDialog = PopDialog.createDialog(PlayerRoomActivity.this, R.layout.pop_save_or_share_draw, Gravity.CENTER, R.style.CustomProgressDialog);
-                Window win = popDialog.getWindow();
-                win.getDecorView().setPadding(0, 0, 0, 0);
-                WindowManager.LayoutParams lp = win.getAttributes();
-                lp.width = WindowManager.LayoutParams.FILL_PARENT;
-                lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
-                win.setAttributes(lp);
-                popDialog.setCanceledOnTouchOutside(false);
-
-                ((ImageView)popDialog.findViewById(R.id.img_draw_bitmap)).setImageBitmap(hbView.getBitmap());
-                if(!popDialog.isShowing()) {
-                    popDialog.show();
-                }
+                answer();
                 break;
 
             case R.id.txt_player_clear_screen:
