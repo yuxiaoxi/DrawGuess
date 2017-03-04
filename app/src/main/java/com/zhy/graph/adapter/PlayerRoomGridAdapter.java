@@ -49,6 +49,7 @@ public class PlayerRoomGridAdapter extends BaseAdapter{
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder viewHolder = null;
+        PlayerBean bean = getItem(position);
         if(convertView == null){
             convertView = this.mInflater.inflate(R.layout.item_grid_player_room,null,false);
             viewHolder = new ViewHolder();
@@ -61,8 +62,20 @@ public class PlayerRoomGridAdapter extends BaseAdapter{
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        viewHolder.guessWordsTextView.setText(dataList.get(position).getStatus());
-        viewHolder.scoreTextView.setText(dataList.get(position).getCurrentScore());
+        if(bean.getAnsser()!=null){
+            viewHolder.guessWordsTextView.setVisibility(View.VISIBLE);
+            viewHolder.guessWordsTextView.setText(bean.getAnsser());
+        }else{
+            viewHolder.guessWordsTextView.setVisibility(View.GONE);
+        }
+
+        if(dataList.get(position).isDrawNow()){//正在画的玩家
+            viewHolder.avatarImageView.setBackgroundResource(R.drawable.red_ring_shape);
+        }else{
+            viewHolder.avatarImageView.setBackground(null);
+        }
+
+        viewHolder.scoreTextView.setText(bean.getCurrentScore());
 
         return convertView;
     }

@@ -8,7 +8,7 @@ import java.util.List;
 public class ReceiveService {
 
     //画板颜色
-    private String color;
+    private int color;
 
     //粗细程度
     private int lw;
@@ -16,11 +16,11 @@ public class ReceiveService {
     //画板数据
     private List<CoordinateBean> pts;
 
-    public String getColor() {
+    public int getColor() {
         return color;
     }
 
-    public void setColor(String color) {
+    public void setColor(int color) {
         this.color = color;
     }
 

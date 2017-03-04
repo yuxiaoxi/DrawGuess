@@ -100,13 +100,20 @@ public class HuaBanView extends View {
 		paintColor = color;
 		updatePaint();
 	}
-	
+
+	public int getPaintColor() {
+		return paintColor;
+	}
 
 	public void setPaintWidth(int width){
 		paintWidth = width;
 		updatePaint();
 	}
-	
+
+	public static int getPaintWidth() {
+		return paintWidth;
+	}
+
 	public static final int PEN = 1;
 	public static final int PAIL = 2;
 	

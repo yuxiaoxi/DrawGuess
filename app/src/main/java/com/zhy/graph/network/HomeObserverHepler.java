@@ -301,15 +301,15 @@ public class HomeObserverHepler extends Thread{
 
             });
 
-            mStompClient.topic("/topic/room."+roomId+"/draw/answer/correct").subscribe(new Subscriber<StompMessage>() {
+            mStompClient.topic("/topic/room."+roomId+"/answer/correct").subscribe(new Subscriber<StompMessage>() {
                 @Override
                 public void onCompleted() {
-                    Log.e(TAG, "draw/answer/correct onCompleted: ");
+                    Log.e(TAG, "answer/correct onCompleted: ");
                 }
 
                 @Override
                 public void onError(Throwable e) {
-                    Log.e(TAG, "/draw/answer/correct onError: " + e.getMessage());
+                    Log.e(TAG, "answer/correct onError: " + e.getMessage());
                 }
 
                 @Override
@@ -319,20 +319,20 @@ public class HomeObserverHepler extends Thread{
                     msg.obj = response.result;
                     msg.what = 0x24;
                     changeUI.sendMessage(msg);
-                    Log.e(TAG, "draw/answer/correct onNext: " + stompMessage.getPayload());
+                    Log.e(TAG, "answer/correct onNext: " + stompMessage.getPayload());
                 }
 
             });
 
-            mStompClient.topic("/topic/room."+roomId+"/draw/answer/incorrect").subscribe(new Subscriber<StompMessage>() {
+            mStompClient.topic("/topic/room."+roomId+"/answer/incorrect").subscribe(new Subscriber<StompMessage>() {
                 @Override
                 public void onCompleted() {
-                    Log.e(TAG, "draw/answer/incorrect onCompleted: ");
+                    Log.e(TAG, "answer/incorrect onCompleted: ");
                 }
 
                 @Override
                 public void onError(Throwable e) {
-                    Log.e(TAG, "/draw/answer/incorrect onError: " + e.getMessage());
+                    Log.e(TAG, "answer/incorrect onError: " + e.getMessage());
                 }
 
                 @Override
@@ -342,7 +342,7 @@ public class HomeObserverHepler extends Thread{
                     msg.obj = response.result;
                     msg.what = 0x25;
                     changeUI.sendMessage(msg);
-                    Log.e(TAG, "draw/answer/incorrect onNext: " + stompMessage.getPayload());
+                    Log.e(TAG, "answer/incorrect onNext: " + stompMessage.getPayload());
                 }
 
             });

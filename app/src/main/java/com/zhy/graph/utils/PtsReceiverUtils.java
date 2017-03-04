@@ -53,14 +53,15 @@ public class PtsReceiverUtils {
             pX = mReService.getPts().get(i).getX();
             pY = mReService.getPts().get(i).getY();
         }
-
+        this.huaBanView.setColor(mReService.getColor());
+        this.huaBanView.setPaintWidth(mReService.getLw());
         this.huaBanView.cacheCanvas.drawPath(this.huaBanView.path, this.huaBanView.paint);
         this.huaBanView.path.reset();
         this.huaBanView.invalidate();
 
     }
 
-    public String sendPaintData(List<CoordinateBean> list){
+    public String sendPaintData(List<CoordinateBean> list, int lw, int color){
 
         if(list == null)
             return null;
@@ -74,7 +75,7 @@ public class PtsReceiverUtils {
             }
         }
 
-        sb.append("],\"lw\":1,\"color\":\"black\"},\"status\":\"end\"}");
+        sb.append("],\"lw\":"+lw+",\"color\":"+color+"},\"status\":\"end\"}");
 
         Log.e("paintDataString---->",sb.toString());
         return sb.toString();
