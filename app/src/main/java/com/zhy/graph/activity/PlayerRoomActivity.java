@@ -27,6 +27,7 @@ import com.zhy.graph.adapter.ChatListAdapter;
 import com.zhy.graph.adapter.HomePlayerGridAdapter;
 import com.zhy.graph.adapter.PlayerRoomGridAdapter;
 import com.zhy.graph.app.BaseApplication;
+import com.zhy.graph.bean.AnswerInfo;
 import com.zhy.graph.bean.ChatInfo;
 import com.zhy.graph.bean.CoordinateBean;
 import com.zhy.graph.bean.PlayerBean;
@@ -148,6 +149,7 @@ public class PlayerRoomActivity extends BaseAct{
         roomType = getIntent().getIntExtra("roomType",0);
         if(roomInfoBean!=null){
             initView();
+            roomInfoBean.getAddedUserList().get(0).setDrawNow(true);
             BaseApplication.obserUitl.setRoomId(roomInfoBean.getRoomId());
             BaseApplication.obserUitl.setChangeUI(changeUI);
             BaseApplication.obserUitl.run();
@@ -275,6 +277,32 @@ public class PlayerRoomActivity extends BaseAct{
                 rel_room_owner_select_question.setVisibility(View.GONE);
                 txt_room_owner_select_question_name.setVisibility(View.GONE);
                 Toast.makeText(PlayerRoomActivity.this,"房主题目选择完成!",Toast.LENGTH_SHORT).show();
+            } else if (msg.what == 0x24) {//回答正确
+                for (PlayerBean bean:
+                roomInfoBean.getAddedUserList()) {
+                    if(bean.getUsername().equals(((AnswerInfo)msg.obj).getUsername())){
+                        if(bean.getCurrentScore() == null)
+                        {
+                            bean.setCurrentScore("0");
+                        }
+                        int score = Integer.parseInt(bean.getCurrentScore())+Integer.parseInt(questionData.getScore());
+                        bean.setAnsser(null);
+                        bean.setCurrentScore("+"+score);
+                    }
+                }
+                adapter.notifyDataSetChanged();
+
+
+            } else if (msg.what == 0x25) {//回答错误
+                for (PlayerBean bean:
+                        roomInfoBean.getAddedUserList()) {
+                    if(bean.getUsername().equals(((AnswerInfo)msg.obj).getUsername())){
+                        bean.setAnsser(((AnswerInfo)msg.obj).getAnswer());
+                    }
+                }
+                adapter.notifyDataSetChanged();
+            } else if (msg.what == 0x26) {//清除画板
+                hbView.clearScreen();
             }
         }
     };
@@ -459,6 +487,7 @@ public class PlayerRoomActivity extends BaseAct{
                 hbView.clearScreen();
                 viewswitch.setDisplayedChild(0);
                 Toast.makeText(PlayerRoomActivity.this,"已选择重绘画板",Toast.LENGTH_SHORT).show();
+                BaseApplication.obserUitl.getmStompClient().send("/app/room."+roomInfoBean.getAddedUserList()+"/draw/paint/clear");
                 break;
 
             case R.id.txt_player_room_send_message:

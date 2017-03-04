@@ -4,6 +4,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
+import com.zhy.graph.bean.AnswerInfo;
 import com.zhy.graph.bean.ChatInfo;
 import com.zhy.graph.bean.PlayerBean;
 import com.zhy.graph.bean.QuestionInfo;
@@ -316,7 +317,7 @@ public class HomeObserverHepler extends Thread{
                 public void onNext(StompMessage stompMessage) {
                     Response response = new Response(stompMessage.getPayload());
                     Message msg = new Message();
-                    msg.obj = response.result;
+                    msg.obj = response.model(AnswerInfo.class);
                     msg.what = 0x24;
                     changeUI.sendMessage(msg);
                     Log.e(TAG, "answer/correct onNext: " + stompMessage.getPayload());
@@ -339,7 +340,7 @@ public class HomeObserverHepler extends Thread{
                 public void onNext(StompMessage stompMessage) {
                     Response response = new Response(stompMessage.getPayload());
                     Message msg = new Message();
-                    msg.obj = response.result;
+                    msg.obj = response.model(AnswerInfo.class);
                     msg.what = 0x25;
                     changeUI.sendMessage(msg);
                     Log.e(TAG, "answer/incorrect onNext: " + stompMessage.getPayload());
@@ -369,6 +370,32 @@ public class HomeObserverHepler extends Thread{
                 }
 
             });
+
+            mStompClient.topic("/topic/room."+roomId+"/draw/paint/clear").subscribe(new Subscriber<StompMessage>() {
+                @Override
+                public void onCompleted() {
+                    Log.i(TAG, "paint/clear onCompleted: ");
+                }
+
+                @Override
+                public void onError(Throwable e) {
+                    Log.i(TAG, "paint/clear onError: " + e.getMessage());
+                }
+
+                @Override
+                public void onNext(StompMessage stompMessage) {
+                    Log.e(TAG, "paint/clear onNext: " + stompMessage.getPayload()
+                    );
+                    Response response = new Response(stompMessage.getPayload());
+                    Message msg = new Message();
+                    msg.what = 0x26;
+                    changeUI.sendMessage(msg);
+                }
+
+            });
+
+
+
 
 
             mStompClient.lifecycle().subscribe(new Observer<LifecycleEvent>() {

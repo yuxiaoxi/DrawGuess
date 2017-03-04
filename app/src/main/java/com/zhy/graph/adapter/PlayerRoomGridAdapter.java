@@ -66,7 +66,7 @@ public class PlayerRoomGridAdapter extends BaseAdapter{
             viewHolder.guessWordsTextView.setVisibility(View.VISIBLE);
             viewHolder.guessWordsTextView.setText(bean.getAnsser());
         }else{
-            viewHolder.guessWordsTextView.setVisibility(View.GONE);
+            viewHolder.guessWordsTextView.setVisibility(View.INVISIBLE);
         }
 
         if(dataList.get(position).isDrawNow()){//正在画的玩家
