@@ -387,13 +387,17 @@ public class HomeActivity extends BaseAct {
 			} else if(msg.what == 0x16){
 				toReady((PlayerBean) msg.obj,false);
 			} else if(msg.what == 0x18){
-				if(roomOwner)
-					return;
-				Intent intent = new Intent();
-				intent.setClass(HomeActivity.this,PlayerRoomActivity.class);
-				intent.putExtra("roomInfoData",(RoomInfoBean)msg.obj);
-				intent.putExtra("roomOwner",roomOwner);
-				startActivityForResult(intent,2);
+				if(roomOwner) {
+					netUitl.questionListUsingGET((RoomInfoBean) msg.obj, 4);
+				}else {
+					BaseApplication.obserUitl.getmStompClient().disconnect();
+					Intent intent = new Intent();
+					intent.setClass(HomeActivity.this, PlayerRoomActivity.class);
+					intent.putExtra("roomInfoData", (RoomInfoBean) msg.obj);
+					intent.putExtra("roomOwner", roomOwner);
+					intent.putExtra("roomType",0);
+					startActivityForResult(intent, 2);
+				}
 			}
 		}
 	};
@@ -441,11 +445,13 @@ public class HomeActivity extends BaseAct {
 				Intent intent = new Intent();
 				intent.setClass(HomeActivity.this,PlayerRoomActivity.class);
 				intent.putExtra("roomInfoData",(RoomInfoBean)msg.obj);
+				intent.putExtra("roomType",1);
 				startActivityForResult(intent,1);
 			} else if(msg.what == 0x15){
 				Intent intent = new Intent();
 				intent.setClass(HomeActivity.this,PlayerRoomActivity.class);
 				intent.putExtra("roomInfoData",(RoomInfoBean)msg.obj);
+				intent.putExtra("roomType",1);
 				startActivityForResult(intent,1);
 			} else if(msg.what == 0x16){
 				Intent intent = new Intent();
@@ -485,7 +491,10 @@ public class HomeActivity extends BaseAct {
 				intent.putExtra("roomInfoData",playerInfo);
 				intent.putExtra("questionData",(QuestionInfo)msg.obj);
 				intent.putExtra("roomOwner",roomOwner);
+				intent.putExtra("roomType",0);
 				startActivityForResult(intent,2);
+			} else if(msg.what == 20){
+				txt_home_ready_time_down.setText("取题中...");
 			}
 		}
 	};

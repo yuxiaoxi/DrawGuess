@@ -93,7 +93,7 @@
         android:persistentDrawingCache="animation">
 
     <ImageView
-        android:id="@+id/txt_player_clear_screen"
+        android:id="@+id/img_setting_panel"
         android:layout_width="70dp"
         android:layout_height="34dp"
         android:gravity="center"
@@ -113,11 +113,13 @@
         android:background="@drawable/huabi_bg"
         android:visibility="gone">
         <ImageView
+            android:id="@+id/img_to_right_btn"
             android:layout_width="wrap_content"
             android:layout_height="24dp"
             android:src="@drawable/to_right_icon"/>
 
         <ImageView
+            android:id="@+id/img_change_color_black_btn"
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:layout_gravity="center_vertical"
@@ -125,6 +127,7 @@
             android:layout_marginLeft="15dp"/>
 
         <ImageView
+            android:id="@+id/img_change_color_white_btn"
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:layout_gravity="center_vertical"
@@ -132,6 +135,7 @@
             android:layout_marginLeft="10dp"/>
 
         <ImageView
+            android:id="@+id/img_change_color_red_btn"
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:layout_gravity="center_vertical"
@@ -139,6 +143,7 @@
             android:layout_marginLeft="10dp"/>
 
         <ImageView
+            android:id="@+id/img_eraser_btn"
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:layout_gravity="center_vertical"
@@ -146,6 +151,7 @@
             android:layout_marginLeft="10dp"/>
 
         <ImageView
+            android:id="@+id/img_clear_screen_btn"
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:layout_gravity="center_vertical"

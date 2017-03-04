@@ -279,7 +279,9 @@ public class HomeNetHelper {
                 if("1".equals(response.code)) {//获取成功
 
                     RoomInfoBean roomInfo = response.modelFromData(RoomInfoBean.class);
-                    questionListUsingGET(roomInfo,4);
+                    Message msg = new Message();
+                    msg.what = 0x20;
+                    mHandler.sendMessage(msg);
                     Log.e(TAG,roomInfo.getNowUserNum());
                 }
             }

@@ -13,6 +13,8 @@ public class PlayerBean implements Serializable{
     private String status;
     private String enabled;
     private String currentScore;
+    private String ansser;
+    private boolean drawNow;
 
     public String getId() {
         return id;
@@ -68,5 +70,21 @@ public class PlayerBean implements Serializable{
 
     public void setCurrentScore(String currentScore) {
         this.currentScore = currentScore;
+    }
+
+    public String getAnsser() {
+        return ansser;
+    }
+
+    public void setAnsser(String ansser) {
+        this.ansser = ansser;
+    }
+
+    public boolean isDrawNow() {
+        return drawNow;
+    }
+
+    public void setDrawNow(boolean drawNow) {
+        this.drawNow = drawNow;
     }
 }
