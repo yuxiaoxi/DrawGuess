@@ -30,6 +30,10 @@ public class HomeNetHelper {
 
     private Handler mHandler;
 
+    private DhNet gameNet;
+
+    private boolean successGame = true;
+
     public HomeNetHelper(Context context, Handler handler){
         this.mContext = context;
         this.mHandler = handler;
@@ -263,19 +267,28 @@ public class HomeNetHelper {
         map.put("username", username);
         map.put("roomId", roomId);
         String url = DomainUtils.SERVER_HOST+"/api/v1/room/"+roomId+"/start";
-        DhNet net = new DhNet(url);
-        net.addParams(map).doGet(new NetTask(mContext) {
+
+        if(gameNet == null){
+            gameNet = new DhNet(url);
+        }else if(!successGame){
+            Toast.makeText(mContext,"已经在请求中....您稍等",Toast.LENGTH_SHORT).show();
+            return;
+        }
+        successGame = false;
+        gameNet.addParams(map).doGet(new NetTask(mContext) {
 
             @Override
             public void onErray(Response response) {
 
                 super.onErray(response);
+                successGame = true;
                 Toast.makeText(mContext,"数据请求错误！请您重新再试！",
                         Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void doInUI(Response response, Integer transfer) {
+                successGame = true;
                 if("1".equals(response.code)) {//获取成功
 
                     RoomInfoBean roomInfo = response.modelFromData(RoomInfoBean.class);
