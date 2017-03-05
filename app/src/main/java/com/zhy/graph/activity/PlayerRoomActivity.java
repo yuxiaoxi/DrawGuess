@@ -27,6 +27,7 @@ import com.zhy.graph.adapter.ChatListAdapter;
 import com.zhy.graph.adapter.HomePlayerGridAdapter;
 import com.zhy.graph.adapter.PlayerRoomGridAdapter;
 import com.zhy.graph.app.BaseApplication;
+import com.zhy.graph.bean.AnswerInfo;
 import com.zhy.graph.bean.ChatInfo;
 import com.zhy.graph.bean.CoordinateBean;
 import com.zhy.graph.bean.PlayerBean;
@@ -137,6 +138,8 @@ public class PlayerRoomActivity extends BaseAct{
     private boolean roomOwner;
     private QuestionInfo questionData = null;
 
+    private int currentDrawer,nowPosition,nowUserNum;
+
     private int roomType ;//区分游客房间和玩家创建的房间 0为游客,1为玩家创建
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -148,9 +151,13 @@ public class PlayerRoomActivity extends BaseAct{
         roomType = getIntent().getIntExtra("roomType",0);
         if(roomInfoBean!=null){
             initView();
+            roomInfoBean.getAddedUserList().get(0).setDrawNow(true);
             BaseApplication.obserUitl.setRoomId(roomInfoBean.getRoomId());
             BaseApplication.obserUitl.setChangeUI(changeUI);
             BaseApplication.obserUitl.run();
+            currentDrawer = 0;
+            nowUserNum = Integer.parseInt(roomInfoBean.getNowUserNum());
+            nowPosition = getPosition();
         }
         if(questionData!=null){
             txt_play_room_warn_describe.setText(questionData.getKeyword1());
@@ -173,6 +180,39 @@ public class PlayerRoomActivity extends BaseAct{
         paintList = new ArrayList<>();
 
         hbView = (HuaBanView) findViewById(R.id.huaBanView1);
+        initToDrawer();
+        playerroomGrid = (GridView) findViewById(R.id.grid_play_room_player);
+
+        adapter = new PlayerRoomGridAdapter(PlayerRoomActivity.this,roomInfoBean.getAddedUserList());
+
+        playerroomGrid.setAdapter(adapter);
+
+        ptsReceiverUtils = new PtsReceiverUtils(PlayerRoomActivity.this,hbView);
+
+        chatAdapter = new ChatListAdapter(PlayerRoomActivity.this,chatList);
+        lv_player_room_chat.setAdapter(chatAdapter);
+
+        pop_player_room_chat.setAdapter(chatAdapter);
+    }
+
+    public int getPosition(){
+        int position = -1;
+        for (int i = 0; i < roomInfoBean.getAddedUserList().size(); i++) {
+            if(BaseApplication.username.equals(roomInfoBean.getAddedUserList().get(i).getUsername())){
+                position = i;
+                break;
+            }
+        }
+        return position;
+
+    }
+
+    /**
+     * 初始化为画画者
+     */
+    public void initToDrawer(){
+        hbView.clearScreen();
+
         if(roomOwner&&roomType == 0) {
             txt_player_room_answer.setVisibility(View.GONE);
             txt_player_room_answer.setText("开始");
@@ -220,6 +260,7 @@ public class PlayerRoomActivity extends BaseAct{
                 }
             });
         }else{
+            txt_player_room_answer.setVisibility(View.VISIBLE);
             txt_player_room_answer.setText("抢答");
             viewswitch.setVisibility(View.GONE);
             hbView.setOnTouchListener(new View.OnTouchListener() {
@@ -229,18 +270,6 @@ public class PlayerRoomActivity extends BaseAct{
                 }
             });
         }
-        playerroomGrid = (GridView) findViewById(R.id.grid_play_room_player);
-
-        adapter = new PlayerRoomGridAdapter(PlayerRoomActivity.this,roomInfoBean.getAddedUserList());
-
-        playerroomGrid.setAdapter(adapter);
-
-        ptsReceiverUtils = new PtsReceiverUtils(PlayerRoomActivity.this,hbView);
-
-        chatAdapter = new ChatListAdapter(PlayerRoomActivity.this,chatList);
-        lv_player_room_chat.setAdapter(chatAdapter);
-
-        pop_player_room_chat.setAdapter(chatAdapter);
     }
 
     @SuppressLint("HandlerLeak")
@@ -275,6 +304,31 @@ public class PlayerRoomActivity extends BaseAct{
                 rel_room_owner_select_question.setVisibility(View.GONE);
                 txt_room_owner_select_question_name.setVisibility(View.GONE);
                 Toast.makeText(PlayerRoomActivity.this,"房主题目选择完成!",Toast.LENGTH_SHORT).show();
+            } else if (msg.what == 0x24) {//回答正确
+                for (PlayerBean bean:
+                roomInfoBean.getAddedUserList()) {
+                    if(bean.getUsername().equals(((AnswerInfo)msg.obj).getUsername())){
+                        if(bean.getCurrentScore() == null)
+                        {
+                            bean.setCurrentScore("0");
+                        }
+                        int score = Integer.parseInt(bean.getCurrentScore())+Integer.parseInt(questionData.getScore());
+                        bean.setAnsser(null);
+                        bean.setCurrentScore("+"+score);
+                    }
+                }
+//                adapter.notifyDataSetInvalidated();
+                changeToDrawer();
+            } else if (msg.what == 0x25) {//回答错误
+                for (PlayerBean bean:
+                        roomInfoBean.getAddedUserList()) {
+                    if(bean.getUsername().equals(((AnswerInfo)msg.obj).getUsername())){
+                        bean.setAnsser(((AnswerInfo)msg.obj).getAnswer());
+                    }
+                }
+                adapter.notifyDataSetChanged();
+            } else if (msg.what == 0x26) {//清除画板
+                hbView.clearScreen();
             }
         }
     };
@@ -408,6 +462,22 @@ public class PlayerRoomActivity extends BaseAct{
         }
     }
 
+    public void changeToDrawer(){
+        roomInfoBean.getAddedUserList().get(currentDrawer%nowUserNum).setDrawNow(false);
+
+        currentDrawer ++;
+        roomInfoBean.getAddedUserList().get(currentDrawer%nowUserNum).setDrawNow(true);
+        if(nowPosition == currentDrawer){//角色变成画画者
+            roomOwner = true;
+        }else{
+            roomOwner = false;
+        }
+        initToDrawer();
+        hbView.setPaintWidth(5);
+        hbView.setColor(Color.parseColor("#000000"));
+        adapter.notifyDataSetChanged();
+    }
+
 
     public void onClickCallBack(View view) {
         switch (view.getId()) {
@@ -450,7 +520,7 @@ public class PlayerRoomActivity extends BaseAct{
 
             case R.id.img_eraser_btn:
                 hbView.setColor(Color.parseColor("#FFFDED"));
-                hbView.setPaintWidth(20);
+                hbView.setPaintWidth(30);
                 viewswitch.setDisplayedChild(0);
                 Toast.makeText(PlayerRoomActivity.this,"已选择橡皮擦",Toast.LENGTH_SHORT).show();
                 break;
@@ -459,6 +529,7 @@ public class PlayerRoomActivity extends BaseAct{
                 hbView.clearScreen();
                 viewswitch.setDisplayedChild(0);
                 Toast.makeText(PlayerRoomActivity.this,"已选择重绘画板",Toast.LENGTH_SHORT).show();
+                BaseApplication.obserUitl.getmStompClient().send("/app/room."+roomInfoBean.getRoomId()+"/draw/paint/clear","").subscribe();
                 break;
 
             case R.id.txt_player_room_send_message:
