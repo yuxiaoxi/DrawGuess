@@ -70,7 +70,7 @@ public class PlayerRoomGridAdapter extends BaseAdapter{
         }
 
         if(dataList.get(position).isDrawNow()){//正在画的玩家
-            viewHolder.avatarImageView.setBackgroundResource(R.drawable.red_ring_shape);
+            viewHolder.avatarImageView.setBackgroundResource(R.drawable.red_ring_rectangle_shape);
         }else{
             viewHolder.avatarImageView.setBackground(null);
         }

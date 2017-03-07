@@ -78,8 +78,8 @@
     <ListView
         android:id="@+id/lv_player_room_chat"
         android:layout_above="@+id/txt_player_room_send_message"
-        android:layout_width="250dp"
-        android:layout_height="100dp"
+        android:layout_width="200dp"
+        android:layout_height="80dp"
         android:background="@android:color/transparent"
         android:listSelector="@android:color/transparent"
         android:divider="@null"
