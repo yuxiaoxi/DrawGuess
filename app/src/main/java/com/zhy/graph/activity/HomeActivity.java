@@ -235,8 +235,8 @@ public class HomeActivity extends BaseAct {
 					daoTimer.cancel();
 					netUitl.userReadyUsingGET(BaseApplication.username,roomId);
 				}else if("已准备".equals(txt_home_ready_ready_btn.getText().toString())){
-					daoTimer.cancel();
-					netUitl.userReadyCancelUsingGET(BaseApplication.username,roomId);
+//					daoTimer.cancel();
+//					netUitl.userReadyCancelUsingGET(BaseApplication.username,roomId);
 				}
 
 				break;

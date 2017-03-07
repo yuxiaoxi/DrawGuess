@@ -31,6 +31,7 @@
         android:paddingTop="10dp"
         android:gravity="center"
         android:textSize="16sp"
+        android:visibility="gone"
         android:text="最大输入字数为200"/>
 
     <TextView
@@ -43,6 +44,7 @@
         android:paddingTop="10dp"
         android:gravity="center"
         android:textSize="16sp"
+        android:visibility="gone"
         android:textColor="@color/red"
         android:text="200"/>
 
