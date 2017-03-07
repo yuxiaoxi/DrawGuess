@@ -394,7 +394,51 @@ public class HomeObserverHepler extends Thread{
 
             });
 
+            mStompClient.topic("/topic/room."+roomId+"/scores").subscribe(new Subscriber<StompMessage>() {
+                @Override
+                public void onCompleted() {
+                    Log.i(TAG, "scores onCompleted: ");
+                }
 
+                @Override
+                public void onError(Throwable e) {
+                    Log.i(TAG, "scores onError: " + e.getMessage());
+                }
+
+                @Override
+                public void onNext(StompMessage stompMessage) {
+                    Log.e(TAG, "scores onNext: " + stompMessage.getPayload()
+                    );
+                    Response response = new Response(stompMessage.getPayload());
+                    Message msg = new Message();
+                    msg.what = 0x27;
+                    changeUI.sendMessage(msg);
+                }
+
+            });
+
+            mStompClient.topic("/topic/room."+roomId+"/game/end").subscribe(new Subscriber<StompMessage>() {
+                @Override
+                public void onCompleted() {
+                    Log.i(TAG, "/game/end onCompleted: ");
+                }
+
+                @Override
+                public void onError(Throwable e) {
+                    Log.i(TAG, "/game/end onError: " + e.getMessage());
+                }
+
+                @Override
+                public void onNext(StompMessage stompMessage) {
+                    Log.e(TAG, "/game/end onNext: " + stompMessage.getPayload()
+                    );
+                    Response response = new Response(stompMessage.getPayload());
+                    Message msg = new Message();
+                    msg.what = 0x28;
+                    changeUI.sendMessage(msg);
+                }
+
+            });
 
 
 

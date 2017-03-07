@@ -498,36 +498,36 @@ public class PlayerRoomActivity extends BaseAct{
                 break;
 
             case R.id.img_change_color_black_btn:
-                hbView.setPaintWidth(5);
+                hbView.setPaintWidth(10);
                 hbView.setColor(Color.parseColor("#000000"));
-                viewswitch.setDisplayedChild(0);
+                // viewswitch.setDisplayedChild(0);
                 Toast.makeText(PlayerRoomActivity.this,"已选择黑色画笔",Toast.LENGTH_SHORT).show();
                 break;
 
             case R.id.img_change_color_white_btn:
-                hbView.setPaintWidth(5);
+                hbView.setPaintWidth(10);
                 hbView.setColor(Color.parseColor("#ffffff"));
-                viewswitch.setDisplayedChild(0);
+                // viewswitch.setDisplayedChild(0);
                 Toast.makeText(PlayerRoomActivity.this,"已选择白色画笔",Toast.LENGTH_SHORT).show();
                 break;
 
             case R.id.img_change_color_red_btn:
-                hbView.setPaintWidth(5);
+                hbView.setPaintWidth(10);
                 hbView.setColor(Color.parseColor("#FF0000"));
-                viewswitch.setDisplayedChild(0);
+                // viewswitch.setDisplayedChild(0);
                 Toast.makeText(PlayerRoomActivity.this,"已选择红色画笔",Toast.LENGTH_SHORT).show();
                 break;
 
             case R.id.img_eraser_btn:
                 hbView.setColor(Color.parseColor("#FFFDED"));
                 hbView.setPaintWidth(30);
-                viewswitch.setDisplayedChild(0);
+                // viewswitch.setDisplayedChild(0);
                 Toast.makeText(PlayerRoomActivity.this,"已选择橡皮擦",Toast.LENGTH_SHORT).show();
                 break;
 
             case R.id.img_clear_screen_btn:
                 hbView.clearScreen();
-                viewswitch.setDisplayedChild(0);
+                // viewswitch.setDisplayedChild(0);
                 Toast.makeText(PlayerRoomActivity.this,"已选择重绘画板",Toast.LENGTH_SHORT).show();
                 BaseApplication.obserUitl.getmStompClient().send("/app/room."+roomInfoBean.getRoomId()+"/draw/paint/clear","").subscribe();
                 break;
