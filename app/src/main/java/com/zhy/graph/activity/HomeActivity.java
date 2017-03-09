@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -14,19 +15,15 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import com.zhy.graph.adapter.HomePlayerGridAdapter;
-import com.zhy.graph.adapter.QuestionsSelectListAdapter;
 import com.zhy.graph.app.BaseApplication;
 import com.zhy.graph.bean.PlayerBean;
 import com.zhy.graph.bean.PlayerInfo;
-import com.zhy.graph.bean.QuestionInfo;
 import com.zhy.graph.bean.RoomInfoBean;
 import com.zhy.graph.network.HomeNetHelper;
 import com.zhy.graph.network.HomeObserverHepler;
@@ -73,21 +70,19 @@ public class HomeActivity extends BaseAct {
 	private HomePlayerGridAdapter adapter;
 	private String TAG = "HomeActivity";
 	private PopDialog popDialog = null;
-	private PopDialog questionDialog = null;
-	private boolean roomOwner,onStop,popDismiss;
+	private boolean roomOwner,onStop,popDismiss,leaveRoom;
 	private List<PlayerInfo> dataList;
 	private String roomId;
 	private HomeNetHelper netUitl = null;
 	private TimerTask task = null;
-	private QuestionsSelectListAdapter questionsAdapter = null;
-	private ListView questionListView;
-	private RoomInfoBean playerInfo;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.act_home_view);
 		initView();
+		String imei = ((TelephonyManager) context.getSystemService(TELEPHONY_SERVICE)).getDeviceId();
 		netUitl.handleUserCreateFormUsingPOST(String.valueOf(new Date().getTime()),"123456","");
 
 	}
@@ -146,14 +141,20 @@ public class HomeActivity extends BaseAct {
 			txt_home_ready_ready_btn.setText("开始");
 		}
 
-
-
-
-
 	}
 
 	public void updateData(PlayerBean playerBean){
 		if(playerBean==null)
+			return;
+		boolean isInit = false;
+		for (PlayerInfo info: dataList
+				) {
+			if(info.getId().equals(playerBean.getId())){
+				isInit = true;
+				break;
+			}
+		}
+		if(isInit)
 			return;
 		PlayerInfo info = new PlayerInfo();
 		info.setNickName(playerBean.getNickname());
@@ -181,6 +182,10 @@ public class HomeActivity extends BaseAct {
 			}
 		}
 		if(dataList.size()==1){
+			if(!roomOwner&&daoTimer!=null){
+				daoTimer.cancel();
+			}
+
 			roomOwner = true;
 			dataList.get(0).setReady(false);
 			dataList.get(0).setMe(true);
@@ -235,8 +240,8 @@ public class HomeActivity extends BaseAct {
 					daoTimer.cancel();
 					netUitl.userReadyUsingGET(BaseApplication.username,roomId);
 				}else if("已准备".equals(txt_home_ready_ready_btn.getText().toString())){
-					daoTimer.cancel();
-					netUitl.userReadyCancelUsingGET(BaseApplication.username,roomId);
+//					daoTimer.cancel();
+//					netUitl.userReadyCancelUsingGET(BaseApplication.username,roomId);
 				}
 
 				break;
@@ -307,6 +312,7 @@ public class HomeActivity extends BaseAct {
 			onStop = false;
 			netUitl.getRandomRoomUsingGET(BaseApplication.username);
 		}else if(requestCode == 2){//游戏退出来后回调
+			onStop = false;
 			if(data!=null){
 				netUitl.leaveRoomUsingGET(BaseApplication.username,0,data.getStringExtra("roomId"));
 			}
@@ -386,18 +392,14 @@ public class HomeActivity extends BaseAct {
 				toReady((PlayerBean) msg.obj,true);
 			} else if(msg.what == 0x16){
 				toReady((PlayerBean) msg.obj,false);
-			} else if(msg.what == 0x18){
-				if(roomOwner) {
-					netUitl.questionListUsingGET((RoomInfoBean) msg.obj, 4);
-				}else {
-					BaseApplication.obserUitl.getmStompClient().disconnect();
-					Intent intent = new Intent();
-					intent.setClass(HomeActivity.this, PlayerRoomActivity.class);
-					intent.putExtra("roomInfoData", (RoomInfoBean) msg.obj);
-					intent.putExtra("roomOwner", roomOwner);
-					intent.putExtra("roomType",0);
-					startActivityForResult(intent, 2);
-				}
+			}else if(msg.what == 0x18){
+//				BaseApplication.obserUitl.getmStompClient().disconnect();
+				Intent intent = new Intent();
+				intent.setClass(HomeActivity.this, PlayerRoomActivity.class);
+				intent.putExtra("roomInfoData", (RoomInfoBean) msg.obj);
+				intent.putExtra("roomOwner", roomOwner);
+				intent.putExtra("roomType",0);
+				startActivityForResult(intent, 2);
 			}
 		}
 	};
@@ -420,6 +422,7 @@ public class HomeActivity extends BaseAct {
 				}
 			} else if(msg.what == 0x11){
 				if(!onStop){//非退出app,倒计时到了自动退出房间
+					leaveRoom = true;
 					netUitl.getRandomRoomUsingGET(BaseApplication.username);
 				}
 			} else if(msg.what == 0x12){
@@ -459,42 +462,6 @@ public class HomeActivity extends BaseAct {
 				startActivityForResult(intent,1);
 			} else if(msg.what == 0x17){
 				(popDialog.findViewById(R.id.txt_warn_room_not_exist)).setVisibility(View.VISIBLE);
-			} else if(msg.what == 0x18){
-				final List<QuestionInfo> questionList = (List<QuestionInfo>)msg.obj;
-				playerInfo = (RoomInfoBean) msg.getData().get("data");
-				questionsAdapter = new QuestionsSelectListAdapter(HomeActivity.this,questionList);
-				questionDialog = PopDialog.createDialog(HomeActivity.this, R.layout.pop_select_guess_word, Gravity.CENTER, R.style.CustomProgressDialog);
-				Window win = questionDialog.getWindow();
-				win.getDecorView().setPadding(0, 0, 0, 0);
-				WindowManager.LayoutParams lp = win.getAttributes();
-				lp.width = WindowManager.LayoutParams.FILL_PARENT;
-				lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
-				win.setAttributes(lp);
-				questionDialog.setCanceledOnTouchOutside(false);
-				questionListView = (ListView)questionDialog.findViewById(R.id.list_guess_word_pop);
-				questionListView.setAdapter(questionsAdapter);
-				questionListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-					@Override
-					public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-						netUitl.questionOkUsingGE(roomId,questionList.get(position).getId());
-					}
-				});
-				if(!questionDialog.isShowing()) {
-					questionDialog.show();
-				}
-			} else if(msg.what == 0x19){
-				if(questionDialog.isShowing()) {
-					questionDialog.dismiss();
-				}
-				Intent intent = new Intent();
-				intent.setClass(HomeActivity.this,PlayerRoomActivity.class);
-				intent.putExtra("roomInfoData",playerInfo);
-				intent.putExtra("questionData",(QuestionInfo)msg.obj);
-				intent.putExtra("roomOwner",roomOwner);
-				intent.putExtra("roomType",0);
-				startActivityForResult(intent,2);
-			} else if(msg.what == 20){
-				txt_home_ready_time_down.setText("取题中...");
 			}
 		}
 	};

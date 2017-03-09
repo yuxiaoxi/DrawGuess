@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
+import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
@@ -26,6 +27,7 @@ import android.widget.ViewSwitcher;
 import com.zhy.graph.adapter.ChatListAdapter;
 import com.zhy.graph.adapter.HomePlayerGridAdapter;
 import com.zhy.graph.adapter.PlayerRoomGridAdapter;
+import com.zhy.graph.adapter.QuestionsSelectListAdapter;
 import com.zhy.graph.app.BaseApplication;
 import com.zhy.graph.bean.AnswerInfo;
 import com.zhy.graph.bean.ChatInfo;
@@ -33,6 +35,7 @@ import com.zhy.graph.bean.CoordinateBean;
 import com.zhy.graph.bean.PlayerBean;
 import com.zhy.graph.bean.QuestionInfo;
 import com.zhy.graph.bean.RoomInfoBean;
+import com.zhy.graph.network.PlayerRoomNetHelper;
 import com.zhy.graph.utils.PtsReceiverUtils;
 import com.zhy.graph.widget.ChatInputDialog;
 import com.zhy.graph.widget.HuaBanView;
@@ -59,7 +62,7 @@ public class PlayerRoomActivity extends BaseAct{
     private int paintWidth;
 
     private int currentTime;
-    private Timer timer,coTimer;
+    private Timer timer,coTimer,saveDrawTimer;
 
     private String TAG = "PlayRoomActivity";
 
@@ -111,6 +114,9 @@ public class PlayerRoomActivity extends BaseAct{
     @InjectView(id = R.id.viewswitch)
     private ViewSwitcher viewswitch;
 
+    @InjectView(id = R.id.txt_play_room_time)
+    private TextView txt_play_room_time;
+
     @InjectView(id = R.id.lv_player_room_chat)
     private ListView lv_player_room_chat;
 
@@ -141,26 +147,29 @@ public class PlayerRoomActivity extends BaseAct{
     private int currentDrawer,nowPosition,nowUserNum;
 
     private int roomType ;//区分游客房间和玩家创建的房间 0为游客,1为玩家创建
+
+    private PlayerRoomNetHelper playerRoomNetHelper = null;
+    private QuestionsSelectListAdapter questionsAdapter = null;
+    private ListView questionListView;
+    private PopDialog questionDialog = null;
+    private TimerTask task = null;
+    int times ;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.drawing);
         roomInfoBean = (RoomInfoBean) getIntent().getSerializableExtra("roomInfoData");
         roomOwner = getIntent().getBooleanExtra("roomOwner",false);
-        questionData = (QuestionInfo) getIntent().getSerializableExtra("questionData");
         roomType = getIntent().getIntExtra("roomType",0);
         if(roomInfoBean!=null){
             initView();
             roomInfoBean.getAddedUserList().get(0).setDrawNow(true);
             BaseApplication.obserUitl.setRoomId(roomInfoBean.getRoomId());
             BaseApplication.obserUitl.setChangeUI(changeUI);
-            BaseApplication.obserUitl.run();
+//            BaseApplication.obserUitl.run();
             currentDrawer = 0;
             nowUserNum = Integer.parseInt(roomInfoBean.getNowUserNum());
             nowPosition = getPosition();
-        }
-        if(questionData!=null){
-            txt_play_room_warn_describe.setText(questionData.getKeyword1());
         }
 
     }
@@ -173,6 +182,7 @@ public class PlayerRoomActivity extends BaseAct{
     }
 
     public void initView() {
+        playerRoomNetHelper = new PlayerRoomNetHelper(PlayerRoomActivity.this,netRequest);
         dataList = new ArrayList<>();
         chatList = new ArrayList<>();
         chatDialog = ChatInputDialog.createDialog(PlayerRoomActivity.this,roomInfoBean.getRoomId());
@@ -180,7 +190,7 @@ public class PlayerRoomActivity extends BaseAct{
         paintList = new ArrayList<>();
 
         hbView = (HuaBanView) findViewById(R.id.huaBanView1);
-        initToDrawer();
+
         playerroomGrid = (GridView) findViewById(R.id.grid_play_room_player);
 
         adapter = new PlayerRoomGridAdapter(PlayerRoomActivity.this,roomInfoBean.getAddedUserList());
@@ -193,6 +203,7 @@ public class PlayerRoomActivity extends BaseAct{
         lv_player_room_chat.setAdapter(chatAdapter);
 
         pop_player_room_chat.setAdapter(chatAdapter);
+        initToDrawer();
     }
 
     public int getPosition(){
@@ -214,6 +225,7 @@ public class PlayerRoomActivity extends BaseAct{
         hbView.clearScreen();
 
         if(roomOwner&&roomType == 0) {
+
             txt_player_room_answer.setVisibility(View.GONE);
             txt_player_room_answer.setText("开始");
             viewswitch.setVisibility(View.VISIBLE);
@@ -226,7 +238,6 @@ public class PlayerRoomActivity extends BaseAct{
                     switch (action) {
                         case MotionEvent.ACTION_DOWN:
                             paintList.clear();
-                            changeTime();
                             hbView.path.moveTo(event.getX(), event.getY());
                             hbView.pX = event.getX();
                             hbView.pY = event.getY();
@@ -236,7 +247,6 @@ public class PlayerRoomActivity extends BaseAct{
                             paintList.add(startBean);
                             break;
                         case MotionEvent.ACTION_MOVE:
-                            timer.cancel();
                             hbView.path.moveTo(hbView.pX, hbView.pY);
 
                             hbView.path.quadTo(hbView.pX, hbView.pY, event.getX(), event.getY());
@@ -248,7 +258,6 @@ public class PlayerRoomActivity extends BaseAct{
                             paintList.add(moveBean);
                             break;
                         case MotionEvent.ACTION_UP:
-                            timer.cancel();
                             hbView.cacheCanvas.drawPath(hbView.path, hbView.paint);
                             hbView.path.reset();
                             break;
@@ -259,6 +268,7 @@ public class PlayerRoomActivity extends BaseAct{
                     return true;
                 }
             });
+            playerRoomNetHelper.questionListUsingGET(roomInfoBean,4);
         }else{
             txt_player_room_answer.setVisibility(View.VISIBLE);
             txt_player_room_answer.setText("抢答");
@@ -270,6 +280,7 @@ public class PlayerRoomActivity extends BaseAct{
                 }
             });
         }
+        countDown(79);
     }
 
     @SuppressLint("HandlerLeak")
@@ -277,9 +288,29 @@ public class PlayerRoomActivity extends BaseAct{
         @Override
         public void handleMessage(Message msg) {
 
-            if (msg.what == 0x11) {//连接后发出handler告诉activity
+            if (msg.what == 0x10) {//连接后发出handler告诉activity
+                if(msg.arg1 == 0){
+                    txt_play_room_time.setText("0");
+                    txt_play_room_time.setVisibility(View.INVISIBLE);
+                    saveCount(5);
+                }else{
+                    txt_play_room_time.setText(msg.arg1+"s");
+                }
+            } else if (msg.what == 0x11) {//连接后发出handler告诉activity
                 // dialog.show();
                 Log.e(TAG, "Stomp reconnection opened");
+            } else if (msg.what == 0x12) {
+                if(popDialog != null && popDialog.isShowing()){
+                    popDialog.dismiss();
+                }
+                if((currentDrawer+1)%nowUserNum == 0){//一轮结束了
+                    Toast.makeText(PlayerRoomActivity.this,"一轮结束了",Toast.LENGTH_SHORT).show();
+                    changeToDrawer();
+                }else{
+                    changeToDrawer();
+                }
+
+
             } else if (msg.what == 0x23) {
                 String result = (String)msg.obj;
                 ptsReceiverUtils.updateView(result);
@@ -293,14 +324,19 @@ public class PlayerRoomActivity extends BaseAct{
             }else if (msg.what == 0x16) {//连接断开
                 connectClosed = true;
             }else if (msg.what == 0x19) {//收到房主选题广播
-                rel_room_owner_select_question.setVisibility(View.VISIBLE);
-                txt_room_owner_select_question_name.setVisibility(View.VISIBLE);
-                txt_room_owner_select_question_name.setText(roomInfoBean.getRoomOwnerName());
+                if(!roomOwner){
+                    rel_room_owner_select_question.setVisibility(View.VISIBLE);
+                    txt_room_owner_select_question_name.setVisibility(View.VISIBLE);
+                    txt_room_owner_select_question_name.setText(roomInfoBean.getRoomOwnerName());
+                }
+
             }else if (msg.what == 0x20) {
                 questionData = (QuestionInfo) msg.obj;
                 if(questionData!=null){
                     txt_play_room_warn_describe.setText(questionData.getKeyword1());
                 }
+                if(roomOwner)
+                    return;
                 rel_room_owner_select_question.setVisibility(View.GONE);
                 txt_room_owner_select_question_name.setVisibility(View.GONE);
                 Toast.makeText(PlayerRoomActivity.this,"房主题目选择完成!",Toast.LENGTH_SHORT).show();
@@ -308,17 +344,13 @@ public class PlayerRoomActivity extends BaseAct{
                 for (PlayerBean bean:
                 roomInfoBean.getAddedUserList()) {
                     if(bean.getUsername().equals(((AnswerInfo)msg.obj).getUsername())){
-                        if(bean.getCurrentScore() == null)
-                        {
-                            bean.setCurrentScore("0");
-                        }
-                        int score = Integer.parseInt(bean.getCurrentScore())+Integer.parseInt(questionData.getScore());
+                        int score = bean.getCurrentScore()+questionData.getScore();
                         bean.setAnsser(null);
-                        bean.setCurrentScore("+"+score);
+                        bean.setCurrentScore(score);
                     }
                 }
-//                adapter.notifyDataSetInvalidated();
-                changeToDrawer();
+                adapter.setData(roomInfoBean.getAddedUserList());
+                adapter.notifyDataSetChanged();
             } else if (msg.what == 0x25) {//回答错误
                 for (PlayerBean bean:
                         roomInfoBean.getAddedUserList()) {
@@ -326,12 +358,116 @@ public class PlayerRoomActivity extends BaseAct{
                         bean.setAnsser(((AnswerInfo)msg.obj).getAnswer());
                     }
                 }
+                adapter.setData(roomInfoBean.getAddedUserList());
                 adapter.notifyDataSetChanged();
             } else if (msg.what == 0x26) {//清除画板
                 hbView.clearScreen();
+            } else if(msg.what == 0x27){//推送分数结果
+                roomInfoBean = (RoomInfoBean) msg.obj;
             }
         }
     };
+
+    public PlayerBean getMaxScore() {
+        PlayerBean maxBean = null;
+        for (PlayerBean bean :
+                roomInfoBean.getAddedUserList()) {
+            if (maxBean == null) {
+                maxBean = bean;
+            } else {
+                if(bean.getCurrentScore()>maxBean.getCurrentScore()){
+                    maxBean = bean;
+                }
+            }
+        }
+        return maxBean;
+    }
+    public PlayerBean getMinScore() {
+        PlayerBean minBean = null;
+        for (PlayerBean bean :
+                roomInfoBean.getAddedUserList()) {
+            if (minBean == null) {
+                minBean = bean;
+            } else {
+                if(bean.getCurrentScore()<minBean.getCurrentScore()){
+                    minBean = bean;
+                }
+            }
+        }
+        return minBean;
+    }
+
+    private Handler netRequest = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            if(msg.what == 0x18){
+                final List<QuestionInfo> questionList = (List<QuestionInfo>)msg.obj;
+                questionsAdapter = new QuestionsSelectListAdapter(PlayerRoomActivity.this,questionList);
+                questionDialog = PopDialog.createDialog(PlayerRoomActivity.this, R.layout.pop_select_guess_word, Gravity.CENTER, R.style.CustomProgressDialog);
+                Window win = questionDialog.getWindow();
+                win.getDecorView().setPadding(0, 0, 0, 0);
+                WindowManager.LayoutParams lp = win.getAttributes();
+                lp.width = WindowManager.LayoutParams.FILL_PARENT;
+                lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
+                win.setAttributes(lp);
+                questionDialog.setCanceledOnTouchOutside(false);
+                questionListView = (ListView)questionDialog.findViewById(R.id.list_guess_word_pop);
+                questionListView.setAdapter(questionsAdapter);
+                questionListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        playerRoomNetHelper.questionOkUsingGE(roomInfoBean.getRoomId(),questionList.get(position).getId());
+                    }
+                });
+                if(!questionDialog.isShowing()) {
+                    questionDialog.show();
+                }
+            }else if(msg.what == 0x19){
+                questionData = (QuestionInfo) msg.obj;
+                if(questionDialog.isShowing()) {
+                    questionDialog.dismiss();
+                }
+            }
+        }
+    };
+
+    private void countDown(int countTime){
+        txt_play_room_time.setVisibility(View.VISIBLE);
+        txt_play_room_time.setText(countTime+"s");
+        timer = new Timer();
+        task = new TimerTask() {
+            public void run() {
+                Message msg = new Message();
+                msg.what = 0x10;
+                msg.arg1 = Integer.parseInt(txt_play_room_time.getText().toString().split("s")[0])-1;
+                if(msg.arg1 == 0){
+                    timer.cancel();
+                }
+                changeUI.sendMessage(msg);
+            }
+        };
+        timer.schedule(task, 0, 1000);
+    }
+
+    private void saveCount(int countTime){
+        saveDrawTimer = new Timer();
+        times = countTime;
+        saveDraw();
+        TimerTask task = new TimerTask() {
+            public void run() {
+                times --;
+
+                if(times == 0){
+                    saveDrawTimer.cancel();
+                    Message msg = new Message();
+                    msg.what = 0x12;
+                    changeUI.sendMessage(msg);
+                }
+
+            }
+        };
+        saveDrawTimer.schedule(task, 0, 1000);
+    }
 
 
     @SuppressLint("UseValueOf")
@@ -377,23 +513,6 @@ public class PlayerRoomActivity extends BaseAct{
             return super.onKeyDown(keyCode, event);
         }
 
-    }
-
-    private void changeTime() {
-        currentTime = 0;
-        timer = new Timer();
-        TimerTask task = new TimerTask() {
-            public void run() {
-                if (++currentTime > 1) {
-                    Log.d("The Time:", currentTime + "");
-                    Message message = new Message();
-                    message.what = 0x14;
-                    changeUI.sendMessage(message);
-                    timer.cancel();
-                }
-            }
-        };
-        timer.schedule(task, 0, 1000);
     }
 
     private void reConnect(){
@@ -463,17 +582,24 @@ public class PlayerRoomActivity extends BaseAct{
     }
 
     public void changeToDrawer(){
+        if(questionDialog!=null &&questionDialog.isShowing()) {
+            questionDialog.dismiss();
+        }
+        for (PlayerBean bean :
+                roomInfoBean.getAddedUserList()) {
+            bean.setAnsser(null);
+        }
         roomInfoBean.getAddedUserList().get(currentDrawer%nowUserNum).setDrawNow(false);
 
         currentDrawer ++;
         roomInfoBean.getAddedUserList().get(currentDrawer%nowUserNum).setDrawNow(true);
-        if(nowPosition == currentDrawer){//角色变成画画者
+        if(nowPosition == currentDrawer%nowUserNum){//角色变成画画者
             roomOwner = true;
         }else{
             roomOwner = false;
         }
         initToDrawer();
-        hbView.setPaintWidth(5);
+        hbView.setPaintWidth(10);
         hbView.setColor(Color.parseColor("#000000"));
         adapter.notifyDataSetChanged();
     }

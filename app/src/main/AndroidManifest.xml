@@ -143,6 +143,9 @@
             android:exported="true"
             android:screenOrientation="portrait" />
 
+        <meta-data android:value="YOUR_APP_KEY" android:name="UMENG_APPKEY"/>
+        <meta-data android:value="Channel ID" android:name="UMENG_CHANNEL"/>
+
     </application>
 
 </manifest>

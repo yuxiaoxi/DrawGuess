@@ -79,6 +79,9 @@ public class FeedBackActivity extends BaseAct {
 			@Override
 			public void afterTextChanged(Editable s) {
 				int amount = edit_feed_back_suggest.getText().toString().trim().length();
+				if(amount == 200){
+					edit_feed_back_suggest.setBackgroundResource(R.color.btn_gray_bg);
+				}
 				txt_input_count.setText((200-amount)+"");
 			}
 		});

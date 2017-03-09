@@ -411,6 +411,7 @@ public class HomeObserverHepler extends Thread{
                     );
                     Response response = new Response(stompMessage.getPayload());
                     Message msg = new Message();
+                    msg.obj = response.model(RoomInfoBean.class);
                     msg.what = 0x27;
                     changeUI.sendMessage(msg);
                 }

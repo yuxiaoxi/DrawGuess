@@ -2,12 +2,13 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="#F8F8F8"
+    android:background="@android:color/transparent"
     android:orientation="vertical" >
 
     <View
         android:layout_width="fill_parent"
         android:layout_height="0.5dp"
+        android:visibility="invisible"
         android:background="#E6E6E6" />
     <ListView
         android:id="@+id/chat_bottom_player_room_chat"
@@ -28,6 +29,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:focusable="true"
+        android:background="#F8F8F8"
         android:gravity="center_vertical"
         android:minHeight="50.0dip"
         android:orientation="horizontal"
@@ -53,8 +55,8 @@
         <TextView
             android:id="@+id/btn_chat_send"
             android:layout_width="60dp"
-            android:layout_height="30dp"
-            android:background="@drawable/fasong_btn"
+            android:layout_height="38dp"
+            android:background="@drawable/btn_shape_send"
             android:gravity="center"
             android:text="发送"
             android:textColor="@color/white" >

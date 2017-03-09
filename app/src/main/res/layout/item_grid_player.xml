@@ -4,8 +4,9 @@
     android:layout_height="match_parent">
     <ImageView
         android:id="@+id/img_player_avatar"
-        android:layout_width="70dp"
-        android:layout_height="70dp"
+        android:layout_width="95dp"
+        android:layout_height="95dp"
+        android:src="@drawable/default_avatar"
         android:layout_centerHorizontal="true"/>
 
     <TextView

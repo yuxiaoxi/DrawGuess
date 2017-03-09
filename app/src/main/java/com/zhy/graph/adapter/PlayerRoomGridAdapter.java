@@ -31,6 +31,10 @@ public class PlayerRoomGridAdapter extends BaseAdapter{
         }
     }
 
+    public void setData(List<PlayerBean> data){
+        this.dataList = data;
+    }
+
     @Override
     public PlayerBean getItem(int position) {
         return dataList.get(position);
@@ -75,7 +79,7 @@ public class PlayerRoomGridAdapter extends BaseAdapter{
             viewHolder.avatarImageView.setBackground(null);
         }
 
-        viewHolder.scoreTextView.setText(bean.getCurrentScore());
+        viewHolder.scoreTextView.setText("+"+bean.getCurrentScore());
 
         return convertView;
     }

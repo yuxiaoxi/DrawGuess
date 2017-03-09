@@ -8,22 +8,22 @@
         android:id="@+id/txt_play_room_latest_time"
         android:layout_width="wrap_content"
         android:layout_height="20dp"
-        android:layout_marginTop="15dp"
+        android:layout_marginTop="10dp"
         android:layout_marginLeft="15dp"
         android:text="倒计时"
-        android:textSize="14sp"
+        android:textSize="12sp"
         android:gravity="center"
         android:textColor="@color/white"/>
     <TextView
         android:id="@+id/txt_play_room_time"
         android:layout_below="@+id/txt_play_room_latest_time"
         android:layout_width="wrap_content"
-        android:layout_height="25dp"
-        android:layout_marginTop="5dp"
+        android:layout_height="30dp"
+        android:layout_marginTop="0dp"
         android:layout_marginLeft="15dp"
-        android:gravity="center"
+        android:gravity="center|top"
         android:text="69s"
-        android:textSize="20sp"
+        android:textSize="22sp"
         android:textColor="@color/white"/>
 
     <TextView
@@ -31,20 +31,21 @@
         android:layout_width="wrap_content"
         android:layout_height="20dp"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="15dp"
+        android:layout_marginTop="10dp"
         android:layout_marginLeft="15dp"
         android:text="提示"
-        android:textSize="14sp"
+        android:textSize="12sp"
         android:textColor="@color/white"/>
     <TextView
         android:id="@+id/txt_play_room_warn_describe"
         android:layout_below="@+id/txt_play_room_access"
         android:layout_centerHorizontal="true"
         android:layout_width="wrap_content"
-        android:layout_height="25dp"
-        android:layout_marginTop="5dp"
+        android:layout_height="30dp"
+        android:layout_marginTop="0dp"
         android:layout_marginLeft="15dp"
-        android:textSize="20sp"
+        android:gravity="center|top"
+        android:textSize="22sp"
         android:textColor="@color/white"/>
 
     <ImageView
@@ -54,24 +55,24 @@
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_marginTop="10dp"
-        android:padding="15dp"
+        android:padding="18dp"
         android:src="@drawable/close_icon"/>
 
     <GridView
         android:id="@+id/grid_play_room_player"
         android:layout_below="@id/txt_play_room_time"
         android:layout_width="match_parent"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
         android:listSelector="@android:color/transparent"
         android:numColumns="7"
         android:scrollbars="none"
-        android:layout_height="65dp"/>
+        android:layout_height="60dp"/>
 
     <com.zhy.graph.widget.HuaBanView
         android:id="@+id/huaBanView1"
         android:background="@color/huaban_bg"
-        android:layout_marginTop="150dp"
+        android:layout_below="@+id/grid_play_room_player"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
@@ -93,22 +94,22 @@
         android:layout_alignRight="@+id/huaBanView1"
         android:persistentDrawingCache="animation">
 
-    <ImageView
-        android:id="@+id/img_setting_panel"
-        android:layout_width="70dp"
-        android:layout_height="34dp"
-        android:gravity="center"
-        android:layout_marginTop="1dp"
-        android:layout_gravity="right"
-        android:src="@drawable/draw_pencel_icon"
-        android:background="@drawable/huabi_bg"
-        android:visibility="visible"
-        />
-
+        <ImageView
+            android:id="@+id/img_setting_panel"
+            android:layout_width="60dp"
+            android:layout_height="29dp"
+            android:gravity="center"
+            android:layout_marginTop="1dp"
+            android:padding="5dp"
+            android:layout_gravity="right"
+            android:src="@drawable/draw_pencel_icon"
+            android:background="@drawable/huabi_bg"
+            android:visibility="visible"
+            />
     <LinearLayout
         android:id="@+id/liner_player_huabi_setting"
         android:layout_width="185dp"
-        android:layout_height="34dp"
+        android:layout_height="29dp"
         android:orientation="horizontal"
         android:layout_marginTop="1dp"
         android:background="@drawable/huabi_bg"
@@ -116,7 +117,11 @@
         <ImageView
             android:id="@+id/img_to_right_btn"
             android:layout_width="wrap_content"
-            android:layout_height="24dp"
+            android:layout_height="match_parent"
+            android:paddingTop="3dp"
+            android:paddingBottom="3dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
             android:src="@drawable/to_right_icon"/>
 
         <ImageView
@@ -125,7 +130,7 @@
             android:layout_height="20dp"
             android:layout_gravity="center_vertical"
             android:src="@drawable/black_ring_shape"
-            android:layout_marginLeft="15dp"/>
+            android:layout_marginLeft="1dp"/>
 
         <ImageView
             android:id="@+id/img_change_color_white_btn"

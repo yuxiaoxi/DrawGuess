@@ -14,11 +14,9 @@ public class RoomInfoBean implements Serializable{
     private String nowUserNum;
     private String questionNum;
     private List<PlayerBean> addedUserList;
-    private List<String> questions;
-    private String currentQuestion;
+    private List<QuestionInfo> questions;
+    private QuestionInfo currentQuestion;
     private String version;
-
-
 
     public String getRoomId() {
         return roomId;
@@ -76,19 +74,19 @@ public class RoomInfoBean implements Serializable{
         this.addedUserList = addedUserList;
     }
 
-    public List<String> getQuestions() {
+    public List<QuestionInfo> getQuestions() {
         return questions;
     }
 
-    public void setQuestions(List<String> questions) {
+    public void setQuestions(List<QuestionInfo> questions) {
         this.questions = questions;
     }
 
-    public String getCurrentQuestion() {
+    public QuestionInfo getCurrentQuestion() {
         return currentQuestion;
     }
 
-    public void setCurrentQuestion(String currentQuestion) {
+    public void setCurrentQuestion(QuestionInfo currentQuestion) {
         this.currentQuestion = currentQuestion;
     }
 

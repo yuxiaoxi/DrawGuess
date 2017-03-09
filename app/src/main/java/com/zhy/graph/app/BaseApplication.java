@@ -7,6 +7,7 @@ import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.ImageScaleType;
+import com.umeng.analytics.MobclickAgent;
 import com.zhy.graph.network.HomeObserverHepler;
 
 import net.duohuo.dhroid.Dhroid;
@@ -42,7 +43,9 @@ public class BaseApplication extends Application {
 
 		ShareSDK.initSDK(this);
 		Dhroid.init(this);
-
+		MobclickAgent.setScenarioType(this, MobclickAgent.EScenarioType.E_UM_NORMAL);
+		//false关闭crash提交到友盟服务器,true为开启
+		MobclickAgent.setCatchUncaughtExceptions(true);
 		// 对话框对象
 		IocContainer.getShare().bind(DialogImpl.class).to(IDialog.class)
 		// 这是单例
