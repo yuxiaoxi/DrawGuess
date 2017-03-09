@@ -8,7 +8,7 @@ import java.io.Serializable;
 public class QuestionInfo implements Serializable{
 
     private String id;
-    private String score;
+    private int score;
     private String question;
     private String keyword1;
     private String keyword2;
@@ -22,11 +22,11 @@ public class QuestionInfo implements Serializable{
         this.id = id;
     }
 
-    public String getScore() {
+    public int getScore() {
         return score;
     }
 
-    public void setScore(String score) {
+    public void setScore(int score) {
         this.score = score;
     }
 

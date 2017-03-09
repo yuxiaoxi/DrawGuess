@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 
+import com.umeng.analytics.MobclickAgent;
 import com.zhy.graph.app.AppManager;
 
 import net.duohuo.dhroid.activity.BaseActivity;
@@ -59,14 +60,14 @@ public class BaseAct extends BaseActivity {
 	protected void onResume() {
 		// TODO Auto-generated method stub
 		super.onResume();
-
+		MobclickAgent.onResume(this);
 	}
 
 	@Override
 	protected void onPause() {
 		// TODO Auto-generated method stub
 		super.onPause();
-
+		MobclickAgent.onPause(this);
 	}
 
 }

@@ -12,7 +12,7 @@ public class PlayerBean implements Serializable{
     private String image;
     private String status;
     private String enabled;
-    private String currentScore;
+    private int currentScore;
     private String ansser;
     private boolean drawNow;
 
@@ -64,11 +64,11 @@ public class PlayerBean implements Serializable{
         this.enabled = enabled;
     }
 
-    public String getCurrentScore() {
+    public int getCurrentScore() {
         return currentScore;
     }
 
-    public void setCurrentScore(String currentScore) {
+    public void setCurrentScore(int currentScore) {
         this.currentScore = currentScore;
     }
 
