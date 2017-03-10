@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="280dp"
+    android:layout_height="300dp"
     android:orientation="vertical">
 
     <RelativeLayout
+        android:id="@+id/rel_top_bg"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="250dp"
         android:layout_marginLeft="40dp"
         android:layout_marginRight="40dp"
         android:focusable="false"
@@ -73,7 +74,7 @@
             android:textSize="16sp"
             android:textColor="@color/red"
             android:gravity="center"
-            android:text="9"
+            android:text="0"
             android:layout_below="@+id/img_winer_player_avatar"
             android:layout_alignStart="@+id/img_winer"
             android:layout_marginTop="30dp"
@@ -85,7 +86,7 @@
             android:layout_height="wrap_content"
             android:textSize="16sp"
             android:gravity="center"
-            android:text="9"
+            android:text="0"
             android:layout_below="@+id/img_failur_player_avatar"
             android:layout_alignParentRight="true"
             android:layout_alignStart="@+id/img_failur_player_avatar"
@@ -94,5 +95,14 @@
 
 
     </RelativeLayout>
+    <TextView
+        android:id="@+id/txt_count_down"
+        android:layout_below="@+id/rel_top_bg"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:text="5s"
+        android:textColor="@color/white"
+        android:textSize="30sp" />
 
 </RelativeLayout>

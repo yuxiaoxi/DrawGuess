@@ -37,6 +37,7 @@ import com.zhy.graph.bean.QuestionInfo;
 import com.zhy.graph.bean.RoomInfoBean;
 import com.zhy.graph.network.PlayerRoomNetHelper;
 import com.zhy.graph.utils.PtsReceiverUtils;
+import com.zhy.graph.utils.Utils;
 import com.zhy.graph.widget.ChatInputDialog;
 import com.zhy.graph.widget.HuaBanView;
 import com.zhy.graph.widget.PopDialog;
@@ -62,7 +63,7 @@ public class PlayerRoomActivity extends BaseAct{
     private int paintWidth;
 
     private int currentTime;
-    private Timer timer,coTimer,saveDrawTimer;
+    private Timer timer,coTimer,saveDrawTimer,nextCountTimer;
 
     private String TAG = "PlayRoomActivity";
 
@@ -135,6 +136,9 @@ public class PlayerRoomActivity extends BaseAct{
     //抢答框
     private PopDialog answerDialog = null;
 
+    //倒计时弹框
+    private PopDialog countdownDialog = null;
+
     private RoomInfoBean roomInfoBean = null;
 
     private List<PlayerBean> dataList;
@@ -154,6 +158,7 @@ public class PlayerRoomActivity extends BaseAct{
     private PopDialog questionDialog = null;
     private TimerTask task = null;
     int times ;
+    private TextView txt_count_down;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -292,20 +297,34 @@ public class PlayerRoomActivity extends BaseAct{
                 if(msg.arg1 == 0){
                     txt_play_room_time.setText("0");
                     txt_play_room_time.setVisibility(View.INVISIBLE);
+
                     saveCount(5);
+
                 }else{
                     txt_play_room_time.setText(msg.arg1+"s");
                 }
             } else if (msg.what == 0x11) {//连接后发出handler告诉activity
                 // dialog.show();
                 Log.e(TAG, "Stomp reconnection opened");
-            } else if (msg.what == 0x12) {
+            } else if(msg.what == 0x13){//有玩家退出
+                logout((PlayerBean)msg.obj);
+            }else if(msg.what == 0x133){
+                if(msg.arg1 == 0){
+                    Toast.makeText(PlayerRoomActivity.this, "新一轮开始了", Toast.LENGTH_SHORT).show();
+                    changeToDrawer();
+                }else{
+                    txt_count_down.setText(msg.arg1+"s");
+                }
+            }else if (msg.what == 0x122) {
                 if(popDialog != null && popDialog.isShowing()){
                     popDialog.dismiss();
                 }
+                if(answerDialog != null && answerDialog.isShowing()){
+                    answerDialog.dismiss();
+                }
                 if((currentDrawer+1)%nowUserNum == 0){//一轮结束了
-                    Toast.makeText(PlayerRoomActivity.this,"一轮结束了",Toast.LENGTH_SHORT).show();
-                    changeToDrawer();
+                    countDownDialog();
+
                 }else{
                     changeToDrawer();
                 }
@@ -349,6 +368,7 @@ public class PlayerRoomActivity extends BaseAct{
                         bean.setCurrentScore(score);
                     }
                 }
+                Toast.makeText(PlayerRoomActivity.this,"恭喜玩家"+((AnswerInfo)msg.obj).getUsername()+"答对了!",Toast.LENGTH_SHORT).show();
                 adapter.setData(roomInfoBean.getAddedUserList());
                 adapter.notifyDataSetChanged();
             } else if (msg.what == 0x25) {//回答错误
@@ -367,6 +387,20 @@ public class PlayerRoomActivity extends BaseAct{
             }
         }
     };
+
+
+    public void logout(PlayerBean playerBean){
+        if(playerBean==null)
+            return;
+        for (PlayerBean bean: adapter.getData()
+                ) {
+            if(bean.getId().equals(playerBean.getId())){
+               bean.setStatus("Empty");
+                break;
+            }
+        }
+        adapter.notifyDataSetChanged();
+    }
 
     public PlayerBean getMaxScore() {
         PlayerBean maxBean = null;
@@ -449,10 +483,35 @@ public class PlayerRoomActivity extends BaseAct{
         timer.schedule(task, 0, 1000);
     }
 
+    private void countDownNext(int countTime){
+        txt_count_down.setText(countTime+"s");
+        nextCountTimer = new Timer();
+        TimerTask task = new TimerTask() {
+            public void run() {
+                Message msg = new Message();
+                msg.what = 0x133;
+                msg.arg1 = Integer.parseInt(txt_count_down.getText().toString().split("s")[0])-1;
+                if(msg.arg1 == 0){
+                    if(countdownDialog.isShowing()){
+                        countdownDialog.dismiss();
+                    }
+                    nextCountTimer.cancel();
+                }
+                changeUI.sendMessage(msg);
+            }
+        };
+        nextCountTimer.schedule(task, 0, 1000);
+    }
+
     private void saveCount(int countTime){
         saveDrawTimer = new Timer();
         times = countTime;
-        saveDraw();
+        if(questionData!=null){
+            saveDraw(questionData.getQuestion());
+        }else{
+            saveDraw("");
+        }
+
         TimerTask task = new TimerTask() {
             public void run() {
                 times --;
@@ -460,7 +519,7 @@ public class PlayerRoomActivity extends BaseAct{
                 if(times == 0){
                     saveDrawTimer.cancel();
                     Message msg = new Message();
-                    msg.what = 0x12;
+                    msg.what = 0x122;
                     changeUI.sendMessage(msg);
                 }
 
@@ -499,6 +558,26 @@ public class PlayerRoomActivity extends BaseAct{
         super.onDestroy();
         destroyed = true;
         coTimer.cancel();
+        if(popDialog != null && popDialog.isShowing()){
+            popDialog.dismiss();
+        }
+        if(answerDialog != null && answerDialog.isShowing()){
+            answerDialog.dismiss();
+        }
+        if(countdownDialog != null && countdownDialog.isShowing()){
+            countdownDialog.dismiss();
+        }
+        if(questionDialog != null && questionDialog.isShowing()){
+            questionDialog.dismiss();
+        }
+        if(timer != null)
+            timer.cancel();
+        if(saveDrawTimer!= null){
+            saveDrawTimer.cancel();
+        }
+        if(nextCountTimer!=null){
+            nextCountTimer.cancel();
+        }
     }
 
     @Override
@@ -545,7 +624,7 @@ public class PlayerRoomActivity extends BaseAct{
         lp.width = WindowManager.LayoutParams.FILL_PARENT;
         lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
         win.setAttributes(lp);
-
+        answerDialog.setCanceledOnTouchOutside(true);
         ((EditText)answerDialog.findViewById(R.id.edit_input_answer)).setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
@@ -565,7 +644,25 @@ public class PlayerRoomActivity extends BaseAct{
         }
     }
 
-    public void saveDraw(){
+    public void countDownDialog(){
+        countdownDialog = PopDialog.createDialog(PlayerRoomActivity.this, R.layout.pop_player_batter_performance, Gravity.CENTER, R.style.CustomProgressDialog);
+        Window win = countdownDialog.getWindow();
+        win.getDecorView().setPadding(0, 0, 0, 0);
+        WindowManager.LayoutParams lp = win.getAttributes();
+        lp.width = WindowManager.LayoutParams.FILL_PARENT;
+        lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
+        win.setAttributes(lp);
+        txt_count_down  = (TextView)countdownDialog.findViewById(R.id.txt_count_down);
+        ((TextView)countdownDialog.findViewById(R.id.txt_winer_score)).setText(getMaxScore().getCurrentScore()+"");
+        ((TextView)countdownDialog.findViewById(R.id.txt_loser_score)).setText(getMinScore().getCurrentScore()+"");
+        countdownDialog.setCanceledOnTouchOutside(false);
+        if(!countdownDialog.isShowing()) {
+            countdownDialog.show();
+        }
+        countDownNext(5);
+    }
+
+    public void saveDraw(final String qustion){
         popDialog = PopDialog.createDialog(PlayerRoomActivity.this, R.layout.pop_save_or_share_draw, Gravity.CENTER, R.style.CustomProgressDialog);
         Window win = popDialog.getWindow();
         win.getDecorView().setPadding(0, 0, 0, 0);
@@ -573,9 +670,16 @@ public class PlayerRoomActivity extends BaseAct{
         lp.width = WindowManager.LayoutParams.FILL_PARENT;
         lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
         win.setAttributes(lp);
-        popDialog.setCanceledOnTouchOutside(false);
+        popDialog.setCanceledOnTouchOutside(true);
 
         ((ImageView)popDialog.findViewById(R.id.img_draw_bitmap)).setImageBitmap(hbView.getBitmap());
+        ((TextView)popDialog.findViewById(R.id.txt_select_word_describe)).setText(qustion);
+        popDialog.findViewById(R.id.linear_save_image).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Utils.saveImageToGallery(PlayerRoomActivity.this,hbView.getBitmap());
+            }
+        });
         if(!popDialog.isShowing()) {
             popDialog.show();
         }

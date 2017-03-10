@@ -37,6 +37,7 @@
             android:layout_marginTop="10dp"
             android:background="#FFFAE9"/>
         <LinearLayout
+            android:id="@+id/linear_save_image"
             android:layout_below="@+id/img_draw_bitmap"
             android:layout_width="wrap_content"
             android:layout_marginTop="25dp"
