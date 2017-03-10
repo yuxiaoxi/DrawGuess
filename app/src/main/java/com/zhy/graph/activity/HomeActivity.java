@@ -19,6 +19,7 @@ import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.zhy.graph.adapter.HomePlayerGridAdapter;
 import com.zhy.graph.app.BaseApplication;
@@ -212,6 +213,24 @@ public class HomeActivity extends BaseAct {
 		adapter.notifyDataSetChanged();
 	}
 
+	public boolean haveStartAble(){
+
+		boolean startAble = true;
+		if(dataList.size()<2){
+			startAble = false;
+			Toast.makeText(HomeActivity.this,"房间人数不够^~^",Toast.LENGTH_SHORT).show();
+			return startAble;
+		}
+		for (int i = 1; i < dataList.size(); i++) {
+			if(!dataList.get(i).isReady()) {
+				startAble = false;
+				Toast.makeText(HomeActivity.this,"有玩家还没准备,请您稍等^~^",Toast.LENGTH_SHORT).show();
+				break;
+			}
+		}
+		return startAble;
+	}
+
 
 	public void onClickCallBack(View view) {
 		Intent intent = new Intent();
@@ -235,7 +254,10 @@ public class HomeActivity extends BaseAct {
 			case R.id.txt_home_ready_ready_btn:
 
 				if("开始".equals(txt_home_ready_ready_btn.getText().toString())){//是房主
-					netUitl.gameStartUsingGET(BaseApplication.username,roomId);
+					if(haveStartAble()){
+						netUitl.gameStartUsingGET(BaseApplication.username,roomId);
+					}
+
 				}else if("准备".equals(txt_home_ready_ready_btn.getText().toString())){
 					daoTimer.cancel();
 					netUitl.userReadyUsingGET(BaseApplication.username,roomId);

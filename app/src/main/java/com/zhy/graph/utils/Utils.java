@@ -1,12 +1,16 @@
 package com.zhy.graph.utils;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
+import android.net.Uri;
 import android.os.Environment;
+import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -156,5 +160,35 @@ public class Utils {
 
 		}
 	}
-    
+
+	public static void saveImageToGallery(Context context, Bitmap bmp) {
+		// 首先保存图片
+		File appDir = new File(Environment.getExternalStorageDirectory(), "draw");
+		if (!appDir.exists()) {
+			appDir.mkdir();
+		}
+		String fileName = System.currentTimeMillis() + ".jpg";
+		File file = new File(appDir, fileName);
+		try {
+			FileOutputStream fos = new FileOutputStream(file);
+			bmp.compress(Bitmap.CompressFormat.JPEG, 100, fos);
+			fos.flush();
+			fos.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		// 其次把文件插入到系统图库
+		try {
+			MediaStore.Images.Media.insertImage(context.getContentResolver(),
+					file.getAbsolutePath(), fileName, null);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		// 最后通知图库更新
+		context.sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(new File(file.getPath()))));
+		Toast.makeText(context,"图片保存成功!",Toast.LENGTH_SHORT).show();
+	}
 }

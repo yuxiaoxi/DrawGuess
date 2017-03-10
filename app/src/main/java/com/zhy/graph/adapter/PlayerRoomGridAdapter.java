@@ -35,6 +35,10 @@ public class PlayerRoomGridAdapter extends BaseAdapter{
         this.dataList = data;
     }
 
+    public List<PlayerBean> getData(){
+        return dataList;
+    }
+
     @Override
     public PlayerBean getItem(int position) {
         return dataList.get(position);
@@ -77,6 +81,12 @@ public class PlayerRoomGridAdapter extends BaseAdapter{
             viewHolder.avatarImageView.setBackgroundResource(R.drawable.red_ring_rectangle_shape);
         }else{
             viewHolder.avatarImageView.setBackground(null);
+        }
+        if("Empty".equals(dataList.get(position).getStatus())){//已经退出
+            viewHolder.avatarImageView.setImageResource(R.drawable.btn_shape_ready_gray);
+        }else{
+            viewHolder.avatarImageView.setImageResource(R.drawable.default_avatar);
+
         }
 
         viewHolder.scoreTextView.setText("+"+bean.getCurrentScore());
