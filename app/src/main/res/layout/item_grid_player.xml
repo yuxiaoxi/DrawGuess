@@ -12,8 +12,8 @@
     <TextView
         android:id="@+id/txt_player_youke_nickname"
         android:layout_width="wrap_content"
-        android:layout_height="30dp"
-        android:layout_marginTop="20dp"
+        android:layout_height="35dp"
+        android:layout_marginTop="30dp"
         android:gravity="center"
         android:layout_centerHorizontal="true"
         android:text="免子"
@@ -34,6 +34,20 @@
         android:paddingTop="2dp"
         android:paddingBottom="2dp"
         android:textColor="@color/white"
+        android:textSize="12sp"/>
+    <TextView
+        android:id="@+id/txt_roomer_count_down"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:background="@drawable/score_ring_shape"
+        android:layout_alignRight="@+id/img_player_avatar"
+        android:layout_alignTop="@+id/img_player_avatar"
+        android:layout_marginTop="2dp"
+        android:layout_marginLeft="5dp"
+        android:gravity="center"
+        android:textColor="@color/white"
+        android:text="0"
+        android:visibility="gone"
         android:textSize="12sp"/>
 
     <TextView

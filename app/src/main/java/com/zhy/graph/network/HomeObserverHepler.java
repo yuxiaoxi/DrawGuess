@@ -172,7 +172,7 @@ public class HomeObserverHepler extends Thread{
                 public void onNext(StompMessage stompMessage) {
                     Response response = new Response(stompMessage.getPayload());
                     Message msg = new Message();
-//					msg.obj = response.model(PlayerBean.class);
+					msg.obj = response.result;
                     msg.what = 0x15;
                     changeUI.sendMessage(msg);
                     Log.e(TAG, "owner.countdown onNext: " + stompMessage.getPayload());

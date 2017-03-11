@@ -64,7 +64,7 @@ public class PlayerRoomGridAdapter extends BaseAdapter{
             viewHolder.avatarImageView = (ImageView) convertView.findViewById(R.id.img_player_room_avatar);
             viewHolder.guessWordsTextView = (TextView) convertView.findViewById(R.id.txt_player_room_guess_word);
             viewHolder.scoreTextView = (TextView) convertView.findViewById(R.id.txt_player_room_score);
-
+            viewHolder.txt_player_youke_nickname = (TextView) convertView.findViewById(R.id.txt_player_youke_nickname);
             convertView.setTag(viewHolder);
         }else{
             viewHolder = (ViewHolder) convertView.getTag();
@@ -76,7 +76,11 @@ public class PlayerRoomGridAdapter extends BaseAdapter{
         }else{
             viewHolder.guessWordsTextView.setVisibility(View.INVISIBLE);
         }
-
+        if(!bean.isYouKe()){
+            viewHolder.txt_player_youke_nickname.setVisibility(View.VISIBLE);
+            viewHolder.txt_player_youke_nickname.setText(bean.getNickname());
+            viewHolder.avatarImageView.setImageResource(R.drawable.white_ring_shape);
+        }
         if(dataList.get(position).isDrawNow()){//正在画的玩家
             viewHolder.avatarImageView.setBackgroundResource(R.drawable.red_ring_rectangle_shape);
         }else{
@@ -97,6 +101,6 @@ public class PlayerRoomGridAdapter extends BaseAdapter{
     public static class ViewHolder{
         private ImageView avatarImageView;
         private TextView guessWordsTextView;
-        private TextView scoreTextView;
+        private TextView scoreTextView,txt_player_youke_nickname;
     }
 }

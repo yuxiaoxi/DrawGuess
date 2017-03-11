@@ -26,6 +26,18 @@
         android:src="@drawable/default_avatar"/>
 
     <TextView
+        android:id="@+id/txt_player_youke_nickname"
+        android:layout_width="wrap_content"
+        android:layout_height="35dp"
+        android:layout_marginTop="20dp"
+        android:gravity="center"
+        android:layout_centerHorizontal="true"
+        android:text="免子"
+        android:textColor="@color/btn_gray_bg"
+        android:textSize="16sp"
+        android:visibility="gone"/>
+
+    <TextView
         android:id="@+id/txt_player_room_score"
         android:layout_width="15dp"
         android:layout_height="15dp"

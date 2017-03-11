@@ -33,7 +33,6 @@ import com.zhy.graph.widget.PopDialog;
 import net.duohuo.dhroid.ioc.annotation.InjectView;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -66,6 +65,9 @@ public class HomeActivity extends BaseAct {
 	@InjectView(id = R.id.txt_home_ready_time_down)
 	private TextView txt_home_ready_time_down;
 
+	@InjectView(id = R.id.txt_roomer_count_down)
+	private TextView txt_roomer_count_down;
+
 
 	private Timer daoTimer;
 	private HomePlayerGridAdapter adapter;
@@ -84,7 +86,7 @@ public class HomeActivity extends BaseAct {
 		setContentView(R.layout.act_home_view);
 		initView();
 		String imei = ((TelephonyManager) context.getSystemService(TELEPHONY_SERVICE)).getDeviceId();
-		netUitl.handleUserCreateFormUsingPOST(String.valueOf(new Date().getTime()),"123456","");
+		netUitl.handleUserCreateFormUsingPOST(imei,"123456","");
 
 	}
 
@@ -96,10 +98,10 @@ public class HomeActivity extends BaseAct {
 		right_image.setImageResource(R.drawable.title_bar_share_icon);
 		titleTextView.setVisibility(View.VISIBLE);
 
-
-		adapter = new HomePlayerGridAdapter(HomeActivity.this,dataList);
-		grid_home.setAdapter(adapter);
 		netUitl = new HomeNetHelper(HomeActivity.this,netRequest);
+		adapter = new HomePlayerGridAdapter(HomeActivity.this,dataList,netUitl);
+		grid_home.setAdapter(adapter);
+
 	}
 
 
@@ -412,7 +414,10 @@ public class HomeActivity extends BaseAct {
 				logout((PlayerBean) msg.obj);
 			} else if(msg.what == 0x14){
 				toReady((PlayerBean) msg.obj,true);
-			} else if(msg.what == 0x16){
+			} else if(msg.what == 0x15){//房主倒计时开始
+				dataList.get(0).setShowCount(true);
+				adapter.notifyDataSetChanged();
+			}else if(msg.what == 0x16){
 				toReady((PlayerBean) msg.obj,false);
 			}else if(msg.what == 0x18){
 //				BaseApplication.obserUitl.getmStompClient().disconnect();
