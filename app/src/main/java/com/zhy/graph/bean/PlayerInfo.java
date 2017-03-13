@@ -20,6 +20,10 @@ public class PlayerInfo {
 
     private String username;
 
+    private boolean showCount;
+
+    private int countDown;
+
     public String getAvater() {
         return avater;
     }
@@ -74,5 +78,21 @@ public class PlayerInfo {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public boolean isShowCount() {
+        return showCount;
+    }
+
+    public void setShowCount(boolean showCount) {
+        this.showCount = showCount;
+    }
+
+    public int getCountDown() {
+        return countDown;
+    }
+
+    public void setCountDown(int countDown) {
+        this.countDown = countDown;
     }
 }

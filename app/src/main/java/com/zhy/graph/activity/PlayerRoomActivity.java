@@ -301,6 +301,9 @@ public class PlayerRoomActivity extends BaseAct{
                     saveCount(5);
 
                 }else{
+                    if(msg.arg1 == 59&&!roomOwner){
+                        txt_play_room_warn_describe.setText(questionData.getKeyword2());
+                    }
                     txt_play_room_time.setText(msg.arg1+"s");
                 }
             } else if (msg.what == 0x11) {//连接后发出handler告诉activity
@@ -352,7 +355,11 @@ public class PlayerRoomActivity extends BaseAct{
             }else if (msg.what == 0x20) {
                 questionData = (QuestionInfo) msg.obj;
                 if(questionData!=null){
-                    txt_play_room_warn_describe.setText(questionData.getKeyword1());
+                    if(roomOwner)
+                        txt_play_room_warn_describe.setText(questionData.getQuestion());
+                    else {
+                        txt_play_room_warn_describe.setText(questionData.getKeyword1());
+                    }
                 }
                 if(roomOwner)
                     return;
