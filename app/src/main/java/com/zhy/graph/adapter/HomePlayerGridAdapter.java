@@ -10,7 +10,6 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.zhy.graph.app.BaseApplication;
 import com.zhy.graph.bean.PlayerInfo;
 import com.zhy.graph.network.HomeNetHelper;
 
@@ -30,12 +29,13 @@ public class HomePlayerGridAdapter extends BaseAdapter{
     private LayoutInflater mInflater;
     private Timer daoTimer;
     private TimerTask task = null;
-    private TextView txt_roomer_count_down;
     private HomeNetHelper netUitl;
-    public HomePlayerGridAdapter(Context context, List<PlayerInfo> data, HomeNetHelper netUitl){
+    private Handler changeUI;
+    public HomePlayerGridAdapter(Context context, List<PlayerInfo> data, HomeNetHelper netUitl, Handler handler){
         this.mContext = context;
         this.dataList = data;
         this.netUitl = netUitl;
+        this.changeUI = handler;
         if(context != null){
             mInflater = LayoutInflater.from(context);
         }
@@ -71,12 +71,11 @@ public class HomePlayerGridAdapter extends BaseAdapter{
         }else{
             viewHolder = (ViewHolder) convertView.getTag();
         }
-
         if(dataList.get(position).isShowCount()){
-            this.txt_roomer_count_down = viewHolder.txt_roomer_count_down;
-            countDown(8,viewHolder.txt_roomer_count_down);
+            viewHolder.txt_roomer_count_down.setVisibility(View.VISIBLE);
+            viewHolder.txt_roomer_count_down.setText(dataList.get(0).getCountDown()+"");
         }else{
-            this.txt_roomer_count_down.setVisibility(View.GONE);
+            viewHolder.txt_roomer_count_down.setVisibility(View.GONE);
         }
 
         if(dataList.get(position).isMe()){
@@ -101,6 +100,11 @@ public class HomePlayerGridAdapter extends BaseAdapter{
 
         viewHolder.nickNameTextView.setText(dataList.get(position).getNickName());
         return convertView;
+    }
+
+
+    public List<PlayerInfo> getDataList(){
+        return dataList;
     }
 
     public void update(List<PlayerInfo> data){
@@ -141,15 +145,15 @@ public class HomePlayerGridAdapter extends BaseAdapter{
         private TextView txt_roomer_count_down;
     }
 
-    private void countDown(int countTime,final TextView textView){
-        textView.setVisibility(View.VISIBLE);
-        textView.setText(countTime+"");
+    public void countDown(){
         daoTimer = new Timer();
         task = new TimerTask() {
             public void run() {
                 Message msg = new Message();
-                msg.what = 0x10;
-                msg.arg1 = Integer.parseInt(textView.getText().toString())-1;
+                msg.what = 0x100;
+                int count = dataList.get(0).getCountDown()-1;
+                dataList.get(0).setCountDown(count);
+                msg.arg1 = count;
                 if(msg.arg1 == 0){
                     daoTimer.cancel();
                 }
@@ -158,20 +162,4 @@ public class HomePlayerGridAdapter extends BaseAdapter{
         };
         daoTimer.schedule(task, 0, 1000);
     }
-
-    private Handler changeUI = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            if (msg.what == 0x10) {
-                if (msg.arg1 == 0) {
-                    txt_roomer_count_down.setText("0");
-                    txt_roomer_count_down.setVisibility(View.GONE);
-                    dataList.get(0).setShowCount(false);
-                    netUitl.leaveRoomUsingGET(BaseApplication.username, 0, null);
-                } else {
-                    txt_roomer_count_down.setText(msg.arg1);
-                }
-            }
-        }
-    };
 }

@@ -301,7 +301,7 @@ public class PlayerRoomActivity extends BaseAct{
                     saveCount(5);
 
                 }else{
-                    if(msg.what == 59&&!roomOwner){
+                    if(msg.arg1 == 59&&!roomOwner){
                         txt_play_room_warn_describe.setText(questionData.getKeyword2());
                     }
                     txt_play_room_time.setText(msg.arg1+"s");

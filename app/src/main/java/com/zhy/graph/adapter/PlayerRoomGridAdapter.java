@@ -76,11 +76,11 @@ public class PlayerRoomGridAdapter extends BaseAdapter{
         }else{
             viewHolder.guessWordsTextView.setVisibility(View.INVISIBLE);
         }
-        if(!bean.isYouKe()){
-            viewHolder.txt_player_youke_nickname.setVisibility(View.VISIBLE);
-            viewHolder.txt_player_youke_nickname.setText(bean.getNickname());
-            viewHolder.avatarImageView.setImageResource(R.drawable.white_ring_shape);
-        }
+
+        viewHolder.txt_player_youke_nickname.setVisibility(View.VISIBLE);
+        viewHolder.txt_player_youke_nickname.setText(bean.getNickname());
+
+
         if(dataList.get(position).isDrawNow()){//正在画的玩家
             viewHolder.avatarImageView.setBackgroundResource(R.drawable.red_ring_rectangle_shape);
         }else{
@@ -89,7 +89,7 @@ public class PlayerRoomGridAdapter extends BaseAdapter{
         if("Empty".equals(dataList.get(position).getStatus())){//已经退出
             viewHolder.avatarImageView.setImageResource(R.drawable.btn_shape_ready_gray);
         }else{
-            viewHolder.avatarImageView.setImageResource(R.drawable.default_avatar);
+            viewHolder.avatarImageView.setImageResource(R.drawable.white_ring_shape);
 
         }
 

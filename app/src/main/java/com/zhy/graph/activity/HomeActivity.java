@@ -68,6 +68,9 @@ public class HomeActivity extends BaseAct {
 	@InjectView(id = R.id.txt_roomer_count_down)
 	private TextView txt_roomer_count_down;
 
+	@InjectView(id = R.id.text_player_nickname)
+	private TextView text_player_nickname;
+
 
 	private Timer daoTimer;
 	private HomePlayerGridAdapter adapter;
@@ -78,7 +81,7 @@ public class HomeActivity extends BaseAct {
 	private String roomId;
 	private HomeNetHelper netUitl = null;
 	private TimerTask task = null;
-
+	private boolean clickReady;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 
@@ -99,7 +102,7 @@ public class HomeActivity extends BaseAct {
 		titleTextView.setVisibility(View.VISIBLE);
 
 		netUitl = new HomeNetHelper(HomeActivity.this,netRequest);
-		adapter = new HomePlayerGridAdapter(HomeActivity.this,dataList,netUitl);
+		adapter = new HomePlayerGridAdapter(HomeActivity.this,dataList,netUitl,changeUI);
 		grid_home.setAdapter(adapter);
 
 	}
@@ -117,8 +120,11 @@ public class HomeActivity extends BaseAct {
 			info.setYouke(true);
 			info.setId(roomInfoBean.getAddedUserList().get(i).getId());
 			info.setUsername(roomInfoBean.getAddedUserList().get(i).getUsername());
-			if((i+1) == Integer.parseInt(roomInfoBean.getNowUserNum()))
+			if((i+1) == Integer.parseInt(roomInfoBean.getNowUserNum())){
 				info.setMe(true);
+				text_player_nickname.setText(info.getNickName());
+			}
+
 			if(i==0&&Integer.parseInt(roomInfoBean.getNowUserNum())==1){
 				roomOwner = true;
 			}else{
@@ -143,6 +149,7 @@ public class HomeActivity extends BaseAct {
 			txt_home_ready_time_down.setText("--");
 			txt_home_ready_ready_btn.setText("开始");
 		}
+
 
 	}
 
@@ -188,7 +195,7 @@ public class HomeActivity extends BaseAct {
 			if(!roomOwner&&daoTimer!=null){
 				daoTimer.cancel();
 			}
-
+			clickReady = false;
 			roomOwner = true;
 			dataList.get(0).setReady(false);
 			dataList.get(0).setMe(true);
@@ -261,7 +268,8 @@ public class HomeActivity extends BaseAct {
 					}
 
 				}else if("准备".equals(txt_home_ready_ready_btn.getText().toString())){
-					daoTimer.cancel();
+					clickReady = true;
+//					daoTimer.cancel();
 					netUitl.userReadyUsingGET(BaseApplication.username,roomId);
 				}else if("已准备".equals(txt_home_ready_ready_btn.getText().toString())){
 //					daoTimer.cancel();
@@ -402,7 +410,12 @@ public class HomeActivity extends BaseAct {
 				if(msg.arg1 == 0){
 					txt_home_ready_time_down.setText("0");
 					txt_home_ready_time_down.setVisibility(View.GONE);
-					netUitl.leaveRoomUsingGET(BaseApplication.username,0,null);
+					if(clickReady){
+						countDown(18);
+					}else{
+						netUitl.leaveRoomUsingGET(BaseApplication.username,0,null);
+					}
+
 				}else{
 					txt_home_ready_time_down.setText(msg.arg1+"s");
 				}
@@ -415,18 +428,37 @@ public class HomeActivity extends BaseAct {
 			} else if(msg.what == 0x14){
 				toReady((PlayerBean) msg.obj,true);
 			} else if(msg.what == 0x15){//房主倒计时开始
-				dataList.get(0).setShowCount(true);
-				adapter.notifyDataSetChanged();
+				if(!roomOwner){
+					daoTimer.cancel();
+					txt_home_ready_time_down.setVisibility(View.GONE);
+					dataList.get(0).setCountDown(8);
+					dataList.get(0).setShowCount(true);
+					adapter.countDown();
+				}else{
+					countDown(8);
+				}
+
 			}else if(msg.what == 0x16){
 				toReady((PlayerBean) msg.obj,false);
 			}else if(msg.what == 0x18){
 //				BaseApplication.obserUitl.getmStompClient().disconnect();
+				if(!roomOwner){
+					daoTimer.cancel();
+				}
 				Intent intent = new Intent();
 				intent.setClass(HomeActivity.this, PlayerRoomActivity.class);
 				intent.putExtra("roomInfoData", (RoomInfoBean) msg.obj);
 				intent.putExtra("roomOwner", roomOwner);
 				intent.putExtra("roomType",0);
 				startActivityForResult(intent, 2);
+			}else if (msg.what == 0x100) {
+				if (msg.arg1 == 0) {
+					adapter.getDataList().get(0).setShowCount(false);
+					if(!roomOwner){
+						countDown(18);
+					}
+				}
+				adapter.notifyDataSetChanged();
 			}
 		}
 	};
@@ -453,12 +485,12 @@ public class HomeActivity extends BaseAct {
 					netUitl.getRandomRoomUsingGET(BaseApplication.username);
 				}
 			} else if(msg.what == 0x12){
-				txt_home_ready_time_down.setVisibility(View.GONE);
+				txt_home_ready_time_down.setVisibility(View.VISIBLE);
 //					adapter.clickReady();
 				txt_home_ready_ready_btn.setText("已准备");
 				txt_home_ready_ready_btn.setTextColor(Color.parseColor("#ffffff"));
 				txt_home_ready_ready_btn.setBackgroundResource(R.drawable.btn_shape_ready_gray);
-				daoTimer.cancel();
+//				daoTimer.cancel();
 			} else if(msg.what == 0x13){
 				txt_home_ready_time_down.setVisibility(View.VISIBLE);
 //					adapter.cancelReady();
