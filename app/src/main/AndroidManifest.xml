@@ -143,8 +143,8 @@
             android:exported="true"
             android:screenOrientation="portrait" />
 
-        <meta-data android:value="YOUR_APP_KEY" android:name="UMENG_APPKEY"/>
-        <meta-data android:value="Channel ID" android:name="UMENG_CHANNEL"/>
+        <meta-data android:value="58d0df728630f50885001480" android:name="UMENG_APPKEY"/>
+        <meta-data android:value="Wandoujia" android:name="UMENG_CHANNEL"/>
 
     </application>
 

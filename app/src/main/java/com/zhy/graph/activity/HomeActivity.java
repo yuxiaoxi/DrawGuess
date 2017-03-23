@@ -87,6 +87,7 @@ public class HomeActivity extends BaseAct {
 
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.act_home_view);
+
 		initView();
 		String imei = ((TelephonyManager) context.getSystemService(TELEPHONY_SERVICE)).getDeviceId();
 		netUitl.handleUserCreateFormUsingPOST(imei,"123456","");
@@ -282,7 +283,7 @@ public class HomeActivity extends BaseAct {
 				if(!roomOwner&&daoTimer!=null){
 					daoTimer.cancel();
 				}
-				popDialog = PopDialog.createDialog(HomeActivity.this, R.layout.pop_join_play_room, Gravity.CENTER,R.style.inputDialog);
+				popDialog = new PopDialog(HomeActivity.this,R.style.inputDialog).setGravity(Gravity.CENTER).setResources(R.layout.pop_join_play_room);
 				((EditText)popDialog.findViewById(R.id.edit_input_room_id)).setOnEditorActionListener(new TextView.OnEditorActionListener() {
 					@Override
 					public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {

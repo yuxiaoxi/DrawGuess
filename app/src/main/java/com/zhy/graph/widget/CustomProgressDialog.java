@@ -12,19 +12,16 @@ import gra.zhy.com.graph.R;
 
 
 public class CustomProgressDialog extends Dialog {
-	private Context context = null;
-	private static CustomProgressDialog customProgressDialog = null;
-
+	private  CustomProgressDialog customProgressDialog = null;
 	public CustomProgressDialog(Context context) {
 		super(context);
-		this.context = context;
 	}
 
 	public CustomProgressDialog(Context context, int theme) {
 		super(context, theme);
 	}
 
-	public static CustomProgressDialog createDialog(Context context) {
+	public  CustomProgressDialog createDialog(Context context) {
 		customProgressDialog = new CustomProgressDialog(context,
 				R.style.CustomProgressDialog);
 		customProgressDialog.setContentView(R.layout.layout_progressdialog);

@@ -3,34 +3,36 @@ package com.zhy.graph.widget;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.view.Window;
+import android.view.WindowManager;
 
-
+/**
+ * @author yuzhuo
+ */
 public class PopDialog extends Dialog {
-	private Context context = null;
-	private static PopDialog customProgressDialog = null;
+
 	public PopDialog(Context context) {
 		super(context);
-		this.context = context;
 	}
 
 	public PopDialog(Context context, int theme) {
 		super(context, theme);
 	}
 
-	public static PopDialog createDialog(Context context, int resouces, int location,int theme) {
-		customProgressDialog = new PopDialog(context,
-				theme);
-		customProgressDialog.setContentView(resouces);
-		customProgressDialog.getWindow().getAttributes().gravity = location;
-
-		return customProgressDialog;
+	public PopDialog setGravity(int location){
+		getWindow().getAttributes().gravity = location;
+		return this;
 	}
 
-	public void onWindowFocusChanged(boolean hasFocus) {
-
-		if (customProgressDialog == null) {
-			return;
-		}
+	public PopDialog setResources(int resources){
+		setContentView(resources);
+		Window win = getWindow();
+		win.getDecorView().setPadding(0, 0, 0, 0);
+		WindowManager.LayoutParams lp = win.getAttributes();
+		lp.width = WindowManager.LayoutParams.FILL_PARENT;
+		lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
+		win.setAttributes(lp);
+		return this;
 	}
 
 }
