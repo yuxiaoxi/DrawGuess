@@ -9,8 +9,6 @@ import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
@@ -72,9 +70,6 @@ public class SelfCenterActivity extends BaseAct implements Callback,
 	@InjectView(id = R.id.img_self_center_avatar)
 	private CircleImageView img_self_center_avatar;
 
-	private PopDialog popDialog = null;
-
-	private PopDialog loginDialog = null;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -107,9 +102,6 @@ public class SelfCenterActivity extends BaseAct implements Callback,
 			setResult(2);
 			finish();
 			break;
-
-
-
 
 		default:
 			break;
@@ -167,11 +159,9 @@ public class SelfCenterActivity extends BaseAct implements Callback,
 			intent.setClass(SelfCenterActivity.this, InviteFriendActivity.class);
 			startActivity(intent);
 		} else if (v.getId() == R.id.item_self_center_distribution_question) {
-			if(popDialog == null){
-				popDialog = PopDialog.createDialog(SelfCenterActivity.this, R.layout.pop_distribution_words, Gravity.CENTER, R.style.inputDialog);
-			}
-
-			((EditText)popDialog.findViewById(R.id.edit_distribution_describe)).setOnEditorActionListener(new TextView.OnEditorActionListener() {
+			final PopDialog popDialog = new PopDialog(SelfCenterActivity.this,R.style.inputDialog).setGravity(Gravity.CENTER).setResources(R.layout.pop_distribution_words);
+			EditText popEdit = (EditText)popDialog.findViewById(R.id.edit_distribution_describe);
+			popEdit.setOnEditorActionListener(new TextView.OnEditorActionListener() {
 				@Override
 				public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
 					if(actionId == EditorInfo.IME_ACTION_SEND){
@@ -183,15 +173,8 @@ public class SelfCenterActivity extends BaseAct implements Callback,
 					return false;
 				}
 			});
-			Window win = popDialog.getWindow();
-			win.getDecorView().setPadding(0, 0, 0, 0);
-			WindowManager.LayoutParams lp = win.getAttributes();
-			lp.width = WindowManager.LayoutParams.FILL_PARENT;
-			lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
-			win.setAttributes(lp);
-			popDialog.setCanceledOnTouchOutside(false);
-
-			if(!popDialog.isShowing()) {
+			popDialog.setCanceledOnTouchOutside(true);
+			if(popDialog!=null&&!popDialog.isShowing()) {
 				popDialog.show();
 			}
 		} else if (v.getId() == R.id.item_self_center_feed_back) {
@@ -201,10 +184,8 @@ public class SelfCenterActivity extends BaseAct implements Callback,
 			intent.setClass(SelfCenterActivity.this, AboutActivity.class);
 			startActivity(intent);
 		} else if(v.getId() == R.id.img_self_center_avatar) {
-			if(loginDialog == null){
-				loginDialog = PopDialog.createDialog(SelfCenterActivity.this, R.layout.pop_select_login_type, Gravity.CENTER, R.style.CustomProgressDialog);
-			}
-
+			final PopDialog loginDialog  = new PopDialog(SelfCenterActivity.this,R.style.CustomProgressDialog).setGravity(Gravity.CENTER).setResources(R.layout.pop_select_login_type);
+//
 			loginDialog.findViewById(R.id.btn_login_qq_bg).setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
@@ -228,12 +209,6 @@ public class SelfCenterActivity extends BaseAct implements Callback,
 				}
 			});
 
-			Window win = loginDialog.getWindow();
-			win.getDecorView().setPadding(0, 0, 0, 0);
-			WindowManager.LayoutParams lp = win.getAttributes();
-			lp.width = WindowManager.LayoutParams.FILL_PARENT;
-			lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
-			win.setAttributes(lp);
 			loginDialog.setCanceledOnTouchOutside(false);
 
 			if(!loginDialog.isShowing()) {
