@@ -8,11 +8,11 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.zhy.graph.R;
 import com.zhy.graph.bean.PlayerBean;
 
 import java.util.List;
 
-import gra.zhy.com.graph.R;
 
 /**
  * Created by yuzhuo on 2017/2/9.

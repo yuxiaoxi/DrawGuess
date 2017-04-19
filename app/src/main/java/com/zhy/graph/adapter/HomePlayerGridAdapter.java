@@ -10,14 +10,13 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.zhy.graph.R;
 import com.zhy.graph.bean.PlayerInfo;
 import com.zhy.graph.network.HomeNetHelper;
 
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-
-import gra.zhy.com.graph.R;
 
 /**
  * Created by yuzhuo on 2017/2/9.

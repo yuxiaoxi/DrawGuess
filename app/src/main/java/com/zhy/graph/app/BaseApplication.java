@@ -9,6 +9,7 @@ import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 import com.squareup.leakcanary.LeakCanary;
 import com.umeng.analytics.MobclickAgent;
+import com.zhy.graph.R;
 import com.zhy.graph.network.HomeObserverHepler;
 
 import net.duohuo.dhroid.Dhroid;
@@ -18,7 +19,6 @@ import net.duohuo.dhroid.ioc.Instance.InstanceScope;
 import net.duohuo.dhroid.ioc.IocContainer;
 
 import cn.sharesdk.framework.ShareSDK;
-import gra.zhy.com.graph.R;
 
 /**
  * 
@@ -32,7 +32,7 @@ public class BaseApplication extends Application {
 
 	public static DisplayImageOptions defaultOptions;
 
-	public static boolean isLogin = true;
+	public static boolean isLogin = false;
 
 	public static  String username;
 

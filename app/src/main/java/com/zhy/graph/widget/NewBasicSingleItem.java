@@ -10,7 +10,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import gra.zhy.com.graph.R;
+import com.zhy.graph.R;
 
 /**
  * Created by yuzhuo on 2017/2/22.

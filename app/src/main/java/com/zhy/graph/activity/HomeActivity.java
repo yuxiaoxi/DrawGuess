@@ -21,6 +21,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.zhy.graph.R;
 import com.zhy.graph.adapter.HomePlayerGridAdapter;
 import com.zhy.graph.app.BaseApplication;
 import com.zhy.graph.bean.PlayerBean;
@@ -28,8 +29,10 @@ import com.zhy.graph.bean.PlayerInfo;
 import com.zhy.graph.bean.RoomInfoBean;
 import com.zhy.graph.network.HomeNetHelper;
 import com.zhy.graph.network.HomeObserverHepler;
+import com.zhy.graph.utils.CusPerference;
 import com.zhy.graph.widget.PopDialog;
 
+import net.duohuo.dhroid.ioc.annotation.Inject;
 import net.duohuo.dhroid.ioc.annotation.InjectView;
 
 import java.util.ArrayList;
@@ -38,7 +41,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import cn.sharesdk.onekeyshare.OnekeyShare;
-import gra.zhy.com.graph.R;
 
 public class HomeActivity extends BaseAct {
 
@@ -71,6 +73,8 @@ public class HomeActivity extends BaseAct {
 	@InjectView(id = R.id.text_player_nickname)
 	private TextView text_player_nickname;
 
+	@Inject
+	private CusPerference perference;
 
 	private Timer daoTimer;
 	private HomePlayerGridAdapter adapter;
@@ -87,10 +91,15 @@ public class HomeActivity extends BaseAct {
 
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.act_home_view);
-
+		perference.load();
 		initView();
-		String imei = ((TelephonyManager) context.getSystemService(TELEPHONY_SERVICE)).getDeviceId();
-		netUitl.handleUserCreateFormUsingPOST(imei,"123456","");
+		if(perference.uid.length()>0){
+			BaseApplication.isLogin = true;
+			netUitl.handleUserCreateFormUsingPOST(perference.uid,"123456","");
+		}else{
+			String imei = ((TelephonyManager) context.getSystemService(TELEPHONY_SERVICE)).getDeviceId();
+			netUitl.handleUserCreateFormUsingPOST(imei,"123456","");
+		}
 
 	}
 
@@ -317,11 +326,9 @@ public class HomeActivity extends BaseAct {
 				break;
 
 			case R.id.image_title_right:
-				if(BaseApplication.isLogin){
-					showShare();
-				}else{
 
-				}
+				showShare();
+
 				break;
 
 		default:
@@ -343,7 +350,13 @@ public class HomeActivity extends BaseAct {
 
 		if(requestCode == 1){
 			onStop = false;
-			netUitl.getRandomRoomUsingGET(BaseApplication.username);
+			if(!BaseApplication.isLogin&&perference.uid.length()>0){//已经登录过了
+				BaseApplication.isLogin = true;
+				netUitl.handleUserCreateFormUsingPOST(perference.uid,"123456","");
+			}else{
+				netUitl.getRandomRoomUsingGET(BaseApplication.username);
+			}
+
 		}else if(requestCode == 2){//游戏退出来后回调
 			onStop = false;
 			if(data!=null){

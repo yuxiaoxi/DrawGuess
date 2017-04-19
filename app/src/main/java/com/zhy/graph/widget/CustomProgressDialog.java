@@ -8,7 +8,7 @@ import android.view.Gravity;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import gra.zhy.com.graph.R;
+import com.zhy.graph.R;
 
 
 public class CustomProgressDialog extends Dialog {

@@ -15,11 +15,13 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
+
+import com.zhy.graph.R;
 import com.zhy.graph.app.AppContext;
 import com.zhy.graph.app.AppManager;
+import com.zhy.graph.bean.VersionInfo;
 import com.zhy.graph.widget.RoundProgressBar;
 
-import com.zhy.graph.bean.VersionInfo;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -28,7 +30,6 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import gra.zhy.com.graph.R;
 
 public class UpdateManager {
 	private Context context;

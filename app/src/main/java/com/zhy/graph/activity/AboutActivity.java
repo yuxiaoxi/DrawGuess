@@ -9,6 +9,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.zhy.graph.R;
 import com.zhy.graph.utils.MyProperUtil;
 
 import net.duohuo.dhroid.ioc.annotation.InjectView;
@@ -19,7 +20,6 @@ import net.duohuo.dhroid.net.Response;
 import java.util.HashMap;
 import java.util.Map;
 
-import gra.zhy.com.graph.R;
 
 public class AboutActivity extends BaseAct {
 

@@ -14,7 +14,7 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.Scroller;
 
-import gra.zhy.com.graph.R;
+import com.zhy.graph.R;
 
 
 /** 单个的下拉刷新控件

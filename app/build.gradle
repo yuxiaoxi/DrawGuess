@@ -5,7 +5,7 @@ android {
     buildToolsVersion "24.0.3"
 
     defaultConfig {
-        applicationId "gra.zhy.com.graph"
+        applicationId "com.zhy.graph"
         minSdkVersion 19
         targetSdkVersion 23
         versionCode 1
@@ -16,6 +16,11 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+    }
+
+    lintOptions{
+        checkReleaseBuilds false
+        abortOnError false
     }
 }
 
