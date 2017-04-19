@@ -9,6 +9,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.zhy.graph.R;
 import com.zhy.graph.utils.CusPerference;
 import com.zhy.graph.utils.MyProperUtil;
 
@@ -21,7 +22,6 @@ import net.duohuo.dhroid.net.Response;
 import java.util.HashMap;
 import java.util.Map;
 
-import gra.zhy.com.graph.R;
 
 public class LoginActivity extends BaseAct {
 

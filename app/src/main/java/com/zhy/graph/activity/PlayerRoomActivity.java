@@ -22,6 +22,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewSwitcher;
 
+import com.zhy.graph.R;
 import com.zhy.graph.adapter.ChatListAdapter;
 import com.zhy.graph.adapter.HomePlayerGridAdapter;
 import com.zhy.graph.adapter.PlayerRoomGridAdapter;
@@ -46,7 +47,6 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import gra.zhy.com.graph.R;
 
 /**
  * Created by yuzhuo on 2017/2/10.
@@ -187,7 +187,8 @@ public class PlayerRoomActivity extends BaseAct{
         playerRoomNetHelper = new PlayerRoomNetHelper(PlayerRoomActivity.this,netRequest);
         dataList = new ArrayList<>();
         chatList = new ArrayList<>();
-        chatDialog = new PopDialog(PlayerRoomActivity.this,R.style.inputDialog).setGravity(Gravity.BOTTOM).setResources(R.layout.include_chat_bottom_bar);
+        chatDialog = new PopDialog(PlayerRoomActivity.this,
+                R.style.inputDialog).setGravity(Gravity.BOTTOM).setResources(R.layout.include_chat_bottom_bar);
 //        chatDialog = ChatInputDialog.createDialog(PlayerRoomActivity.this,roomInfoBean.getRoomId());
         final EditText chatEdit = (EditText)chatDialog.findViewById(R.id.edit_user_comment);
         chatDialog.findViewById(R.id.btn_chat_send).setOnClickListener(new View.OnClickListener() {

@@ -7,11 +7,11 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import com.zhy.graph.R;
 import com.zhy.graph.bean.QuestionInfo;
 
 import java.util.List;
 
-import gra.zhy.com.graph.R;
 
 /**
  * Created by yuzhuo on 2017/2/9.

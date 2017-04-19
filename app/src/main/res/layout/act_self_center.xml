@@ -44,7 +44,7 @@
     <com.zhy.graph.widget.NewBasicSingleItem
         android:id="@+id/item_self_center_invite_friend"
         android:layout_below="@+id/text_self_center_id"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="20dp"
         style="@style/BasicSingleItemStyle"
         yz:item_indicator="@drawable/arrow_normal"
         yz:item_title="邀请好友" />
@@ -71,5 +71,13 @@
         android:layout_below="@+id/item_self_center_feed_back"
         yz:item_indicator="@drawable/arrow_normal"
         yz:item_title="关于" />
+    <com.zhy.graph.widget.NewBasicSingleItem
+        android:id="@+id/item_self_center_logout"
+        style="@style/BasicSingleItemStyle"
+        android:layout_marginTop="20dp"
+        android:layout_below="@+id/item_self_center_about"
+        android:gravity="center"
+        yz:item_indicator="@drawable/arrow_normal"
+        yz:item_title="退出登录" />
 
 </RelativeLayout>
