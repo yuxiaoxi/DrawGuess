@@ -93,14 +93,14 @@ public class HomeActivity extends BaseAct {
 		setContentView(R.layout.act_home_view);
 		perference.load();
 		initView();
-//		if(perference.uid.length()>0){
-//			BaseApplication.isLogin = true;
-//			Log.e(TAG,perference.uid);
-//			netUitl.handleUserCreateFormUsingPOST(perference.uid,"123456",perference.nickName,perference.avatar,"");
-//		}else{
+		if(perference.uid.length()>0){
+			BaseApplication.isLogin = true;
+			Log.e(TAG,perference.uid);
+			netUitl.handleUserCreateFormUsingPOST(perference.uid,"123456",perference.nickName,perference.avatar,"");
+		}else{
 			String imei = ((TelephonyManager) context.getSystemService(TELEPHONY_SERVICE)).getDeviceId();
 			netUitl.handleUserCreateFormUsingPOST(imei,"123456","","","");
-//		}
+		}
 
 	}
 
@@ -356,10 +356,8 @@ public class HomeActivity extends BaseAct {
 
 		if(requestCode == 1){
 			onStop = false;
-			if(!BaseApplication.isLogin&&perference.uid.length()>0){//已经登录过了
-				BaseApplication.isLogin = true;
-				netUitl.getRandomRoomUsingGET(BaseApplication.username);
-//				netUitl.handleUserCreateFormUsingPOST(perference.uid,"123456",perference.nickName,perference.avatar,"");
+			if(BaseApplication.isLogin){//已经登录过了
+				netUitl.handleUserCreateFormUsingPOST(perference.uid,"123456",perference.nickName,perference.avatar,"");
 			}else{
 				netUitl.getRandomRoomUsingGET(BaseApplication.username);
 			}
