@@ -6,7 +6,7 @@ package com.zhy.graph.bean;
 public class ChatInfo {
 
     private String nickName;
-    private String content;
+    private String message;
 
     public String getNickName() {
         return nickName;
@@ -17,10 +17,10 @@ public class ChatInfo {
     }
 
     public String getContent() {
-        return content;
+        return message;
     }
 
     public void setContent(String content) {
-        this.content = content;
+        this.message = content;
     }
 }

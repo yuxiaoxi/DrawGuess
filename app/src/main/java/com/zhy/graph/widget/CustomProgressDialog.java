@@ -15,6 +15,7 @@ public class CustomProgressDialog extends Dialog {
 	private  CustomProgressDialog customProgressDialog = null;
 	public CustomProgressDialog(Context context) {
 		super(context);
+		createDialog(context);
 	}
 
 	public CustomProgressDialog(Context context, int theme) {

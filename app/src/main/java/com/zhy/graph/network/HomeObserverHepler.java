@@ -290,12 +290,9 @@ public class HomeObserverHepler extends Thread{
                 @Override
                 public void onNext(StompMessage stompMessage) {
                     Response response = new Response(stompMessage.getPayload());
-                    ChatInfo info = new ChatInfo();
-                    info.setContent(response.result);
-                    info.setNickName("二二");
                     Message msg = new Message();
                     msg.what = 0x15;
-                    msg.obj = info;
+                    msg.obj = response.model(ChatInfo.class);
                     changeUI.sendMessage(msg);
                     Log.e(TAG, "/game.talk onNext: " + stompMessage.getPayload());
                 }
