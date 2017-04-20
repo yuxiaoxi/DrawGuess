@@ -93,13 +93,14 @@ public class HomeActivity extends BaseAct {
 		setContentView(R.layout.act_home_view);
 		perference.load();
 		initView();
-		if(perference.uid.length()>0){
-			BaseApplication.isLogin = true;
-			netUitl.handleUserCreateFormUsingPOST(perference.uid,"123456","");
-		}else{
+//		if(perference.uid.length()>0){
+//			BaseApplication.isLogin = true;
+//			Log.e(TAG,perference.uid);
+//			netUitl.handleUserCreateFormUsingPOST(perference.uid,"123456",perference.nickName,perference.avatar,"");
+//		}else{
 			String imei = ((TelephonyManager) context.getSystemService(TELEPHONY_SERVICE)).getDeviceId();
-			netUitl.handleUserCreateFormUsingPOST(imei,"123456","");
-		}
+			netUitl.handleUserCreateFormUsingPOST(imei,"123456","","","");
+//		}
 
 	}
 
@@ -127,7 +128,12 @@ public class HomeActivity extends BaseAct {
 		for (int i = 0; i<roomInfoBean.getAddedUserList().size(); i++){
 			PlayerInfo info = new PlayerInfo();
 			info.setNickName(roomInfoBean.getAddedUserList().get(i).getNickname());
-			info.setYouke(true);
+			if(roomInfoBean.getAddedUserList().get(i).getImage()!=null&&roomInfoBean.getAddedUserList().get(i).getImage().length()>0){
+				info.setYouke(false);
+			}else{
+				info.setYouke(true);
+			}
+			info.setAvater(roomInfoBean.getAddedUserList().get(i).getImage());
 			info.setId(roomInfoBean.getAddedUserList().get(i).getId());
 			info.setUsername(roomInfoBean.getAddedUserList().get(i).getUsername());
 			if((i+1) == Integer.parseInt(roomInfoBean.getNowUserNum())){
@@ -352,7 +358,8 @@ public class HomeActivity extends BaseAct {
 			onStop = false;
 			if(!BaseApplication.isLogin&&perference.uid.length()>0){//已经登录过了
 				BaseApplication.isLogin = true;
-				netUitl.handleUserCreateFormUsingPOST(perference.uid,"123456","");
+				netUitl.getRandomRoomUsingGET(BaseApplication.username);
+//				netUitl.handleUserCreateFormUsingPOST(perference.uid,"123456",perference.nickName,perference.avatar,"");
 			}else{
 				netUitl.getRandomRoomUsingGET(BaseApplication.username);
 			}

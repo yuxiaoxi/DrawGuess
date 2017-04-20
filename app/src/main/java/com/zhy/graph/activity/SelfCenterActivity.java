@@ -23,6 +23,7 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.zhy.graph.R;
 import com.zhy.graph.app.BaseApplication;
 import com.zhy.graph.utils.CusPerference;
+import com.zhy.graph.widget.CustomProgressDialog;
 import com.zhy.graph.widget.NewBasicSingleItem;
 import com.zhy.graph.widget.PopDialog;
 
@@ -82,6 +83,8 @@ public class SelfCenterActivity extends BaseAct implements Callback,
 
 	private PopDialog loginDialog = null;
 
+	private CustomProgressDialog customProgressDialog = null;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 
@@ -92,6 +95,7 @@ public class SelfCenterActivity extends BaseAct implements Callback,
 	}
 
 	public void initView(){
+		customProgressDialog = new CustomProgressDialog(SelfCenterActivity.this).setMessage("请稍等……");
 		backLayout.setImageResource(R.drawable.back_left_icon);
 		backLayout.setVisibility(View.VISIBLE);
 		txt_title_name.setTextColor(Color.parseColor("#000000"));
@@ -135,7 +139,9 @@ public class SelfCenterActivity extends BaseAct implements Callback,
 	protected void onResume() {
 		// TODO Auto-generated method stub
 		super.onResume();
-
+		if(customProgressDialog !=null &&customProgressDialog.isShowing()){
+			customProgressDialog.dismiss();
+		}
 	}
 
 	@Override
@@ -184,6 +190,7 @@ public class SelfCenterActivity extends BaseAct implements Callback,
 				@Override
 				public void onClick(View v) {
 					authorize(new QQ(SelfCenterActivity.this));
+					customProgressDialog.show();
 				}
 			});
 
@@ -191,6 +198,7 @@ public class SelfCenterActivity extends BaseAct implements Callback,
 				@Override
 				public void onClick(View v) {
 					authorize(new Wechat(SelfCenterActivity.this));
+					customProgressDialog.show();
 				}
 			});
 
@@ -287,7 +295,9 @@ public class SelfCenterActivity extends BaseAct implements Callback,
 					text_self_center_nickname.setText(perference.nickName);
 					ImageLoader.getInstance().displayImage(perference.avatar,img_self_center_avatar);
 					perference.commit();
-					Toast.makeText(this, R.string.login_success, Toast.LENGTH_SHORT).show();
+					if(!BaseApplication.isLogin) {
+						Toast.makeText(this, R.string.login_success, Toast.LENGTH_SHORT).show();
+					}
 					img_self_center_avatar.setClickable(false);
 					item_self_center_logout.setVisibility(View.VISIBLE);
 				}else{

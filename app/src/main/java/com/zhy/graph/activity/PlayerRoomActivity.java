@@ -198,20 +198,21 @@ public class PlayerRoomActivity extends BaseAct{
                 if(content == null ||content.length() ==0)
                     return;
 
-                BaseApplication.obserUitl.getmStompClient().send("/app/room."+roomInfoBean.getRoomId()+"/talk",content).subscribe();
+                BaseApplication.obserUitl.getmStompClient().send("/app/room."+roomInfoBean.getRoomId()+"/"+BaseApplication.username+"/talk",content).subscribe();
 
                 chatEdit.setText("");
             }
         });
         pop_player_room_chat = (ListView)chatDialog.findViewById(R.id.chat_bottom_player_room_chat);
-        pop_player_room_chat.setOnClickListener(new View.OnClickListener() {
-                @Override
-            public void onClick(View v) {
+        pop_player_room_chat.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 if(chatDialog.isShowing()){
                     chatDialog.dismiss();
                 }
             }
         });
+
         paintList = new ArrayList<>();
 
         hbView = (HuaBanView) findViewById(R.id.huaBanView1);

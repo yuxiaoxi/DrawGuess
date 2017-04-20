@@ -10,6 +10,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.nostra13.universalimageloader.core.ImageLoader;
 import com.zhy.graph.R;
 import com.zhy.graph.bean.PlayerInfo;
 import com.zhy.graph.network.HomeNetHelper;
@@ -88,9 +89,9 @@ public class HomePlayerGridAdapter extends BaseAdapter{
             viewHolder.avatarImageView.setImageResource(R.drawable.white_ring_shape);
         }else{
             viewHolder.youkeNameTextView.setVisibility(View.GONE);
-            viewHolder.avatarImageView.setImageResource(R.drawable.default_avatar);
+//            viewHolder.avatarImageView.setImageResource(R.drawable.default_avatar);
+            ImageLoader.getInstance().displayImage(dataList.get(position).getAvater(),viewHolder.avatarImageView);
         }
-
         if(dataList.get(position).isReady()&&position>0){
             viewHolder.isReadyTextView.setVisibility(View.VISIBLE);
         }else{

@@ -63,7 +63,7 @@ public class HomeNetHelper {
                     msg.obj = roomInfo;
                     msg.what = 0x10;
                     mHandler.sendMessage(msg);
-                    Log.e(TAG,roomInfo.getNowUserNum());
+                    Log.e(TAG,roomInfo.getAddedUserList().toString());
                 }
             }
         });
@@ -305,11 +305,13 @@ public class HomeNetHelper {
      * @param password
      * @param vcode
      */
-    public void handleUserCreateFormUsingPOST(final String userName, final String password, final String vcode) {
+    public void handleUserCreateFormUsingPOST(final String userName, final String password, final String nickname, final String image, final String vcode) {
 
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("username", userName);
         map.put("password",password);
+        map.put("nickname",nickname);
+        map.put("image",image);
         map.put("vcode",vcode);
         System.out.println(map.toString());
         String url = DomainUtils.SERVER_HOST+"/api/v1/create";
