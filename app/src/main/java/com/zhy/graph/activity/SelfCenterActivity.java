@@ -115,7 +115,9 @@ public class SelfCenterActivity extends BaseAct implements Callback,
 		}else{
 			text_self_center_nickname.setText(perference.nickName);
 			ImageLoader.getInstance().displayImage(perference.avatar,img_self_center_avatar);
-			Toast.makeText(this, R.string.login_success, Toast.LENGTH_SHORT).show();
+			if(!BaseApplication.isLogin) {
+				Toast.makeText(this, R.string.login_success, Toast.LENGTH_SHORT).show();
+			}
 			img_self_center_avatar.setClickable(false);
 			item_self_center_logout.setVisibility(View.VISIBLE);
 		}
@@ -176,10 +178,9 @@ public class SelfCenterActivity extends BaseAct implements Callback,
 			intent.setClass(SelfCenterActivity.this, AboutActivity.class);
 			startActivity(intent);
 		} else if (v.getId() == R.id.item_self_center_logout) {
-			perference.clearAll();
-			perference.commit();
 			text_self_center_nickname.setText("未登录");
 			img_self_center_avatar.setImageResource(R.drawable.default_avatar);
+			BaseApplication.isLogin = false;
 			Toast.makeText(this, R.string.logout_success, Toast.LENGTH_SHORT).show();
 			img_self_center_avatar.setClickable(true);
 			item_self_center_logout.setVisibility(View.GONE);
@@ -225,6 +226,9 @@ public class SelfCenterActivity extends BaseAct implements Callback,
 			String userId = plat.getDb().getUserId();
 			Log.e(TAG,userId);
 			if (!TextUtils.isEmpty(userId)) {
+				if(customProgressDialog !=null &&customProgressDialog.isShowing()){
+					customProgressDialog.dismiss();
+				}
 				UIHandler.sendEmptyMessage(MSG_USERID_FOUND, this);
 				login(plat.getName(), userId, null);
 				return;
@@ -298,12 +302,16 @@ public class SelfCenterActivity extends BaseAct implements Callback,
 					if(!BaseApplication.isLogin) {
 						Toast.makeText(this, R.string.login_success, Toast.LENGTH_SHORT).show();
 					}
+					BaseApplication.isLogin = true;
 					img_self_center_avatar.setClickable(false);
 					item_self_center_logout.setVisibility(View.VISIBLE);
 				}else{
 					text_self_center_nickname.setText(perference.nickName);
 					ImageLoader.getInstance().displayImage(perference.avatar,img_self_center_avatar);
-					Toast.makeText(this, R.string.login_success, Toast.LENGTH_SHORT).show();
+					if(!BaseApplication.isLogin) {
+						Toast.makeText(this, R.string.login_success, Toast.LENGTH_SHORT).show();
+					}
+					BaseApplication.isLogin = true;
 					img_self_center_avatar.setClickable(false);
 					item_self_center_logout.setVisibility(View.VISIBLE);
 				}

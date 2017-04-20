@@ -15,6 +15,8 @@ import com.zhy.graph.R;
 import com.zhy.graph.bean.PlayerInfo;
 import com.zhy.graph.network.HomeNetHelper;
 
+import net.duohuo.dhroid.view.megwidget.CircleImageView;
+
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -62,11 +64,12 @@ public class HomePlayerGridAdapter extends BaseAdapter{
         if(convertView == null){
             convertView = this.mInflater.inflate(R.layout.item_grid_player,null,false);
             viewHolder = new ViewHolder();
-            viewHolder.avatarImageView = (ImageView) convertView.findViewById(R.id.img_player_avatar);
+            viewHolder.avatarImageView = (CircleImageView) convertView.findViewById(R.id.img_player_avatar);
             viewHolder.isReadyTextView = (TextView) convertView.findViewById(R.id.txt_player_is_ready);
             viewHolder.nickNameTextView = (TextView) convertView.findViewById(R.id.txt_player_nickname);
             viewHolder.youkeNameTextView = (TextView) convertView.findViewById(R.id.txt_player_youke_nickname);
             viewHolder.txt_roomer_count_down = (TextView) convertView.findViewById(R.id.txt_roomer_count_down);
+            viewHolder.avatarBgImageView = (ImageView) convertView.findViewById(R.id.img_avatar_bg);
             convertView.setTag(viewHolder);
         }else{
             viewHolder = (ViewHolder) convertView.getTag();
@@ -79,9 +82,9 @@ public class HomePlayerGridAdapter extends BaseAdapter{
         }
 
         if(dataList.get(position).isMe()){
-            viewHolder.avatarImageView.setBackgroundResource(R.drawable.border_ring_shape);
+            viewHolder.avatarBgImageView.setVisibility(View.VISIBLE);
         }else{
-            viewHolder.avatarImageView.setBackgroundColor(mContext.getResources().getColor(R.color.transparent));
+            viewHolder.avatarBgImageView.setVisibility(View.GONE);
         }
         if(dataList.get(position).isYouke()){
             viewHolder.youkeNameTextView.setVisibility(View.VISIBLE);
@@ -89,7 +92,6 @@ public class HomePlayerGridAdapter extends BaseAdapter{
             viewHolder.avatarImageView.setImageResource(R.drawable.white_ring_shape);
         }else{
             viewHolder.youkeNameTextView.setVisibility(View.GONE);
-//            viewHolder.avatarImageView.setImageResource(R.drawable.default_avatar);
             ImageLoader.getInstance().displayImage(dataList.get(position).getAvater(),viewHolder.avatarImageView);
         }
         if(dataList.get(position).isReady()&&position>0){
@@ -138,7 +140,8 @@ public class HomePlayerGridAdapter extends BaseAdapter{
     }
 
     public static class ViewHolder{
-        private ImageView avatarImageView;
+        private CircleImageView avatarImageView;
+        private ImageView avatarBgImageView;
         private TextView nickNameTextView;
         private TextView isReadyTextView;
         private TextView youkeNameTextView;
