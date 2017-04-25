@@ -241,7 +241,7 @@ public class HomeActivity extends BaseAct {
 	public boolean haveStartAble(){
 
 		boolean startAble = true;
-		if(dataList.size()<2){
+		if(dataList.size()<3){
 			startAble = false;
 			Toast.makeText(HomeActivity.this,"房间人数不够^~^",Toast.LENGTH_SHORT).show();
 			return startAble;

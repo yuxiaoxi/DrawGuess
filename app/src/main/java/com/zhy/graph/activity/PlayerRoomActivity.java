@@ -57,9 +57,6 @@ public class PlayerRoomActivity extends BaseAct{
     private HuaBanView hbView;
     private GridView playerroomGrid;
 
-    private int paintWidth;
-
-    private int currentTime;
     private Timer timer,coTimer,saveDrawTimer,nextCountTimer;
 
     private String TAG = "PlayRoomActivity";
@@ -137,9 +134,6 @@ public class PlayerRoomActivity extends BaseAct{
     private PopDialog countdownDialog = null;
 
     private RoomInfoBean roomInfoBean = null;
-
-    private List<PlayerBean> dataList;
-
     private List<ChatInfo> chatList;
 
     private boolean roomOwner;
@@ -185,7 +179,6 @@ public class PlayerRoomActivity extends BaseAct{
 
     public void initView() {
         playerRoomNetHelper = new PlayerRoomNetHelper(PlayerRoomActivity.this,netRequest);
-        dataList = new ArrayList<>();
         chatList = new ArrayList<>();
         chatDialog = new PopDialog(PlayerRoomActivity.this,
                 R.style.inputDialog).setGravity(Gravity.BOTTOM).setResources(R.layout.include_chat_bottom_bar);
@@ -204,9 +197,10 @@ public class PlayerRoomActivity extends BaseAct{
             }
         });
         pop_player_room_chat = (ListView)chatDialog.findViewById(R.id.chat_bottom_player_room_chat);
-        pop_player_room_chat.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        View view_click_pop_dismiss = chatDialog.findViewById(R.id.view_click_pop_dismiss);
+        view_click_pop_dismiss.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            public void onClick(View v) {
                 if(chatDialog.isShowing()){
                     chatDialog.dismiss();
                 }
@@ -361,6 +355,8 @@ public class PlayerRoomActivity extends BaseAct{
                 BaseApplication.obserUitl.run();
             } else if (msg.what == 0x15) {//聊天
                 ChatInfo info = (ChatInfo) msg.obj;
+                String name = info.getNickname()+":";
+                info.setNickname(name);
                 chatAdapter.update(info);
                 lv_player_room_chat.setSelection(chatAdapter.getDataList().size()-1);
                 pop_player_room_chat.setSelection(chatAdapter.getDataList().size()-1);
@@ -390,24 +386,34 @@ public class PlayerRoomActivity extends BaseAct{
             } else if (msg.what == 0x24) {//回答正确
                 for (PlayerBean bean:
                 roomInfoBean.getAddedUserList()) {
-                    if(bean.getUsername().equals(((AnswerInfo)msg.obj).getUsername())){
+                    if(bean.getUsername().equals(((AnswerInfo)msg.obj).getNickname())){
                         int score = bean.getCurrentScore()+questionData.getScore();
                         bean.setAnsser(null);
                         bean.setCurrentScore(score);
                     }
                 }
-                Toast.makeText(PlayerRoomActivity.this,"恭喜玩家"+((AnswerInfo)msg.obj).getUsername()+"答对了!",Toast.LENGTH_SHORT).show();
+                Toast.makeText(PlayerRoomActivity.this,"恭喜玩家"+((AnswerInfo)msg.obj).getNickname()+"答对了!",Toast.LENGTH_SHORT).show();
                 adapter.setData(roomInfoBean.getAddedUserList());
                 adapter.notifyDataSetChanged();
+                ChatInfo info = new ChatInfo();
+                info.setNickname("法官:");
+                info.setContent(((AnswerInfo)msg.obj).getNickname()+"回答正确");
+                chatAdapter.update(info);
+                lv_player_room_chat.setSelection(chatAdapter.getDataList().size()-1);
             } else if (msg.what == 0x25) {//回答错误
                 for (PlayerBean bean:
                         roomInfoBean.getAddedUserList()) {
-                    if(bean.getUsername().equals(((AnswerInfo)msg.obj).getUsername())){
+                    if(bean.getUsername().equals(((AnswerInfo)msg.obj).getNickname())){
                         bean.setAnsser(((AnswerInfo)msg.obj).getAnswer());
                     }
                 }
                 adapter.setData(roomInfoBean.getAddedUserList());
                 adapter.notifyDataSetChanged();
+                ChatInfo info = new ChatInfo();
+                info.setNickname("法官:");
+                info.setContent(((AnswerInfo)msg.obj).getNickname()+"回答错误");
+                chatAdapter.update(info);
+                lv_player_room_chat.setSelection(chatAdapter.getDataList().size()-1);
             } else if (msg.what == 0x26) {//清除画板
                 hbView.clearScreen();
             } else if(msg.what == 0x27){//推送分数结果
@@ -466,12 +472,6 @@ public class PlayerRoomActivity extends BaseAct{
                 final List<QuestionInfo> questionList = (List<QuestionInfo>)msg.obj;
                 questionsAdapter = new QuestionsSelectListAdapter(PlayerRoomActivity.this,questionList);
                 questionDialog = new PopDialog(PlayerRoomActivity.this,R.style.CustomProgressDialog).setGravity(Gravity.CENTER).setResources(R.layout.pop_select_guess_word);
-//                Window win = questionDialog.getWindow();
-//                win.getDecorView().setPadding(0, 0, 0, 0);
-//                WindowManager.LayoutParams lp = win.getAttributes();
-//                lp.width = WindowManager.LayoutParams.FILL_PARENT;
-//                lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
-//                win.setAttributes(lp);
                 questionDialog.setCanceledOnTouchOutside(false);
                 questionListView = (ListView)questionDialog.findViewById(R.id.list_guess_word_pop);
                 questionListView.setAdapter(questionsAdapter);
@@ -646,14 +646,6 @@ public class PlayerRoomActivity extends BaseAct{
 
     public void answer(){
         answerDialog = new PopDialog(PlayerRoomActivity.this,R.style.inputDialog).setGravity(Gravity.BOTTOM).setResources(R.layout.pop_ask_answer);
-
-//        answerDialog = PopDialog.createDialog(PlayerRoomActivity.this, R.layout.pop_ask_answer, Gravity.BOTTOM, R.style.inputDialog);
-//        Window win = answerDialog.getWindow();
-//        win.getDecorView().setPadding(0, 0, 0, 0);
-//        WindowManager.LayoutParams lp = win.getAttributes();
-//        lp.width = WindowManager.LayoutParams.FILL_PARENT;
-//        lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
-//        win.setAttributes(lp);
         answerDialog.setCanceledOnTouchOutside(true);
         final EditText answerEdit = (EditText)answerDialog.findViewById(R.id.edit_input_answer);
         answerEdit.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -677,13 +669,6 @@ public class PlayerRoomActivity extends BaseAct{
 
     public void countDownDialog(){
         countdownDialog = new PopDialog(PlayerRoomActivity.this,R.style.CustomProgressDialog).setGravity(Gravity.CENTER).setResources(R.layout.pop_player_batter_performance);
-//        countdownDialog = PopDialog.createDialog(PlayerRoomActivity.this, R.layout.pop_player_batter_performance, Gravity.CENTER, R.style.CustomProgressDialog);
-//        Window win = countdownDialog.getWindow();
-//        win.getDecorView().setPadding(0, 0, 0, 0);
-//        WindowManager.LayoutParams lp = win.getAttributes();
-//        lp.width = WindowManager.LayoutParams.FILL_PARENT;
-//        lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
-//        win.setAttributes(lp);
         txt_count_down  = (TextView)countdownDialog.findViewById(R.id.txt_count_down);
         ((TextView)countdownDialog.findViewById(R.id.txt_winer_score)).setText(getMaxScore().getCurrentScore()+"");
         ((TextView)countdownDialog.findViewById(R.id.txt_loser_score)).setText(getMinScore().getCurrentScore()+"");
@@ -696,14 +681,6 @@ public class PlayerRoomActivity extends BaseAct{
 
     public void saveDraw(final String qustion){
         popDialog = new PopDialog(PlayerRoomActivity.this,R.style.CustomProgressDialog).setGravity(Gravity.CENTER).setResources(R.layout.pop_save_or_share_draw);
-
-//        popDialog = PopDialog.createDialog(PlayerRoomActivity.this, R.layout.pop_save_or_share_draw, Gravity.CENTER, R.style.CustomProgressDialog);
-//        Window win = popDialog.getWindow();
-//        win.getDecorView().setPadding(0, 0, 0, 0);
-//        WindowManager.LayoutParams lp = win.getAttributes();
-//        lp.width = WindowManager.LayoutParams.FILL_PARENT;
-//        lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
-//        win.setAttributes(lp);
         popDialog.setCanceledOnTouchOutside(true);
 
         ((ImageView)popDialog.findViewById(R.id.img_draw_bitmap)).setImageBitmap(hbView.getBitmap());
@@ -813,6 +790,5 @@ public class PlayerRoomActivity extends BaseAct{
                 break;
         }
     }
-
 
 }

@@ -44,6 +44,7 @@
             android:layout_height="60dp"
             android:paddingLeft="30dp"
             android:paddingRight="20dp"
+            android:layout_centerInParent="true"
             android:orientation="horizontal">
             <ImageView
                 android:layout_width="wrap_content"
@@ -61,12 +62,14 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/linear_share_image"
             android:layout_below="@+id/img_draw_bitmap"
             android:layout_width="wrap_content"
             android:layout_marginTop="25dp"
             android:layout_height="60dp"
             android:paddingRight="30dp"
             android:paddingLeft="20dp"
+            android:visibility="gone"
             android:layout_alignParentRight="true"
             android:orientation="horizontal">
             <ImageView
@@ -101,6 +104,7 @@
         android:text="好题"
         android:layout_marginLeft="6dp"
         android:textSize="16sp"
+        android:visibility="gone"
         android:textColor="@color/white"/>
 
     <TextView
@@ -117,6 +121,7 @@
         android:text="差题"
         android:layout_marginLeft="6dp"
         android:textSize="16sp"
+        android:visibility="gone"
         android:textColor="@color/white"/>
 
 </RelativeLayout>

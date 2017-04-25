@@ -10,15 +10,25 @@
         android:layout_height="0.5dp"
         android:visibility="invisible"
         android:background="#E6E6E6" />
-    <ListView
-        android:id="@+id/chat_bottom_player_room_chat"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_marginTop="1dp"
-        android:layout_height="109dp"
-        android:background="@android:color/transparent"
-        android:listSelector="@android:color/transparent"
-        android:divider="@null"
-        android:scrollbars="none"></ListView>
+        android:layout_height="wrap_content">
+
+        <ListView
+            android:id="@+id/chat_bottom_player_room_chat"
+            android:layout_width="match_parent"
+            android:layout_height="109dp"
+            android:layout_marginTop="1dp"
+            android:background="@android:color/transparent"
+            android:divider="@null"
+            android:listSelector="@android:color/transparent"
+            android:scrollbars="none"></ListView>
+        <View
+            android:id="@+id/view_click_pop_dismiss"
+            android:layout_width="match_parent"
+            android:layout_height="109dp"
+            android:background="@color/transparent"/>
+    </FrameLayout>
 
     <View
         android:layout_width="fill_parent"

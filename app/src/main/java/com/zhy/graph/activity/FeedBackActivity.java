@@ -13,15 +13,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.zhy.graph.R;
-import com.zhy.graph.utils.MyProperUtil;
 
 import net.duohuo.dhroid.ioc.annotation.InjectView;
-import net.duohuo.dhroid.net.DhNet;
-import net.duohuo.dhroid.net.NetTask;
-import net.duohuo.dhroid.net.Response;
-
-import java.util.HashMap;
-import java.util.Map;
 
 
 public class FeedBackActivity extends BaseAct {
@@ -98,7 +91,11 @@ public class FeedBackActivity extends BaseAct {
 
 
 		case R.id.text_title_right:
-			Toast.makeText(FeedBackActivity.this,"提交成功!",Toast.LENGTH_SHORT).show();
+			if(isEmpty(edit_feed_back_suggest.getText().toString().trim())){
+				Toast.makeText(FeedBackActivity.this,"反馈内容不能为空!",Toast.LENGTH_SHORT).show();
+				return;
+			}
+			sendMailByIntent(edit_feed_back_suggest.getText().toString());
 			break;
 
 
@@ -111,42 +108,6 @@ public class FeedBackActivity extends BaseAct {
 	protected void onResume() {
 		// TODO Auto-generated method stub
 		super.onResume();
-
-	}
-
-
-	/**
-	 * 
-	 * @Title: doLogin
-	 * @Description: 登录
-	 * @param @param uid
-	 * @return void 返回类型
-	 * @throws
-	 */
-	void doLogin(final String uid, final String password) {
-		Map<String, Object> map = new HashMap<String, Object>();
-		map.put("username", uid);
-		map.put("passwd", password);
-		String url = MyProperUtil.getProperties(this,
-				"appConfigDebugHost.properties").getProperty("Host")
-				+ MyProperUtil.getProperties(this, "appConfigDebug.properties")
-						.getProperty("login");
-		DhNet net = new DhNet(url);
-		net.addParams(map).doPost(new NetTask(this) {
-
-			@Override
-			public void onErray(Response response) {
-
-				super.onErray(response);
-				Toast.makeText(FeedBackActivity.this,"数据请求错误！请您重新再试！",
-						Toast.LENGTH_SHORT).show();
-			}
-
-			@Override
-			public void doInUI(Response response, Integer transfer) {
-
-			}
-		});
 
 	}
 
@@ -165,39 +126,21 @@ public class FeedBackActivity extends BaseAct {
 		}
 		return false;
 	}
-	
-	/**
-	 * 判断帐号是否可用
-	 * 
-	 * @Title: isUserExist
-	 * @Description: TODO(这里用一句话描述这个方法的作用)
-	 * @param @param uid 设定文件
-	 * @return void 返回类型
-	 * @throws
-	 */
-	public void isUserExist(final String userId, final String name, final String avatar,final String type) {
-		
-		Map<String, Object> map = new HashMap<String, Object>();
-		map.put("username", userId);
-		String url = MyProperUtil.getProperties(this,
-				"appConfigDebugHost.properties").getProperty("Host")
-				+ MyProperUtil.getProperties(this, "appConfigDebug.properties")
-						.getProperty("isUserExist");
-		DhNet net = new DhNet(url);
-		net.addParams(map).doPost(new NetTask(this) {
-
-			@Override
-			public void onErray(Response response) {
-
-				super.onErray(response);
-			}
-
-			@Override
-			public void doInUI(Response response, Integer transfer) {
 
 
-			}
-		});
+	public int sendMailByIntent(String body) {
+		String[] reciver = new String[] { "247741082@qq.com" };
+		String[] mySbuject = new String[] { "意见反馈" };
+		String myCc = "cc";
+		Intent myIntent = new Intent(android.content.Intent.ACTION_SEND);
+		myIntent.setType("plain/text");
+		myIntent.putExtra(android.content.Intent.EXTRA_EMAIL, reciver);
+		myIntent.putExtra(android.content.Intent.EXTRA_CC, myCc);
+		myIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, mySbuject);
+		myIntent.putExtra(android.content.Intent.EXTRA_TEXT, body);
+		startActivity(Intent.createChooser(myIntent, "意见反馈"));
+
+		return 1;
 
 	}
 
