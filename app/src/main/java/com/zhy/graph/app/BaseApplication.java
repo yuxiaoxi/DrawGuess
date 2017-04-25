@@ -34,7 +34,7 @@ public class BaseApplication extends Application {
 
 	public static boolean isLogin = false;
 
-	public static  String username;
+	public static  String username,nickname;
 
 	public static HomeObserverHepler obserUitl = null;
 

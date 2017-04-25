@@ -124,7 +124,7 @@ public class PlayerRoomActivity extends BaseAct{
     private List<CoordinateBean> paintList;
 
     private boolean destroyed,connectClosed;
-
+    private boolean answerRight;
     private PopDialog popDialog = null;
 
     //抢答框
@@ -162,7 +162,6 @@ public class PlayerRoomActivity extends BaseAct{
             roomInfoBean.getAddedUserList().get(0).setDrawNow(true);
             BaseApplication.obserUitl.setRoomId(roomInfoBean.getRoomId());
             BaseApplication.obserUitl.setChangeUI(changeUI);
-//            BaseApplication.obserUitl.run();
             currentDrawer = 0;
             nowUserNum = Integer.parseInt(roomInfoBean.getNowUserNum());
             nowPosition = getPosition();
@@ -182,7 +181,6 @@ public class PlayerRoomActivity extends BaseAct{
         chatList = new ArrayList<>();
         chatDialog = new PopDialog(PlayerRoomActivity.this,
                 R.style.inputDialog).setGravity(Gravity.BOTTOM).setResources(R.layout.include_chat_bottom_bar);
-//        chatDialog = ChatInputDialog.createDialog(PlayerRoomActivity.this,roomInfoBean.getRoomId());
         final EditText chatEdit = (EditText)chatDialog.findViewById(R.id.edit_user_comment);
         chatDialog.findViewById(R.id.btn_chat_send).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -386,11 +384,16 @@ public class PlayerRoomActivity extends BaseAct{
             } else if (msg.what == 0x24) {//回答正确
                 for (PlayerBean bean:
                 roomInfoBean.getAddedUserList()) {
-                    if(bean.getUsername().equals(((AnswerInfo)msg.obj).getNickname())){
+                    if(bean.getNickname().equals(((AnswerInfo)msg.obj).getNickname())){
                         int score = bean.getCurrentScore()+questionData.getScore();
                         bean.setAnsser(null);
                         bean.setCurrentScore(score);
+                        if(BaseApplication.nickname.equals(bean.getNickname())){
+                            answerRight = true;
+                            txt_player_room_answer.setClickable(false);
+                        }
                     }
+
                 }
                 Toast.makeText(PlayerRoomActivity.this,"恭喜玩家"+((AnswerInfo)msg.obj).getNickname()+"答对了!",Toast.LENGTH_SHORT).show();
                 adapter.setData(roomInfoBean.getAddedUserList());
@@ -403,7 +406,7 @@ public class PlayerRoomActivity extends BaseAct{
             } else if (msg.what == 0x25) {//回答错误
                 for (PlayerBean bean:
                         roomInfoBean.getAddedUserList()) {
-                    if(bean.getUsername().equals(((AnswerInfo)msg.obj).getNickname())){
+                    if(bean.getNickname().equals(((AnswerInfo)msg.obj).getNickname())){
                         bean.setAnsser(((AnswerInfo)msg.obj).getAnswer());
                     }
                 }
@@ -697,16 +700,32 @@ public class PlayerRoomActivity extends BaseAct{
     }
 
     public void changeToDrawer(){
+        txt_player_room_answer.setClickable(true);
+        answerRight = false;
         if(questionDialog!=null &&questionDialog.isShowing()) {
             questionDialog.dismiss();
         }
+        int playerCount = 0;
         for (PlayerBean bean :
                 roomInfoBean.getAddedUserList()) {
             bean.setAnsser(null);
+            if(!"Empty".equals(bean.getStatus())){
+                playerCount++;
+            }
+        }
+        if(playerCount<2){
+            if(timer != null)
+                timer.cancel();
+            Toast.makeText(PlayerRoomActivity.this,"在线玩家已少于两个,请退出重新开始游戏^~^",Toast.LENGTH_SHORT).show();
+            return;
         }
         roomInfoBean.getAddedUserList().get(currentDrawer%nowUserNum).setDrawNow(false);
 
         currentDrawer ++;
+
+        while("Empty".equals(roomInfoBean.getAddedUserList().get(currentDrawer%nowUserNum).getStatus())){//离线了
+            currentDrawer ++;
+        }
         roomInfoBean.getAddedUserList().get(currentDrawer%nowUserNum).setDrawNow(true);
         if(nowPosition == currentDrawer%nowUserNum){//角色变成画画者
             roomOwner = true;
@@ -716,6 +735,7 @@ public class PlayerRoomActivity extends BaseAct{
         initToDrawer();
         hbView.setPaintWidth(10);
         hbView.setColor(Color.parseColor("#000000"));
+        adapter.setData(roomInfoBean.getAddedUserList());
         adapter.notifyDataSetChanged();
     }
 
@@ -724,6 +744,10 @@ public class PlayerRoomActivity extends BaseAct{
         switch (view.getId()) {
 
             case R.id.txt_player_room_answer:
+                if(answerRight){
+                    Toast.makeText(PlayerRoomActivity.this,"您已回答正确!不需要重复抢答了^~^",Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 answer();
                 break;
 
