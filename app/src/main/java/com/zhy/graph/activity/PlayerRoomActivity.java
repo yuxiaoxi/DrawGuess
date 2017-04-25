@@ -16,6 +16,7 @@ import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -126,13 +127,13 @@ public class PlayerRoomActivity extends BaseAct{
     private boolean destroyed,connectClosed;
     private boolean answerRight;
     private PopDialog popDialog = null;
-
+    private RelativeLayout rel_pop_save_draw;
     //抢答框
     private PopDialog answerDialog = null;
 
     //倒计时弹框
     private PopDialog countdownDialog = null;
-
+    private LinearLayout linear_save_image;
     private RoomInfoBean roomInfoBean = null;
     private List<ChatInfo> chatList;
 
@@ -685,19 +686,24 @@ public class PlayerRoomActivity extends BaseAct{
     public void saveDraw(final String qustion){
         popDialog = new PopDialog(PlayerRoomActivity.this,R.style.CustomProgressDialog).setGravity(Gravity.CENTER).setResources(R.layout.pop_save_or_share_draw);
         popDialog.setCanceledOnTouchOutside(true);
-
+        rel_pop_save_draw = (RelativeLayout)popDialog.findViewById(R.id.rel_pop_save_draw);
+        rel_pop_save_draw.setDrawingCacheEnabled(true);
+        rel_pop_save_draw.buildDrawingCache();
         ((ImageView)popDialog.findViewById(R.id.img_draw_bitmap)).setImageBitmap(hbView.getBitmap());
         ((TextView)popDialog.findViewById(R.id.txt_select_word_describe)).setText(qustion);
+        linear_save_image = (LinearLayout) popDialog.findViewById(R.id.linear_save_image);
         popDialog.findViewById(R.id.linear_save_image).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Utils.saveImageToGallery(PlayerRoomActivity.this,hbView.getBitmap());
+                linear_save_image.setVisibility(View.GONE);
+                Utils.saveImageToGallery(PlayerRoomActivity.this,rel_pop_save_draw.getDrawingCache());
             }
         });
         if(!popDialog.isShowing()) {
             popDialog.show();
         }
     }
+
 
     public void changeToDrawer(){
         txt_player_room_answer.setClickable(true);
