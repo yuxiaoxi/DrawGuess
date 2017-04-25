@@ -125,6 +125,19 @@ public class StringUtil {
 		return getJidByName(userName, jidFor);
 	}
 
+	public static boolean isEmpty(String str){
+		boolean isEmpty = false;
+		if(str == null){
+			isEmpty = true;
+		}else{
+			if(str.length()==0){
+				isEmpty = true;
+			}
+		}
+
+		return isEmpty;
+	}
+
 	/**
 	 * 根据给定的时间字符串，返回月 日 时 分 秒
 	 * 

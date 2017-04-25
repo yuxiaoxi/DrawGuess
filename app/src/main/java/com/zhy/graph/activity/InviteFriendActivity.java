@@ -203,12 +203,12 @@ public class InviteFriendActivity extends BaseAct implements View.OnClickListene
 			return;
 		}
 		Platform.ShareParams sp = new Platform.ShareParams();
-		sp.setShareType(Platform.SHARE_IMAGE);
-		sp.setTitle("测试分享的标题");
+		sp.setShareType(Platform.SHARE_WEBPAGE);
+		sp.setTitle("你画我猜go!go!go!");
 		sp.setTitleUrl("http://sharesdk.cn"); // 标题的超链接
-		sp.setText("测试分享的文本");
+		sp.setText("你画我猜go!go!go!");
 		sp.setImageUrl("http://f1.sharesdk.cn/imgs/2014/02/26/owWpLZo_638x960.jpg");
-
+		sp.setUrl("http://sharesdk.cn");
 		Platform pf = ShareSDK.getPlatform (platform);
 // 设置分享事件回调（注：回调放在不能保证在主线程调用，不可以在里面直接处理UI操作）
 		pf.setPlatformActionListener (new PlatformActionListener() {

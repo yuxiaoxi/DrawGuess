@@ -11,6 +11,7 @@
         android:background="@drawable/waite_shape"
         android:layout_centerHorizontal="true"
         android:text="闭月羞花"
+        android:lines="1"
         android:textColor="@color/white"
         android:textSize="10sp"/>
 

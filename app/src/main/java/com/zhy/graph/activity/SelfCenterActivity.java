@@ -11,7 +11,6 @@ import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -23,15 +22,21 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.zhy.graph.R;
 import com.zhy.graph.app.BaseApplication;
 import com.zhy.graph.utils.CusPerference;
+import com.zhy.graph.utils.DomainUtils;
+import com.zhy.graph.utils.StringUtil;
 import com.zhy.graph.widget.CustomProgressDialog;
 import com.zhy.graph.widget.NewBasicSingleItem;
 import com.zhy.graph.widget.PopDialog;
 
 import net.duohuo.dhroid.ioc.annotation.Inject;
 import net.duohuo.dhroid.ioc.annotation.InjectView;
+import net.duohuo.dhroid.net.DhNet;
+import net.duohuo.dhroid.net.NetTask;
+import net.duohuo.dhroid.net.Response;
 import net.duohuo.dhroid.view.megwidget.CircleImageView;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import cn.sharesdk.framework.Platform;
 import cn.sharesdk.framework.PlatformActionListener;
@@ -82,6 +87,7 @@ public class SelfCenterActivity extends BaseAct implements Callback,
 
 
 	private PopDialog loginDialog = null;
+	private PopDialog questionDialog = null;
 
 	private CustomProgressDialog customProgressDialog = null;
 
@@ -153,23 +159,34 @@ public class SelfCenterActivity extends BaseAct implements Callback,
 			intent.setClass(SelfCenterActivity.this, InviteFriendActivity.class);
 			startActivity(intent);
 		} else if (v.getId() == R.id.item_self_center_distribution_question) {
-			final PopDialog popDialog = new PopDialog(SelfCenterActivity.this,R.style.inputDialog).setGravity(Gravity.CENTER).setResources(R.layout.pop_distribution_words);
-			EditText popEdit = (EditText)popDialog.findViewById(R.id.edit_distribution_describe);
+			if(!BaseApplication.isLogin){
+				showLoginDialog();
+				return;
+			}
+			questionDialog = new PopDialog(SelfCenterActivity.this,R.style.inputDialog).setGravity(Gravity.CENTER).setResources(R.layout.pop_distribution_words);
+			final EditText popEdit = (EditText)questionDialog.findViewById(R.id.edit_distribution_describe);
+			final EditText nameEdit = (EditText)questionDialog.findViewById(R.id.edit_distribution_word_name);
 			popEdit.setOnEditorActionListener(new TextView.OnEditorActionListener() {
 				@Override
 				public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
 					if(actionId == EditorInfo.IME_ACTION_SEND){
-						((InputMethodManager) getSystemService(INPUT_METHOD_SERVICE)).toggleSoftInput(0,InputMethodManager.HIDE_NOT_ALWAYS);
-						if(popDialog.isShowing()) {
-							popDialog.dismiss();
+//						((InputMethodManager) getSystemService(INPUT_METHOD_SERVICE)).toggleSoftInput(0,InputMethodManager.HIDE_NOT_ALWAYS);
+//						if(questionDialog.isShowing()) {
+//							questionDialog.dismiss();
+//						}
+						if(StringUtil.isEmpty(nameEdit.getText().toString().trim())||StringUtil.isEmpty(popEdit.getText().toString().trim())){
+							Toast.makeText(SelfCenterActivity.this,"不能为空!",
+									Toast.LENGTH_SHORT).show();
+						}else{
+							addQuestion(nameEdit.getText().toString().trim(),popEdit.getText().toString().trim(),"");
 						}
 					}
 					return false;
 				}
 			});
-			popDialog.setCanceledOnTouchOutside(true);
-			if(popDialog!=null&&!popDialog.isShowing()) {
-				popDialog.show();
+			questionDialog.setCanceledOnTouchOutside(true);
+			if(questionDialog!=null&&!questionDialog.isShowing()) {
+				questionDialog.show();
 			}
 		} else if (v.getId() == R.id.item_self_center_feed_back) {
 			intent.setClass(SelfCenterActivity.this, FeedBackActivity.class);
@@ -185,38 +202,42 @@ public class SelfCenterActivity extends BaseAct implements Callback,
 			img_self_center_avatar.setClickable(true);
 			item_self_center_logout.setVisibility(View.GONE);
 		}else if(v.getId() == R.id.img_self_center_avatar) {
-			loginDialog  = new PopDialog(SelfCenterActivity.this,R.style.CustomProgressDialog).setGravity(Gravity.CENTER).setResources(R.layout.pop_select_login_type);
+			showLoginDialog();
+		}
+	}
+
+	private void showLoginDialog(){
+		loginDialog  = new PopDialog(SelfCenterActivity.this,R.style.CustomProgressDialog).setGravity(Gravity.CENTER).setResources(R.layout.pop_select_login_type);
 //
-			loginDialog.findViewById(R.id.btn_login_qq_bg).setOnClickListener(new View.OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					authorize(new QQ(SelfCenterActivity.this));
-					customProgressDialog.show();
-				}
-			});
-
-			loginDialog.findViewById(R.id.btn_login_weixin_bg).setOnClickListener(new View.OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					authorize(new Wechat(SelfCenterActivity.this));
-					customProgressDialog.show();
-				}
-			});
-
-			loginDialog.findViewById(R.id.btn_close).setOnClickListener(new View.OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					if(loginDialog.isShowing()) {
-						loginDialog.dismiss();
-					}
-				}
-			});
-
-			loginDialog.setCanceledOnTouchOutside(false);
-
-			if(!loginDialog.isShowing()) {
-				loginDialog.show();
+		loginDialog.findViewById(R.id.btn_login_qq_bg).setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				authorize(new QQ(SelfCenterActivity.this));
+				customProgressDialog.show();
 			}
+		});
+
+		loginDialog.findViewById(R.id.btn_login_weixin_bg).setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				authorize(new Wechat(SelfCenterActivity.this));
+				customProgressDialog.show();
+			}
+		});
+
+		loginDialog.findViewById(R.id.btn_close).setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				if(loginDialog.isShowing()) {
+					loginDialog.dismiss();
+				}
+			}
+		});
+
+		loginDialog.setCanceledOnTouchOutside(false);
+
+		if(!loginDialog.isShowing()) {
+			loginDialog.show();
 		}
 	}
 
@@ -245,6 +266,11 @@ public class SelfCenterActivity extends BaseAct implements Callback,
 		if (action == Platform.ACTION_USER_INFOR) {
 			UIHandler.sendEmptyMessage(MSG_AUTH_COMPLETE, this);
 			login(platform.getName(), platform.getDb().getUserId(), res);
+		}
+//		{ret=0, is_yellow_year_vip=0, figureurl_qq_1=http://q.qlogo.cn/qqapp/1106036077/95E00E4645C6630FBFE72F5DB49692FE/40, nickname=卜早, figureurl_qq_2=http://q.qlogo.cn/qqapp/1106036077/95E00E4645C6630FBFE72F5DB49692FE/100, yellow_vip_level=0, is_lost=0, msg=, city=阿布歇隆, figureurl_1=http://qzapp.qlogo.cn/qzapp/1106036077/95E00E4645C6630FBFE72F5DB49692FE/50, vip=0, figureurl_2=http://qzapp.qlogo.cn/qzapp/1106036077/95E00E4645C6630FBFE72F5DB49692FE/100, level=0, province=, gender=男, is_yellow_vip=0, figureurl=http://qzapp.qlogo.cn/qzapp/1106036077/95E00E4645C6630FBFE72F5DB49692FE/30}
+		if(QQ.NAME.equals(platform.getName())){
+			res.put("openid",platform.getDb().getUserId());
+			res.put("headimgurl",res.get("figureurl_qq_2"));
 		}
 		System.out.println(res);
 		System.out.println("------User Name ---------" + platform.getDb().getUserName());
@@ -291,6 +317,7 @@ public class SelfCenterActivity extends BaseAct implements Callback,
 				//登录处理逻辑
 				HashMap<String, Object> userInfo = (HashMap<String, Object>)msg.obj;
 				if(userInfo!=null){
+
 					perference.uid = (String)userInfo.get("openid");
 					perference.avatar = (String)userInfo.get("headimgurl");
 					perference.nickName = (String)userInfo.get("nickname");
@@ -335,5 +362,36 @@ public class SelfCenterActivity extends BaseAct implements Callback,
 			break;
 		}
 		return false;
+	}
+
+
+	public void addQuestion(final String name, final String key1, final String key2) {
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("name", name);
+		map.put("key1", key1);
+		map.put("key2", key2);
+		String url = DomainUtils.SERVER_HOST+"/api/v1/question/add/";
+		DhNet net = new DhNet(url);
+		net.addParams(map).doGet(new NetTask(SelfCenterActivity.this) {
+
+			@Override
+			public void onErray(Response response) {
+
+				super.onErray(response);
+				Toast.makeText(SelfCenterActivity.this,"数据请求错误！请您重新再试！",
+						Toast.LENGTH_SHORT).show();
+			}
+
+			@Override
+			public void doInUI(Response response, Integer transfer) {
+//				((InputMethodManager) getSystemService(INPUT_METHOD_SERVICE)).toggleSoftInput(0,InputMethodManager.HIDE_NOT_ALWAYS);
+//				if(questionDialog.isShowing()) {
+//					questionDialog.dismiss();
+//				}
+				Toast.makeText(SelfCenterActivity.this,response.msg,
+						Toast.LENGTH_SHORT).show();
+			}
+		});
+
 	}
 }

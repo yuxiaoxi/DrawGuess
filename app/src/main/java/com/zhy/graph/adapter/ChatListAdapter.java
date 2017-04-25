@@ -59,7 +59,8 @@ public class ChatListAdapter extends BaseAdapter{
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        viewHolder.nameTextView.setText(dataList.get(position).getNickName());
+        viewHolder.nameTextView.setText(dataList.get(position).getNickname()
+        );
         viewHolder.contentTextView.setText(dataList.get(position).getContent());
 
         return convertView;
