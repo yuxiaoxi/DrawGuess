@@ -205,10 +205,10 @@ public class InviteFriendActivity extends BaseAct implements View.OnClickListene
 		Platform.ShareParams sp = new Platform.ShareParams();
 		sp.setShareType(Platform.SHARE_WEBPAGE);
 		sp.setTitle("你画我猜go!go!go!");
-		sp.setTitleUrl("http://sharesdk.cn"); // 标题的超链接
-		sp.setText("你画我猜go!go!go!");
-		sp.setImageUrl("http://f1.sharesdk.cn/imgs/2014/02/26/owWpLZo_638x960.jpg");
-		sp.setUrl("http://sharesdk.cn");
+		sp.setTitleUrl("http://sj.qq.com/myapp/detail.htm?apkName=com.zhy.graph"); // 标题的超链接
+		sp.setText("菊长手把手教你如何撩妹!");
+		sp.setImageUrl("https://thumbnail0.baidupcs.com/thumbnail/076045b6d6b35945be577217c71fea0b?fid=622204658-250528-925177685278487&time=1493190000&rt=sh&sign=FDTAER-DCb740ccc5511e5e8fedcff06b081203-FNzxHV9ATlNiyG3bCmE%2BWHjZg40%3D&expires=8h&chkv=0&chkbd=0&chkpc=&dp-logid=2681861173436973243&dp-callid=0&size=c710_u400&quality=100");
+		sp.setUrl("http://sj.qq.com/myapp/detail.htm?apkName=com.zhy.graph");
 		Platform pf = ShareSDK.getPlatform (platform);
 // 设置分享事件回调（注：回调放在不能保证在主线程调用，不可以在里面直接处理UI操作）
 		pf.setPlatformActionListener (new PlatformActionListener() {
