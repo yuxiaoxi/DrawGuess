@@ -552,15 +552,15 @@ public class HomeActivity extends BaseAct {
 		// title标题，印象笔记、邮箱、信息、微信、人人网、QQ和QQ空间使用
 		oks.setTitle("你画我猜go!go!go!");
 		// titleUrl是标题的网络链接，仅在Linked-in,QQ和QQ空间使用
-		oks.setTitleUrl("http://sharesdk.cn");
+		oks.setTitleUrl("http://sj.qq.com/myapp/detail.htm?apkName=com.zhy.graph");
 		// text是分享文本，所有平台都需要这个字段
-		oks.setText("你画我猜go!go!go!");
+		oks.setText("菊长手把手教你如何撩妹!");
 		//分享网络图片，新浪微博分享网络图片需要通过审核后申请高级写入接口，否则请注释掉测试新浪微博
-		oks.setImageUrl("http://f1.sharesdk.cn/imgs/2014/02/26/owWpLZo_638x960.jpg");
+		oks.setImageUrl("https://thumbnail0.baidupcs.com/thumbnail/076045b6d6b35945be577217c71fea0b?fid=622204658-250528-925177685278487&time=1493190000&rt=sh&sign=FDTAER-DCb740ccc5511e5e8fedcff06b081203-FNzxHV9ATlNiyG3bCmE%2BWHjZg40%3D&expires=8h&chkv=0&chkbd=0&chkpc=&dp-logid=2681861173436973243&dp-callid=0&size=c710_u400&quality=100");
 		// imagePath是图片的本地路径，Linked-In以外的平台都支持此参数
 		//oks.setImagePath("/sdcard/test.jpg");//确保SDcard下面存在此张图片
 		// url仅在微信（包括好友和朋友圈）中使用
-		oks.setUrl("http://sharesdk.cn");
+		oks.setUrl("http://sj.qq.com/myapp/detail.htm?apkName=com.zhy.graph");
 		// comment是我对这条分享的评论，仅在人人网和QQ空间使用
 //		oks.setComment("我是测试评论文本");
 		// site是分享此内容的网站名称，仅在QQ空间使用
