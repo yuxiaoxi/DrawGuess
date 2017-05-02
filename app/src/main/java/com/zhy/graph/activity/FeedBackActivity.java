@@ -129,7 +129,7 @@ public class FeedBackActivity extends BaseAct {
 
 
 	public int sendMailByIntent(String body) {
-		String[] reciver = new String[] { "247741082@qq.com" };
+		String[] reciver = new String[] { "suao1989@163.com" };
 		String[] mySbuject = new String[] { "意见反馈" };
 		String myCc = "cc";
 		Intent myIntent = new Intent(android.content.Intent.ACTION_SEND);
