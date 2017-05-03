@@ -524,12 +524,14 @@ public class HomeActivity extends BaseAct {
 					popDialog.dismiss();
 				}
 				popDismiss = true;
+				BaseApplication.obserUitl.getmStompClient().disconnect();
 				Intent intent = new Intent();
 				intent.setClass(HomeActivity.this,PlayerRoomActivity.class);
 				intent.putExtra("roomInfoData",(RoomInfoBean)msg.obj);
 				intent.putExtra("roomType",1);
 				startActivityForResult(intent,1);
 			} else if(msg.what == 0x15){
+				BaseApplication.obserUitl.getmStompClient().disconnect();
 				Intent intent = new Intent();
 				intent.setClass(HomeActivity.this,PlayerRoomActivity.class);
 				intent.putExtra("roomInfoData",(RoomInfoBean)msg.obj);

@@ -106,7 +106,10 @@ public class HomeNetHelper {
                         mHandler.sendMessage(msg);
                     }
 
-
+                }else{
+                    if(type == 2){
+                        intoRoomUsingGET(username,roomId);
+                    }
                 }
             }
         });

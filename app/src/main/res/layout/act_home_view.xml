@@ -67,7 +67,7 @@
             android:layout_alignParentBottom="true"
             android:layout_alignParentLeft="true"
             android:layout_marginBottom="30dp"
-            android:visibility="gone"
+            android:visibility="visible"
             android:background="@drawable/btn_shape_gray"
             android:textSize="16sp"/>
         <TextView
@@ -82,7 +82,7 @@
             android:layout_marginBottom="8dp"
             android:paddingBottom="8dp"
             android:background="@drawable/warn_pop_show_bg"
-            android:visibility="gone"
+            android:visibility="visible"
             android:textSize="12sp"/>
         <TextView
             android:id="@+id/txt_home_join_player_room"
@@ -93,7 +93,7 @@
             android:text="进入房间"
             android:textColor="@color/btn_gray_bg"
             android:gravity="center"
-            android:visibility="gone"
+            android:visibility="visible"
             android:layout_marginBottom="30dp"
             android:layout_marginRight="20dp"
             android:background="@drawable/btn_shape_gray"

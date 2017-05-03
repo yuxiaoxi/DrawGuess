@@ -26,6 +26,7 @@ public class PlayerRoomNetHelper {
     private Context mContext;
 
     private Handler mHandler;
+    private boolean successGame = true;
 
     public PlayerRoomNetHelper(Context context, Handler handler){
         this.mContext = context;
@@ -103,6 +104,47 @@ public class PlayerRoomNetHelper {
                     msg.what = 0x19;
                     mHandler.sendMessage(msg);
                     Log.e(TAG,response.result);
+                }
+            }
+        });
+
+    }
+
+    public void gameStartUsingGET(final String username, final String roomId) {
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("username", username);
+        map.put("roomId", roomId);
+        String url = DomainUtils.SERVER_HOST+"/api/v1/room/"+roomId+"/start";
+
+
+        DhNet  gameNet = new DhNet(url);
+        if (!successGame) {
+            Toast.makeText(mContext, "已经在请求中....您稍等", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        successGame = false;
+        gameNet.addParams(map).doGet(new NetTask(mContext) {
+
+            @Override
+            public void onErray(Response response) {
+
+                super.onErray(response);
+                successGame = true;
+                Toast.makeText(mContext,"数据请求错误！请您重新再试！",
+                        Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void doInUI(Response response, Integer transfer) {
+                successGame = true;
+                if("1".equals(response.code)) {//获取成功
+
+                    RoomInfoBean roomInfo = response.modelFromData(RoomInfoBean.class);
+                    Message msg = new Message();
+                    msg.what = 0x20;
+                    mHandler.sendMessage(msg);
+                    Log.e(TAG,roomInfo.getNowUserNum());
                 }
             }
         });

@@ -137,7 +137,7 @@ public class PlayerRoomActivity extends BaseAct{
     private RoomInfoBean roomInfoBean = null;
     private List<ChatInfo> chatList;
 
-    private boolean roomOwner;
+    private boolean roomOwner,gameStarted;
     private QuestionInfo questionData = null;
 
     private int currentDrawer,nowPosition,nowUserNum;
@@ -163,9 +163,15 @@ public class PlayerRoomActivity extends BaseAct{
             roomInfoBean.getAddedUserList().get(0).setDrawNow(true);
             BaseApplication.obserUitl.setRoomId(roomInfoBean.getRoomId());
             BaseApplication.obserUitl.setChangeUI(changeUI);
+            if(roomType == 1){
+                BaseApplication.obserUitl.run();
+            }
             currentDrawer = 0;
             nowUserNum = Integer.parseInt(roomInfoBean.getNowUserNum());
             nowPosition = getPosition();
+            if(nowPosition == 0){
+                roomOwner = true;
+            }
         }
 
     }
@@ -222,7 +228,35 @@ public class PlayerRoomActivity extends BaseAct{
         lv_player_room_chat.setAdapter(chatAdapter);
 
         pop_player_room_chat.setAdapter(chatAdapter);
-        initToDrawer();
+        if(roomType == 0){
+            initToDrawer();
+        }else{
+            initCreateDrawer();
+        }
+    }
+
+    private void initCreateDrawer(){
+        for (PlayerBean bean: roomInfoBean.getAddedUserList()
+                ) {
+            bean.setStatus("Ready");
+        }
+        txt_play_room_warn_describe.setText("房间号:"+roomInfoBean.getRoomId());
+        txt_play_room_time.setVisibility(View.INVISIBLE);
+        viewswitch.setVisibility(View.INVISIBLE);
+        if(nowUserNum>1&&roomOwner){
+            txt_player_room_answer.setVisibility(View.VISIBLE);
+            txt_player_room_answer.setText("开始");
+        }else{
+            txt_player_room_answer.setVisibility(View.GONE);
+            txt_player_room_answer.setText("抢答");
+        }
+        hbView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                return true;
+            }
+        });
+
     }
 
     public int getPosition(){
@@ -243,10 +277,10 @@ public class PlayerRoomActivity extends BaseAct{
     public void initToDrawer(){
         hbView.clearScreen();
 
-        if(roomOwner&&roomType == 0) {
+        if(roomOwner) {
 
             txt_player_room_answer.setVisibility(View.GONE);
-            txt_player_room_answer.setText("开始");
+            txt_player_room_answer.setText("抢答");
             viewswitch.setVisibility(View.VISIBLE);
             hbView.setOnTouchListener(new View.OnTouchListener() {
 
@@ -323,7 +357,10 @@ public class PlayerRoomActivity extends BaseAct{
             } else if (msg.what == 0x11) {//连接后发出handler告诉activity
                 // dialog.show();
                 Log.e(TAG, "Stomp reconnection opened");
-            } else if(msg.what == 0x13){//有玩家退出
+            } else if (msg.what == 0x12) {//有玩家进来
+                playerLogin((PlayerBean)msg.obj);
+                Log.e(TAG, "有玩家进来");
+            }else if(msg.what == 0x13){//有玩家退出
                 logout((PlayerBean)msg.obj);
             }else if(msg.what == 0x133){
                 if(msg.arg1 == 0){
@@ -422,10 +459,35 @@ public class PlayerRoomActivity extends BaseAct{
                 hbView.clearScreen();
             } else if(msg.what == 0x27){//推送分数结果
                 roomInfoBean = (RoomInfoBean) msg.obj;
+            }else if(msg.what == 0x18){
+                gameStarted = true;
+                initToDrawer();
             }
         }
     };
 
+    private void playerLogin(PlayerBean playerBean){
+        if(playerBean==null)
+            return;
+        boolean isInit = false;
+        for (PlayerBean info: adapter.getData()
+                ) {
+            if(info.getId().equals(playerBean.getId())){
+                isInit = true;
+                break;
+            }
+        }
+        if(isInit)
+            return;
+        playerBean.setStatus("Ready");
+        adapter.getData().add(playerBean);
+        if(adapter.getData().size()>1&&roomOwner){
+            txt_player_room_answer.setVisibility(View.VISIBLE);
+            txt_player_room_answer.setText("开始");
+        }
+        nowUserNum = adapter.getData().size();
+        adapter.notifyDataSetChanged();
+    }
 
     public void logout(PlayerBean playerBean){
         if(playerBean==null)
@@ -433,10 +495,24 @@ public class PlayerRoomActivity extends BaseAct{
         for (PlayerBean bean: adapter.getData()
                 ) {
             if(bean.getId().equals(playerBean.getId())){
-               bean.setStatus("Empty");
+                if(gameStarted){
+                    bean.setStatus("Empty");
+                }else{
+                    adapter.getData().remove(bean);
+                }
                 break;
             }
         }
+        if(roomType == 1) {
+            if (getPosition() == 0) {
+                adapter.getData().get(0).setDrawNow(true);
+                roomOwner = true;
+            }
+            if (adapter.getData().size() < 2 && roomOwner) {
+                txt_player_room_answer.setVisibility(View.GONE);
+            }
+        }
+        nowUserNum = adapter.getData().size();
         adapter.notifyDataSetChanged();
     }
 
@@ -750,6 +826,11 @@ public class PlayerRoomActivity extends BaseAct{
         switch (view.getId()) {
 
             case R.id.txt_player_room_answer:
+                if("开始".equals(txt_player_room_answer.getText())&&roomOwner){//创建房间还未开始情况
+                    //请求开始
+                    playerRoomNetHelper.gameStartUsingGET(BaseApplication.username,roomInfoBean.getRoomId());
+                    return;
+                }
                 if(answerRight){
                     Toast.makeText(PlayerRoomActivity.this,"您已回答正确!不需要重复抢答了^~^",Toast.LENGTH_SHORT).show();
                     return;
